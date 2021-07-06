@@ -126,6 +126,9 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         Map<Integer, IYModel> selectedSeries = initSeries(ss, filter);
 
         List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
+        if(threadQuarkList.isEmpty()) {
+            return Collections.emptyList();
+        }
         Collection<Long> times = getTimes(filter, ss.getStartTime(), currentEnd);
         for (ITmfStateInterval interval : ss.query2D(threadQuarkList, times)) {
             if (monitor != null && monitor.isCanceled()) {
@@ -174,7 +177,6 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
                 }
             }
         }
-
         ImmutableList.Builder<IYModel> ySeries = ImmutableList.builder();
 
         String total = getTrace().getName() + MemoryUsageTreeModel.TOTAL_SUFFIX;
