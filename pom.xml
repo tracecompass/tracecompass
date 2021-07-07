@@ -65,6 +65,8 @@
     <SWT_GTK3>0</SWT_GTK3>
 
     <!-- Sonar rule configuration -->
+    <sonar-version>3.9.0.2155</sonar-version>
+    <jacoco-version>0.8.7</jacoco-version>
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.java.source>${jdk.version}</sonar.java.source>
@@ -187,7 +189,7 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.4</version>
+            <version>${jacoco-version}</version>
             <executions>
               <execution>
                 <id>pre-test</id>
@@ -649,7 +651,7 @@
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
-          <version>3.2</version>
+          <version>${sonar-version}</version>
         </plugin>
 
         <plugin>
