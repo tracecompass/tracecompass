@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class CtfIteratorManager {
     public CtfIteratorManager(CtfTmfTrace trace) {
         fMap = new HashMap<>();
         fRandomAccess = new ArrayList<>();
-        fRnd = new Random(System.nanoTime());
+        fRnd = new SecureRandom();
         fTrace = trace;
     }
 
