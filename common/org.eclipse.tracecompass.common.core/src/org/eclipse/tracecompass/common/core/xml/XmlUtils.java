@@ -13,6 +13,8 @@ package org.eclipse.tracecompass.common.core.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +32,8 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.common.core.Activator;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -43,6 +46,8 @@ import org.xml.sax.SAXNotSupportedException;
  * @since 3.2
  */
 public final class XmlUtils {
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(XmlUtils.class);
 
     private static final String EMPTY = ""; //$NON-NLS-1$
     private static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl"; //$NON-NLS-1$
@@ -93,7 +98,12 @@ public final class XmlUtils {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             // This one is from Sonar (squid:S2755)
-            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            feature = XMLConstants.FEATURE_SECURE_PROCESSING;
+            dbf.setFeature(feature, true);
+        } catch (ParserConfigurationException e) {
+            logException(feature, e);
+        }
+        try {
             // This is the PRIMARY defense. If DTDs (doctypes) are disallowed,
             // almost all
             // XML entity attacks are prevented
@@ -102,6 +112,10 @@ public final class XmlUtils {
             feature = DISALLOW_DOCTYPE_DECL;
             dbf.setFeature(feature, true);
 
+        } catch (ParserConfigurationException e) {
+            logException(feature, e);
+        }
+        try {
             // If you can't completely disable DTDs, then at least do the
             // following:
             // Xerces 1 -
@@ -111,7 +125,10 @@ public final class XmlUtils {
             // JDK7+ - http://xml.org/sax/features/external-general-entities
             feature = ACCESS_EXTERNAL_GENERAL_ENTITIES;
             dbf.setFeature(feature, false);
-
+        } catch (ParserConfigurationException e) {
+            logException(feature, e);
+        }
+        try {
             // Xerces 1 -
             // http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
             // Xerces 2 -
@@ -119,29 +136,26 @@ public final class XmlUtils {
             // JDK7+ - http://xml.org/sax/features/external-parameter-entities
             feature = USE_EXTERNAL_PARAMETER_ENTITIES;
             dbf.setFeature(feature, false);
-
+        } catch (ParserConfigurationException e) {
+            logException(feature, e);
+        }
+        try {
             // Disable external DTDs as well
             feature = NONVALIDATING_LOAD_EXTERNAL_DTD;
             dbf.setFeature(feature, false);
-
-            // and these as well, per Timothy Morgan's 2014 paper: "XML Schema,
-            // DTD, and Entity Attacks"
-            dbf.setXIncludeAware(false);
-            dbf.setExpandEntityReferences(false);
-
-            // And, per Timothy Morgan:
-            // "If for some reason support for inline  DOCTYPEs are a requirement, then  ensure
-            // the entity settings are disabled (as shown above) and beware that SSRF attacks
-            // (http://cwe.mitre.org/data/definitions/918.html)
-            // and denial of service attacks (such as billion laughs or decompression bombs via
-            // "jar:") are a risk."
-
         } catch (ParserConfigurationException e) {
-            // This should catch a failed setFeature feature
-            Activator.instance().logInfo("ParserConfigurationException was thrown. The feature '" + feature //$NON-NLS-1$
-                    + "' is probably not supported by your XML processor.", e); //$NON-NLS-1$
-        }
+            logException(feature, e);
+        } // and these as well, per Timothy Morgan's 2014 paper: "XML Schema,
+          // DTD, and Entity Attacks"
+        dbf.setXIncludeAware(false);
+        dbf.setExpandEntityReferences(false);
+
         return dbf;
+    }
+
+    private static void logException(String feature, ParserConfigurationException e) {
+        // This should catch a failed setFeature feature
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING,  "ParserConfigurationException" , "feature", feature, "stack", e.getStackTrace()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     /**
