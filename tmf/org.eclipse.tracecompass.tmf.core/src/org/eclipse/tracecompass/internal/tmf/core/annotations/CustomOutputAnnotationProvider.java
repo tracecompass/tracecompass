@@ -79,7 +79,7 @@ public class CustomOutputAnnotationProvider implements IOutputAnnotationProvider
          * if the trace is not the first element of its trace set.
          */
         if ((requestedTrace.isPresent() && !requestedTrace.get().equals(fTrace)) ||
-                (requestedTrace.isEmpty() && !isFirstTrace())) {
+                (!requestedTrace.isPresent() && !isFirstTrace())) {
             return new TmfModelResponse<>(null, Status.COMPLETED, ""); //$NON-NLS-1$
         }
         if (markerID == null) {
