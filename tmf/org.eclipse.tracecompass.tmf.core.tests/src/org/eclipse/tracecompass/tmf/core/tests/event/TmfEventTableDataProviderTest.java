@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableColumnDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableDataProvider.Direction;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableFilterModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.EventTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
@@ -36,7 +37,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVi
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.TmfVirtualTableModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.VirtualTableCell;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -321,8 +321,45 @@ public class TmfEventTableDataProviderTest {
     }
 
     /**
+     * Given a start index, count and a list of desired columns, we check model returned by
+     * the data provider. We also apply a search filter on a single column, where no event matches
+     * the search expression.
+     */
+    @Test
+    public void testDataProviderWithSearchNoMatch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
+        // Query for the index for the first matching event
+        VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, 1, null);
+        Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "Does not exits");
+
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_DIRECTION_KEY, Direction.NEXT.name());
+
+        List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
+        TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
+        List<EventTableLine> expectedData = Collections.emptyList();
+
+        TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
+        ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
+        currentModel = response.getModel();
+        assertNotNull(currentModel);
+        assertTrue(currentModel.getLines().isEmpty());
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        assertEquals(expectedModel, currentModel);
+    }
+
+    /**
      * Given a start index, count and a list of desired columns, we check model
-     * returned by the data provider. We also apply a search filter on a single column.
+     * returned by the data provider. We also apply a search filter on a single
+     * column to search NEXT from the start index.
      */
     @Test
     public void testDataProviderWithSimpleSingleColumnsSearch() {
@@ -340,7 +377,7 @@ public class TmfEventTableDataProviderTest {
         searchExpressions.put(eventTypeColumnId, "Type-2");
 
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
-        parameters.put(DataProviderParameterUtils.FILTERED_KEY, true);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_DIRECTION_KEY, Direction.NEXT.name());
 
         List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
@@ -351,7 +388,7 @@ public class TmfEventTableDataProviderTest {
         TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
         ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
 
-        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 2, 10000);
         assertEquals(expectedModel, currentModel);
 
         // Query for events with search filter active. Matching lines will be tagged for highlighting
@@ -377,6 +414,127 @@ public class TmfEventTableDataProviderTest {
 
     /**
      * Given a start index, count and a list of desired columns, we check model
+     * returned by the data provider. We also apply a search filter on a single
+     * column to search NEXT from the start index. N number of events from
+     * the first matched event will be returned by the data provider.
+     */
+    @Test
+    public void testDataProviderWithGetDataFromSearchForwardMatch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
+        // Query for the index for the first matching event
+        int nbEventsRequested = 3;
+        VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, nbEventsRequested, null);
+        Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "Type-2");
+
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_DIRECTION_KEY, Direction.NEXT.name());
+
+        List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
+        TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
+        List<EventTableLine> expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-2"), new VirtualTableCell(lineTimestamp(3))), 2, TmfTimestamp.fromMillis(3), 2, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-3"), new VirtualTableCell(lineTimestamp(4))), 3, TmfTimestamp.fromMillis(4), 3, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-4"), new VirtualTableCell(lineTimestamp(5))), 4, TmfTimestamp.fromMillis(5), 4, 0));
+        expectedData.get(0).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+
+        TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
+        ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
+
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 2, 10000);
+        assertNotNull(currentModel);
+        assertEquals(nbEventsRequested, currentModel.getLines().size());
+        assertEquals(expectedModel, currentModel);
+    }
+
+    /**
+     * Given a start index, count and a list of desired columns, we check model
+     * returned by the data provider. We also apply a search filter on a single column
+     * with search direction PREVIOUS.
+     */
+    @Test
+    public void testDataProviderWithSimpleSingleColumnsIndexBackwardsSearch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
+        // Query for the index for the first matching event backwards, starting at index 10
+        VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 10, 1, null);
+        Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "Type-2");
+
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_DIRECTION_KEY, Direction.PREVIOUS.name());
+
+        List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
+        TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
+        List<EventTableLine> expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-2"), new VirtualTableCell(lineTimestamp(10))), 9, TmfTimestamp.fromMillis(10), 9, 0));
+        expectedData.get(0).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+
+        TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
+        ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
+
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 9, 10000);
+        assertEquals(expectedModel, currentModel);
+    }
+
+    /**
+     * Given a start index, count and a list of desired columns, we check model
+     * returned by the data provider. We also apply a search filter on a single
+     * column to search PREVIOUS from the start index. N number of events from
+     * the first matched event will be returned by the data provider.
+     */
+    @Test
+    public void testDataProviderWithGetDataFromSearchBackwardsMatch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
+        // Query for the 3 events starting from the the first matching event backwards, starting at index 10
+        int nbEventsRequested = 3;
+        VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 10, nbEventsRequested, null);
+        Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "Type-2");
+
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_DIRECTION_KEY, Direction.PREVIOUS.name());
+
+        List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
+        TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
+        List<EventTableLine> expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-2"), new VirtualTableCell(lineTimestamp(10))), 9, TmfTimestamp.fromMillis(10), 9, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-3"), new VirtualTableCell(lineTimestamp(11))), 10, TmfTimestamp.fromMillis(11), 10, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-4"), new VirtualTableCell(lineTimestamp(12))), 11, TmfTimestamp.fromMillis(12), 11, 0));
+        expectedData.get(0).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+
+        TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
+        ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
+
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 9, 10000);
+        assertNotNull(currentModel);
+        assertEquals(nbEventsRequested, currentModel.getLines().size());
+        assertEquals(expectedModel, currentModel);
+    }
+
+
+    /**
+     * Given a start index, count and a list of desired columns, we check model
      * returned by the data provider. We also apply a search filter on multiple columns
      */
     @Test
@@ -396,7 +554,7 @@ public class TmfEventTableDataProviderTest {
         searchExpressions.put(timestampColumnId, "\\d*4\\d*s*");
 
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
-        parameters.put(DataProviderParameterUtils.FILTERED_KEY, true);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_DIRECTION_KEY, Direction.NEXT.name());
 
         List<Long> expectedColumnsId = new ArrayList<>(fColumns.values());
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
@@ -407,7 +565,7 @@ public class TmfEventTableDataProviderTest {
         TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
         ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
 
-        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 3, 10000);
         assertEquals(expectedModel, currentModel);
 
         // Query for events with search filter active. Matching lines will be tagged for highlighting

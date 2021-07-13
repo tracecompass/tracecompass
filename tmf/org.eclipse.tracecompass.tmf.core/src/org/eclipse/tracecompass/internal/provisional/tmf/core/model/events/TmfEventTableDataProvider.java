@@ -18,13 +18,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.EventTableLine;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFilterModel;
@@ -37,6 +40,8 @@ import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProv
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.filter.FilterManager;
@@ -53,6 +58,7 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -62,6 +68,7 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 /**
  * This data provider will return a virtual table model (wrapped in a response)
@@ -77,10 +84,9 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      */
     public static final String TABLE_SEARCH_EXPRESSION_KEY = "table_search_expressions"; //$NON-NLS-1$
     /**
-     * Key for table search to get index of search
+     * Key for table search direction (forward or backward)
      */
-    public static final String TABLE_SEARCH_INDEX_KEY = "table_search_index"; //$NON-NLS-1$
-
+    public static final String TABLE_SEARCH_DIRECTION_KEY = "table_search_direction"; //$NON-NLS-1$
     /**
      * Key for table filters
      */
@@ -94,9 +100,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     private @Nullable ITmfFilter fFilter;
 
     /**
-     * Maps used for the optimization of filtered query. TODO: Since these map can
-     * take a lot of memory, one solution would be to replace these maps by two
-     * lists and use binary search instead of TreeMap floor
+     * Maps used for the optimization of filtered query.
+     *
+     * TODO: Since these map can take a lot of memory, one solution would be to
+     * replace these maps by two lists and use binary search instead of TreeMap
+     * floor.
      */
     private TreeMap<Long, Long> fIndexToRankMap = new TreeMap<>();
     private TreeMap<Long, Long> fRankToIndexMap = new TreeMap<>();
@@ -124,6 +132,17 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * getting a huge map
      */
     private static final int INDEX_STORING_INTERVAL = 1000;
+
+    /**
+     * Direction of search, navigation etc.
+     * @since 7.1
+     */
+    public enum Direction {
+        /** Search next */
+        NEXT,
+        /** Search previous*/
+        PREVIOUS
+    }
 
     /**
      * Constructor
@@ -180,24 +199,73 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         @Nullable TmfCollapseFilter collapseFilter = extractCollapseFilter(fetchParameters);
         Map<Long, ITmfEventAspect<?>> aspects = getAspectsFromColumnsId(queryFilter.getColumnsId());
 
-        Boolean isFiltered = DataProviderParameterUtils.extractIsFiltered(fetchParameters);
-        boolean isIndexRequest = isFiltered != null && isFiltered;
-
         if (aspects.isEmpty()) {
-            return new TmfModelResponse<>(new TmfVirtualTableModel<EventTableLine>(Collections.emptyList(), Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new TmfVirtualTableModel<>(Collections.emptyList(), Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
         List<Long> columnsIds = new ArrayList<>(aspects.keySet());
         if (getTrace().getNbEvents() == 0) {
             return new TmfModelResponse<>(new TmfVirtualTableModel<>(columnsIds, Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
-        boolean forwardSearch = queryFilter.getCount() >= 0;
+        /*
+         * Search for the next or previous event starting from the given event index
+         */
+        Object directionValue = fetchParameters.get(TABLE_SEARCH_DIRECTION_KEY);
 
+        /////////////////////////////////////
+        // TODO remove isFiltered when Theia front-end is updated to use TABLE_SEARCH_DIRECTION_KEY instead
+        Boolean isFiltered = DataProviderParameterUtils.extractIsFiltered(fetchParameters);
+        boolean isIndexRequest = isFiltered != null && isFiltered;
+        if (isIndexRequest && directionValue == null) {
+            directionValue = Direction.NEXT.name();
+        }
+        /////////////////////////////////////
+
+        if (searchFilter != null && directionValue != null) {
+            Direction direction = directionValue.equals(Direction.PREVIOUS.name()) ? Direction.PREVIOUS : Direction.NEXT;
+            @Nullable WrappedEvent event = null;
+            Predicate<@NonNull ITmfEvent> predicate;
+            if (filter == null) {
+                predicate = searchFilter::matches;
+            } else {
+                predicate = e -> (filter.matches(e) && searchFilter.matches(e));
+            }
+            if (direction == Direction.NEXT) {
+                event = getNextWrappedEventMatching(getTrace(), Math.abs(queryFilter.getIndex()), predicate, monitor);
+            } else if (direction == Direction.PREVIOUS) {
+                event = getPreviousWrappedEventMatching(getTrace(), Math.abs(queryFilter.getIndex()), predicate, monitor);
+            }
+            List<EventTableLine> lines = new ArrayList<>();
+            long rank = queryFilter.getIndex();
+            if (event != null) {
+                rank = event.getRank();
+                // create new queryFilter with updated start rank to get number of events starting from first matching event
+                queryFilter = new VirtualTableQueryFilter(queryFilter.getColumnsId(), rank, queryFilter.getCount());
+                lines.add(buildEventTableLine(aspects, event.getOriginalEvent(), rank, rank, true));
+            }
+            if ((queryFilter.getCount() == 1) || (event == null)) {
+                /**
+                 * If no event was found or the number of requested events is one
+                 * reply here since all required data for the reply is available.
+                 */
+                TmfVirtualTableModel<EventTableLine> model = new TmfVirtualTableModel<>(columnsIds, lines, rank, getTrace().getNbEvents());
+                return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            }
+        }
+
+        /*
+         * Collect queryFilter.getCount() number of events from start rank
+         */
+
+        /*
+         * TODO implement upper limit of queryFilter.getCount() to avoid running out of memory.
+         * TBD if the check and should be handled here or in the calling methods.
+         */
         TableEventRequest request;
         if (filter != null) {
-            request = filteredTableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, filter, searchFilter, forwardSearch, collapseFilter, monitor);
+            request = filteredTableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, filter, searchFilter, collapseFilter, monitor);
         } else {
-            request = tableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, searchFilter, forwardSearch, collapseFilter, isIndexRequest,  monitor);
+            request = tableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, searchFilter, collapseFilter, monitor);
             request.setEventCount(getTrace().getNbEvents());
         }
 
@@ -205,13 +273,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         try {
             request.waitForCompletion();
         } catch (InterruptedException e) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, e.getMessage());
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, NonNullUtils.nullToEmptyString(e.getMessage()));
         }
-
         if (request.isCancelled()) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
         }
-
         TmfVirtualTableModel<EventTableLine> model = new TmfVirtualTableModel<>(columnsIds, request.getEventLines(), queryFilter.getIndex(), request.getCurrentCount());
         return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
@@ -293,7 +359,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         try {
             request.waitForCompletion();
         } catch (InterruptedException e) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, e.getMessage());
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, NonNullUtils.nullToEmptyString(e.getMessage()));
         }
 
         return new TmfModelResponse<>(foundIndex, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -325,12 +391,31 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         }
     }
 
+    /**
+     * Create a table event request that fills a list of {@link EventTableLine}
+     * based on the query parameters and based on a filter.
+     *
+     * @param queryCount
+     *            number of requested events
+     * @param queryIndex
+     *            start rank to start looking for requested events
+     * @param aspects
+     *            Aspects to resolve
+     * @param filter
+     *            The filter to apply
+     * @param searchFilter
+     *            Search filter used to tag event lines
+     * @param collapseFilter
+     *            The collapse filter to apply
+     * @param monitor
+     *            a progress monitor
+     * @return a {@link TableEventRequest} to fill a list of {@link EventTableLine}
+     */
     private TableEventRequest filteredTableRequest(int queryCount,
             long queryIndex,
             Map<Long, ITmfEventAspect<?>> aspects,
             ITmfFilter filter,
             @Nullable ITmfFilter searchFilter,
-            boolean forwardSearch,
             @Nullable ITmfFilter collapseFilter,
             @Nullable IProgressMonitor monitor) {
 
@@ -354,15 +439,13 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
 
                 List<EventTableLine> events = getEventLines();
                 if (filter.matches(event) && (collapseFilter == null || collapseFilter.matches(event))) {
-                    if (searchFilter == null || searchFilter.matches(event)) {
-                        if (events.size() < queryCount && queryIndex <= currentIndex) {
-                            // FIXME: searching while filtering
-                            events.add(buildEventTableLine(aspects, event, currentIndex, rank, false));
-                        }
-                        if (currentIndex % INDEX_STORING_INTERVAL == 0) {
-                            fIndexToRankMap.put(currentIndex, rank);
-                            fRankToIndexMap.put(rank, currentIndex);
-                        }
+                    boolean matches = searchFilter != null && searchFilter.matches(event);
+                    if (events.size() < queryCount && queryIndex <= currentIndex) {
+                        events.add(buildEventTableLine(aspects, event, currentIndex, rank, matches));
+                    }
+                    if (currentIndex % INDEX_STORING_INTERVAL == 0) {
+                        fIndexToRankMap.put(currentIndex, rank);
+                        fRankToIndexMap.put(rank, currentIndex);
                     }
                     currentIndex++;
                     incrementCount();
@@ -375,10 +458,15 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
                 }
 
-                if (searchFilter != null && ((!forwardSearch && getCurrentCount() == queryCount) || events.size() == queryCount)) {
-                    done();
-                    return;
-                }
+                /*
+                 *  FIXME: Right now the whole trace is read to determine the number of matched events.
+                 *  In case of search filter being present, it only starts counting from the first
+                 *  matched event and the total number of filtered event is incorrect.
+                 *
+                 *  However, the number of matched events should only be done once per filter and
+                 *  after the filter changed. Implement way to determine the number of matched events.
+                 */
+
                 rank++;
             }
 
@@ -393,13 +481,29 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         };
     }
 
+    /**
+     * Create a table event request that fills a list of {@link EventTableLine}
+     * based on the query parameters.
+     *
+     * @param queryCount
+     *            number of requested events
+     * @param queryIndex
+     *            start rank to start looking for requested events
+     * @param aspects
+     *            Aspects to resolve
+     * @param searchFilter
+     *            Search filter used to tag event lines
+     * @param collapseFilter
+     *            The collapse filter to apply
+     * @param monitor
+     *            a progress monitor
+     * @return a {@link TableEventRequest} to fill a list of {@link EventTableLine}
+     */
     private TableEventRequest tableRequest(int queryCount,
             long queryIndex,
             Map<Long, ITmfEventAspect<?>> aspects,
             @Nullable ITmfFilter searchFilter,
-            boolean forwardSearch,
             @Nullable ITmfFilter collapseFilter,
-            boolean isIndexRequest,
             @Nullable IProgressMonitor monitor) {
 
         return new TableEventRequest(queryIndex) {
@@ -415,11 +519,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
 
                 List<EventTableLine> events = getEventLines();
                 boolean matches = searchFilter != null && searchFilter.matches(event);
-                if ((!isIndexRequest || matches) && (collapseFilter == null || collapseFilter.matches(event))) {
+                if (collapseFilter == null || collapseFilter.matches(event)) {
                     if (events.size() < queryCount) {
                         events.add(buildEventTableLine(aspects, event, rank, rank, matches));
                     }
-                } else if (collapseFilter != null && !events.isEmpty()) {
+                } else if (!events.isEmpty()) {
                     // If a collapse filter is present, we need to update the last event we have in
                     // our list to increment the repeat count value.
                     int lastIndex = events.size() - 1;
@@ -428,7 +532,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
                 }
 
-                if ((searchFilter != null && !forwardSearch && getNbRead() == queryCount) || events.size() == queryCount) {
+                if ((getNbRead() == queryCount) || events.size() == queryCount) {
                     done();
                     return;
                 }
@@ -471,6 +575,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      *            Filter to apply
      */
     private void applyFilter(ITmfFilter filter) {
+        // TODO verify if this works correctly
         if (!filter.equals(fFilter)) {
             fFilter = filter;
             fIndexToRankMap.clear();
@@ -548,7 +653,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     @SuppressWarnings("unchecked")
-    private @Nullable static ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
+    private static @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
         Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_EXPRESSION_KEY);
         if (searchFilterObject instanceof Map<?, ?>) {
             return extractSimpleSearchFilter((Map<?, String>) searchFilterObject);
@@ -556,7 +661,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return null;
     }
 
-    private @Nullable static ITmfFilter extractSimpleSearchFilter (Map<?, String> searchMap) {
+    private static @Nullable ITmfFilter extractSimpleSearchFilter (Map<?, String> searchMap) {
         if (searchMap.isEmpty()) {
             return null;
         }
@@ -670,4 +775,270 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         }
         return commonTraceType != null;
     }
+
+
+    /**
+     * Retrieve from a trace the next event, from a starting rank, matching the
+     * given predicate.
+     *
+     * Code inspired from TmfTraceUtils implementation, however this will return
+     * a {@link WrappedEvent} with the correct event rank.
+     *
+     * @param trace
+     *            The trace
+     * @param startRank
+     *            The rank of the event at which to start searching. Use
+     *            <code>0</code> to search from the start of the trace.
+     * @param predicate
+     *            The predicate to test events against
+     * @param monitor
+     *            Optional progress monitor that can be used to cancel the operation
+     * @return The first {@link WrappedEvent} matching the predicate, or null if the end of the
+     *         trace was reached and no event was found
+     */
+    private static @Nullable WrappedEvent getNextWrappedEventMatching(ITmfTrace trace, long startRank,
+            Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
+        if (monitor != null && monitor.isCanceled()) {
+            return null;
+        }
+
+        /*
+         * startRank + 1 because we do not want to include the start event itself in the
+         * search
+         */
+        EventMatchingRequest req = new EventMatchingRequest(startRank + 1, predicate, monitor);
+        trace.sendRequest(req);
+        try {
+            req.waitForCompletion();
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        return req.getFoundEvent();
+    }
+
+    /**
+     * Retrieve from a trace the previous event, from a given rank, matching the
+     * given predicate.
+     *
+     * Code inspired from TmfTraceUtils implementation, however this will return
+     * a {@link WrappedEvent} with the correct event rank.
+     *
+     * @param trace
+     *            The trace
+     * @param startRank
+     *            The rank of the event at which to start searching backwards.
+     * @param predicate
+     *            The predicate to test events against
+     * @param monitor
+     *            Optional progress monitor that can be used to cancel the operation
+     * @return The first {@link WrappedEvent} found matching the predicate, or null if the
+     *         beginning of the trace was reached and no event was found
+     */
+    private static @Nullable WrappedEvent getPreviousWrappedEventMatching(ITmfTrace trace, long startRank,
+            Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
+        if (monitor != null && monitor.isCanceled()) {
+            return null;
+        }
+        /*
+         * We are going to do a series of queries matching the trace's cache size in
+         * length (which should minimize on-disk seeks), then iterate on the found
+         * events in reverse order until we find a match.
+         */
+        int step = trace.getCacheSize();
+
+        /*
+         * If we are close to the beginning of the trace, make sure we only look for the
+         * events before the startRank.
+         */
+        if (startRank < step) {
+            step = (int) startRank;
+        }
+
+        long currentRank = startRank;
+        try {
+            while (currentRank > 0) {
+                currentRank = Math.max(currentRank - step, 0);
+
+                List<WrappedEvent> list = new ArrayList<>(step);
+                ArrayFillingRequest req = new ArrayFillingRequest(currentRank, step, list, monitor);
+                trace.sendRequest(req);
+
+                /* Check periodically if the job was cancelled */
+                req.waitForCompletion();
+
+                Optional<WrappedEvent> matchingEvent = Lists.reverse(list).stream()
+                        .filter(e -> predicate.test(e.getOriginalEvent()))
+                        .findFirst();
+
+                if (matchingEvent.isPresent()) {
+                    /* We found an event matching, return it! */
+                    return matchingEvent.get();
+                }
+                /* Keep searching, next loop */
+
+            }
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+        /*
+         * We searched up to the beginning of the trace and didn't find anything.
+         */
+        return null;
+
+    }
+
+    /**
+     * Event request looking for an event matching a Predicate.
+     */
+    private static class EventMatchingRequest extends TmfEventRequest {
+
+        private final Predicate<ITmfEvent> fPredicate;
+        private final @Nullable IProgressMonitor fMonitor;
+
+        private @Nullable WrappedEvent fFoundEvent = null;
+
+        /**
+         * Basic constructor, will query the trace until the end.
+         *
+         * @param startRank
+         *            The rank at which to start, use 0 for the beginning
+         * @param predicate
+         *            The predicate to test against each event
+         * @param monitor
+         *            an optional progress monitor
+         */
+        public EventMatchingRequest(long startRank, Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
+            super(ITmfEvent.class, startRank, ALL_DATA, ExecutionType.FOREGROUND);
+            fPredicate = predicate;
+            fMonitor = monitor;
+        }
+
+        /**
+         * Basic constructor, will query the trace the limit is reached.
+         *
+         * @param startRank
+         *            The rank at which to start, use 0 for the beginning
+         * @param limit
+         *            The limit on the number of events
+         * @param predicate
+         *            The predicate to test against each event
+         * @param monitor
+         *            an optional progress monitor
+         */
+        public EventMatchingRequest(long startRank, int limit, Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
+            super(ITmfEvent.class, startRank, limit, ExecutionType.FOREGROUND);
+            fPredicate = predicate;
+            fMonitor = monitor;
+        }
+
+        public @Nullable WrappedEvent getFoundEvent() {
+            return fFoundEvent;
+        }
+
+        @Override
+        public void handleData(ITmfEvent event) {
+            super.handleData(event);
+            if (fPredicate.test(event)) {
+                fFoundEvent = new WrappedEvent(event, getNbRead() + getIndex() - 1);
+                done();
+            }
+            if (fMonitor != null && fMonitor.isCanceled()) {
+                cancel();
+            }
+        }
+    }
+
+    /**
+     * Event request that simply puts all returned events into a list passed in
+     * parameter.
+     */
+    private static class ArrayFillingRequest extends TmfEventRequest {
+
+        private final List<WrappedEvent> fList;
+        private final @Nullable IProgressMonitor fMonitor;
+
+        public ArrayFillingRequest(long startRank, int limit, List<WrappedEvent> listToFill, @Nullable IProgressMonitor monitor) {
+            super(ITmfEvent.class, startRank, limit, ExecutionType.FOREGROUND);
+            fList = listToFill;
+            fMonitor = monitor;
+        }
+
+        @Override
+        public void handleData(ITmfEvent event) {
+            super.handleData(event);
+            fList.add(new WrappedEvent(event, getIndex() + getNbRead() - 1));
+            if (fMonitor != null && fMonitor.isCanceled()) {
+                cancel();
+            }
+        }
+    }
+
+    /**
+     * A TMF Events wrapper class wrapping a ITmfEvent and the corresponding, valid rank.
+     */
+    private static class WrappedEvent implements ITmfEvent {
+        /**
+         * Event reference.
+         */
+        ITmfEvent fEvent;
+        /**
+         * Events rank.
+         */
+        long fRank;
+
+        /**
+         * Constructor for new cached events.
+         *
+         * @param tmfEvent
+         *            The original trace event
+         * @param rank
+         *            The rank of this event in the trace
+         */
+        public WrappedEvent (ITmfEvent tmfEvent, long rank) {
+            this.fEvent = tmfEvent;
+            this.fRank = rank;
+        }
+
+        public ITmfEvent getOriginalEvent() {
+            return fEvent;
+        }
+
+        @Override
+        public @Nullable <T> T getAdapter(@Nullable Class<T> adapterType) {
+            return fEvent.getAdapter(adapterType);
+        }
+
+        @Override
+        public ITmfTrace getTrace() {
+            return fEvent.getTrace();
+        }
+
+        @Override
+        public long getRank() {
+            return fRank;
+        }
+
+        @Override
+        public String getName() {
+            return fEvent.getName();
+        }
+
+        @Override
+        public ITmfTimestamp getTimestamp() {
+            return fEvent.getTimestamp();
+        }
+
+        @Override
+        public @Nullable ITmfEventType getType() {
+            return fEvent.getType();
+        }
+
+        @Override
+        public @Nullable ITmfEventField getContent() {
+            return fEvent.getContent();
+        }
+    }
+
 }
