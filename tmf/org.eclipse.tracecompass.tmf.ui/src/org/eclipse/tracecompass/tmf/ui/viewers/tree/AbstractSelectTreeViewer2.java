@@ -490,6 +490,7 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
                 }
                 Display.getDefault().asyncExec(() -> {
                     try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractSelectTreeViewer:TreeUpdate").setParentScope(parentScope).build()) { //$NON-NLS-1$
+                        long startTime = System.currentTimeMillis();
 
                         if (!trace.equals(getTrace())) {
                             return;
@@ -504,7 +505,9 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
                         if (rootEntry != currentRootEntry) {
                             // FIXME should add a bit of padding
                             for (TreeColumn column : treeViewer.getTree().getColumns()) {
-                                column.pack();
+                                if ((System.currentTimeMillis() - startTime) < 500) {
+                                    column.pack();
+                                }
                             }
                         }
                     }
