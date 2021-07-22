@@ -121,8 +121,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private static final Color COLOR_LIGHT_MAGENTA = new Color(Display.getDefault(), 255, 192, 255);
     private static final Color COLOR_MAGENTA = Display.getDefault().getSystemColor(SWT.COLOR_MAGENTA);
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
-    private static final Color COLOR_TEXT_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
-    private static final Color COLOR_WIDGET_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
     private static final Color COLOR_GRAY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 
     private final ISelection selection;
@@ -143,6 +141,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private Font fixedFont;
     private UpdateListener updateListener;
     private Browser helpBrowser;
+    private Color fBGColor = null;
 
     // variables used recursively through line traversal
     private String timeStampFormat;
@@ -239,6 +238,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         timestampPreviewText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
         timestampPreviewText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
         timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noMatchingTimestamp);
+        timestampPreviewText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
         Composite buttonBar = new Composite(container, SWT.NONE);
         GridLayout buttonBarLayout = new GridLayout(5, false);
@@ -391,7 +391,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         treeViewer.setLabelProvider(new InputLineTreeLabelProvider());
         treeViewer.addSelectionChangedListener(new InputLineTreeSelectionChangedListener());
         treeContainer.layout();
-
+        fBGColor = treeViewer.getTree().getBackground();
         treeScrolledComposite.setMinSize(treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 
         lineScrolledComposite = new ScrolledComposite(hSash, SWT.V_SCROLL);
@@ -468,7 +468,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         inputText.setLayoutData(gd);
         inputText.setText(getSelectionText());
         inputText.addModifyListener(updateListener);
-
         vSash.setWeights(new int[] { hSash.computeSize(SWT.DEFAULT, SWT.DEFAULT).y, sashBottom.computeSize(SWT.DEFAULT, SWT.DEFAULT).y });
 
         setControl(container);
@@ -557,6 +556,10 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         if (fixedFont != null) {
             fixedFont.dispose();
             fixedFont = null;
+        }
+        if (fBGColor != null) {
+            fBGColor.dispose();
+            fBGColor = null;
         }
         super.dispose();
     }
@@ -678,6 +681,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             // early update during construction
             return;
         }
+        inputText.setBackground(fBGColor);
         inputText.setStyleRanges(new StyleRange[] {});
 
         try (Scanner scanner = new Scanner(inputText.getText());) {
@@ -1553,7 +1557,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             gd.widthHint = 0;
             previewText.setLayoutData(gd);
             previewText.setText(Messages.CustomTxtParserInputWizardPage_noMatch);
-            previewText.setBackground(COLOR_WIDGET_BACKGROUND);
+            previewText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
         }
 
         private void dispose() {
@@ -1590,8 +1594,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             errors.append("Enter a name for the new trace type. "); //$NON-NLS-1$
             logtypeText.setBackground(COLOR_LIGHT_RED);
         } else {
-            categoryText.setBackground(COLOR_TEXT_BACKGROUND);
-            logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
+            categoryText.setBackground(fBGColor);
+            logtypeText.setBackground(fBGColor);
             if (definition.categoryName.indexOf(':') != -1) {
                 errors.append("Invalid character ':' in category. "); //$NON-NLS-1$
                 categoryText.setBackground(COLOR_LIGHT_RED);
@@ -1622,13 +1626,13 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         if (timestampFound && !definition.timeStampOutputFormat.isEmpty()) {
             try {
                 new TmfTimestampFormat(definition.timeStampOutputFormat);
-                timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+                timestampOutputFormatText.setBackground(fBGColor);
             } catch (IllegalArgumentException e) {
                 errors.append("Enter a valid output format for the Time Stamp field [" + e.getMessage() + "]."); //$NON-NLS-1$ //$NON-NLS-2$
                 timestampOutputFormatText.setBackground(COLOR_LIGHT_RED);
             }
         } else {
-            timestampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+            timestampOutputFormatText.setBackground(fBGColor);
         }
 
         if (errors.length() == 0) {
@@ -1658,7 +1662,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         try {
             Pattern.compile(inputLine.getRegex());
             if (line != null) {
-                line.regexText.setBackground(COLOR_TEXT_BACKGROUND);
+                line.regexText.setBackground(fBGColor);
             }
         } catch (PatternSyntaxException e) {
             errors.append("Enter a valid regular expression (Line " + name + "). "); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1673,7 +1677,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         } else {
             if (line != null) {
-                line.cardinalityMinText.setBackground(COLOR_TEXT_BACKGROUND);
+                line.cardinalityMinText.setBackground(fBGColor);
             }
         }
         if (inputLine.getMaxCount() == -1) {
@@ -1691,7 +1695,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         } else {
             if (line != null) {
-                line.cardinalityMaxText.setBackground(COLOR_TEXT_BACKGROUND);
+                line.cardinalityMaxText.setBackground(fBGColor);
             }
         }
         if (inputLine.eventType != null && inputLine.eventType.trim().isEmpty()) {
@@ -1701,7 +1705,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             }
         } else {
             if (line != null) {
-                line.eventTypeText.setBackground(COLOR_TEXT_BACKGROUND);
+                line.eventTypeText.setBackground(fBGColor);
             }
         }
         for (int i = 0; inputLine.columns != null && i < inputLine.columns.size(); i++) {
@@ -1721,7 +1725,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     try {
                         new TmfTimestampFormat(inputData.format);
                         if (group != null) {
-                            group.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                            group.tagText.setBackground(fBGColor);
                         }
                     } catch (IllegalArgumentException e) {
                         errors.append("Enter a valid input format for the Time Stamp (Line " + name + " Group " + (i + 1) + ") [" + e.getMessage() + "]. "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -1743,12 +1747,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     }
                 } else {
                     if (group != null) {
-                        group.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                        group.tagText.setBackground(fBGColor);
                     }
                 }
             } else {
                 if (group != null) {
-                    group.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                    group.tagText.setBackground(fBGColor);
                 }
             }
         }

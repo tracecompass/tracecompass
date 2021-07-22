@@ -121,8 +121,6 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private static final Image MOVE_DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
     private static final Image HELP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/help_button.gif"); //$NON-NLS-1$
     private static final Color COLOR_LIGHT_RED = new Color(Display.getDefault(), 255, 192, 192);
-    private static final Color COLOR_TEXT_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
-    private static final Color COLOR_WIDGET_BACKGROUND = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
     private static final Color COLOR_GRAY = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 
     private final ISelection selection;
@@ -135,7 +133,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private Text categoryText;
     private Text logtypeText;
     private Text timeStampOutputFormatText;
-    private Text timeStampPreviewText;
+    private Text timestampPreviewText;
     private Button removeButton;
     private Button addChildButton;
     private Button addNextButton;
@@ -157,6 +155,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private boolean timeStampFound;
     private int logEntriesCount;
     private boolean logEntryFound;
+    private Color fBGColor = null;
 
     /**
      * Constructor
@@ -245,9 +244,10 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         Label timeStampPreviewLabel = new Label(headerComposite, SWT.NULL);
         timeStampPreviewLabel.setText(Messages.CustomXmlParserInputWizardPage_preview);
 
-        timeStampPreviewText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-        timeStampPreviewText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-        timeStampPreviewText.setText("*no time stamp element or attribute*"); //$NON-NLS-1$
+        timestampPreviewText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+        timestampPreviewText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+        timestampPreviewText.setText("*no time stamp element or attribute*"); //$NON-NLS-1$
+        timestampPreviewText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
         createButtonBar();
 
@@ -271,6 +271,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         treeViewer.setLabelProvider(new InputElementTreeLabelProvider());
         treeViewer.addSelectionChangedListener(new InputElementTreeSelectionChangedListener());
         treeContainer.layout();
+        fBGColor = treeViewer.getTree().getBackground();
 
         treeScrolledComposite
                 .setMinSize(treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x, treeContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
@@ -322,7 +323,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         previewLabel.setText(Messages.CustomXmlParserInputWizardPage_previewInput);
 
         errorText = new Text(sashBottom, SWT.SINGLE | SWT.READ_ONLY);
-        errorText.setBackground(COLOR_WIDGET_BACKGROUND);
+        errorText.setBackground(fBGColor);
         errorText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         errorText.setVisible(false);
 
@@ -626,6 +627,10 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             fixedFont.dispose();
             fixedFont = null;
         }
+        if (fBGColor != null) {
+            fBGColor.dispose();
+            fBGColor = null;
+        }
         super.dispose();
     }
 
@@ -811,6 +816,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             // early update during construction
             return;
         }
+        inputText.setBackground(fBGColor);
         inputText.setStyleRanges(new StyleRange[] {});
         if (selectedElement == null) {
             return;
@@ -829,14 +835,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 } else {
                     timestampFormat = new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
                 }
-                timeStampPreviewText.setText(timestampFormat.format(timestamp));
+                timestampPreviewText.setText(timestampFormat.format(timestamp));
             } catch (ParseException e) {
-                timeStampPreviewText.setText("*parse exception* [" + timeStampValue + "] <> [" + timeStampFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                timestampPreviewText.setText("*parse exception* [" + timeStampValue + "] <> [" + timeStampFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } catch (IllegalArgumentException e) {
-                timeStampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
+                timestampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
             }
         } else {
-            timeStampPreviewText.setText("*no matching time stamp*"); //$NON-NLS-1$
+            timestampPreviewText.setText("*no matching time stamp*"); //$NON-NLS-1$
         }
     }
 
@@ -938,7 +944,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 gd.widthHint = 0;
                 previewText.setLayoutData(gd);
                 previewText.setText(Messages.CustomXmlParserInputWizardPage_noMatchingElement);
-                previewText.setBackground(COLOR_WIDGET_BACKGROUND);
+                previewText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
                 logEntryButton = new Button(group, SWT.CHECK);
                 logEntryButton.setText(Messages.CustomXmlParserInputWizardPage_logEntry);
@@ -1385,7 +1391,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             gd.widthHint = 0;
             previewText.setLayoutData(gd);
             previewText.setText(Messages.CustomXmlParserInputWizardPage_noMatch);
-            previewText.setBackground(COLOR_WIDGET_BACKGROUND);
+            previewText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
             filler = new Label(parent, SWT.NULL);
 
@@ -1630,8 +1636,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             errors.add(Messages.CustomXmlParserInputWizardPage_emptyLogTypeError);
             logtypeText.setBackground(COLOR_LIGHT_RED);
         } else {
-            categoryText.setBackground(COLOR_TEXT_BACKGROUND);
-            logtypeText.setBackground(COLOR_TEXT_BACKGROUND);
+            categoryText.setBackground(fBGColor);
+            logtypeText.setBackground(fBGColor);
             if (definition.categoryName.indexOf(':') != -1) {
                 errors.add(Messages.CustomXmlParserInputWizardPage_invalidCategoryError);
                 categoryText.setBackground(COLOR_LIGHT_RED);
@@ -1672,20 +1678,20 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 if (timeStampFound && !definition.timeStampOutputFormat.isEmpty()) {
                     try {
                         new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
-                        timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+                        timeStampOutputFormatText.setBackground(fBGColor);
                     } catch (IllegalArgumentException e) {
                         errors.add(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError);
                         timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                     }
                 } else {
-                    timeStampOutputFormatText.setBackground(COLOR_TEXT_BACKGROUND);
+                    timeStampOutputFormatText.setBackground(fBGColor);
                     if (!timeStampFound) {
-                        timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
+                        timestampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
                     }
                 }
             }
         } else {
-            timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
+            timestampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
         }
 
         if (errors.isEmpty()) {
@@ -1718,7 +1724,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
             } else {
                 if (elementNode != null) {
-                    elementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
+                    elementNode.elementNameText.setBackground(fBGColor);
                 }
             }
         }
@@ -1737,7 +1743,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     try {
                         new TmfTimestampFormat(inputElement.getInputFormat());
                         if (elementNode != null) {
-                            elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                            elementNode.tagText.setBackground(fBGColor);
                         }
                     } catch (IllegalArgumentException e) {
                         errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError, getName(inputElement)));
@@ -1758,7 +1764,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
             } else {
                 if (elementNode != null) {
-                    elementNode.tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                    elementNode.tagText.setBackground(fBGColor);
                 }
             }
             if (inputElement.getEventType() != null && inputElement.getEventType().trim().isEmpty()) {
@@ -1768,14 +1774,14 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
             } else {
                 if (elementNode != null) {
-                    elementNode.eventTypeText.setBackground(COLOR_TEXT_BACKGROUND);
+                    elementNode.eventTypeText.setBackground(fBGColor);
                 }
             }
         }
         if (inputElement.getAttributes() != null) {
             if (elementNode != null) {
                 for (Attribute attribute : elementNode.attributes) {
-                    attribute.attributeNameText.setBackground(COLOR_TEXT_BACKGROUND);
+                    attribute.attributeNameText.setBackground(fBGColor);
                 }
             }
             for (int i = 0; i < inputElement.getAttributes().size(); i++) {
@@ -1812,7 +1818,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         try {
                             new TmfTimestampFormat(attribute.getInputFormat());
                             if (elementNode != null) {
-                                elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                                elementNode.attributes.get(i).tagText.setBackground(fBGColor);
                             }
                         } catch (IllegalArgumentException e) {
                             errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeInvalidTimestampFmtError, getName(attribute, inputElement)));
@@ -1833,7 +1839,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 } else {
                     if (elementNode != null) {
-                        elementNode.attributes.get(i).tagText.setBackground(COLOR_TEXT_BACKGROUND);
+                        elementNode.attributes.get(i).tagText.setBackground(fBGColor);
                     }
                 }
             }
@@ -1845,7 +1851,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     childElementNode = selectedElement;
                 }
                 if (childElementNode != null) {
-                    childElementNode.elementNameText.setBackground(COLOR_TEXT_BACKGROUND);
+                    childElementNode.elementNameText.setBackground(fBGColor);
                 }
             }
             for (int i = 0; i < inputElement.getChildElements().size(); i++) {
