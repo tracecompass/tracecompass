@@ -213,6 +213,12 @@ public class DataDrivenActionStateChange implements DataDrivenAction {
             Integer currentValue = (currentState == null ? 0 : (Integer) currentState);
             return incrementLong + currentValue;
         }
+        if (stateValue instanceof Double) {
+            Double incrementLong = (Double) stateValue;
+            Object currentState = ss.queryOngoing(quark);
+            Double currentValue = (currentState == null ? 0 : (Double) currentState);
+            return incrementLong + currentValue;
+        }
         return stateValue;
     }
 
