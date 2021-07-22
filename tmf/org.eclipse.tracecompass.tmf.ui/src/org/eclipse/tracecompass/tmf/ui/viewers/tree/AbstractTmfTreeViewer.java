@@ -78,6 +78,11 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
  */
 public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
+    /**
+     * Selective expansion is O(n2) in jface. So have a limit set. If it's too big,
+     * we don't care anyway, people will filter
+     */
+    private static final int THRESHOLD_TO_PRESERVE_TREE = 500;
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractTmfTreeViewer.class);
     private final TreeViewer fTreeViewer;
     private final Map<ITmfTrace, TmfTreeViewerEntry> fRoots = Collections.synchronizedMap(new HashMap<>());
@@ -601,11 +606,14 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
             }
             try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#expand")) { //$NON-NLS-1$
                 /*
-                 * Reset Expanded. This may be a slow operation
-                 * TODO: only do if it is currently not expanded well
-                 * TODO: use expandall if possible
+                 * Reset Expanded. This may be a slow operation, so only do it for smaller trees
                  */
-                fTreeViewer.setExpandedElements(newExpanded.toArray());
+                if (newExpanded.size() > THRESHOLD_TO_PRESERVE_TREE) {
+                    fTreeViewer.expandAll();
+                } else {
+                    fTreeViewer.setExpandedElements(newExpanded.toArray());
+                }
+
             }
         }
     }
