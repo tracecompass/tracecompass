@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -132,7 +133,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private Composite container;
     private Text categoryText;
     private Text logtypeText;
-    private Text timeStampOutputFormatText;
+    private Text timestampOutputFormatText;
     private Text timestampPreviewText;
     private Button removeButton;
     private Button addChildButton;
@@ -150,9 +151,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private Element documentElement;
 
     // variables used recursively through element traversal
-    private String timeStampValue;
-    private String timeStampFormat;
-    private boolean timeStampFound;
+    private StringBuilder timestampValue;
+    private StringBuilder timestampFormat;
+    private boolean timestampFound;
     private int logEntriesCount;
     private boolean logEntryFound;
     private Color fBGColor = null;
@@ -206,13 +207,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         Label timeStampFormatLabel = new Label(headerComposite, SWT.NULL);
         timeStampFormatLabel.setText(Messages.CustomXmlParserInputWizardPage_timestampFormat);
 
-        timeStampOutputFormatText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
-        timeStampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        timeStampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
-        timeStampOutputFormatText.addPaintListener(e -> {
-            if (!timeStampOutputFormatText.isFocusControl() && timeStampOutputFormatText.getText().trim().isEmpty()) {
+        timestampOutputFormatText = new Text(headerComposite, SWT.BORDER | SWT.SINGLE);
+        timestampOutputFormatText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        timestampOutputFormatText.setText(DEFAULT_TIMESTAMP_FORMAT);
+        timestampOutputFormatText.addPaintListener(e -> {
+            if (!timestampOutputFormatText.isFocusControl() && timestampOutputFormatText.getText().trim().isEmpty()) {
                 e.gc.setForeground(COLOR_GRAY);
-                int borderWidth = timeStampOutputFormatText.getBorderWidth();
+                int borderWidth = timestampOutputFormatText.getBorderWidth();
                 e.gc.drawText(Messages.CustomXmlParserInputWizardPage_default, borderWidth, borderWidth);
             }
         });
@@ -296,7 +297,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         categoryText.addModifyListener(updateListener);
         logtypeText.addModifyListener(updateListener);
-        timeStampOutputFormatText.addModifyListener(updateListener);
+        timestampOutputFormatText.addModifyListener(updateListener);
 
         elementScrolledComposite.setMinSize(elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).x,
                 elementContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y - 1);
@@ -599,11 +600,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 removeButton.setEnabled(true);
                 addChildButton.setEnabled(true);
                 addChildButton.setToolTipText(Messages.CustomXmlParserInputWizardPage_addChildElement);
-                if (definition.rootInputElement == inputElement) {
-                    addNextButton.setEnabled(false);
-                } else {
-                    addNextButton.setEnabled(true);
-                }
+                addNextButton.setEnabled(definition.rootInputElement != inputElement);
                 moveUpButton.setEnabled(true);
                 moveDownButton.setEnabled(true);
             } else {
@@ -638,9 +635,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         categoryText.setText(def.categoryName);
         logtypeText.setText(def.definitionName);
         if (def.timeStampOutputFormat != null) {
-            timeStampOutputFormatText.setText(def.timeStampOutputFormat);
+            timestampOutputFormatText.setText(def.timeStampOutputFormat);
         } else {
-            timeStampOutputFormatText.setText(""); //$NON-NLS-1$
+            timestampOutputFormatText.setText(""); //$NON-NLS-1$
         }
         treeViewer.setInput(def);
 
@@ -793,20 +790,17 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             Document doc = null;
             doc = db.parse(new ByteArrayInputStream(string.getBytes()));
             documentElement = doc.getDocumentElement();
-        } catch (ParserConfigurationException e) {
-            Activator.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
+        } catch (IOException | ParserConfigurationException e) {
+            Activator.getDefault().logError("Error parsing XML input string: " + string, e); //$NON-NLS-1$
             documentElement = null;
         } catch (SAXException e) {
-            documentElement = null;
-        } catch (IOException e) {
-            Activator.getDefault().logError("Error pasing XML input string: " + string, e); //$NON-NLS-1$
             documentElement = null;
         }
     }
 
     private void initValues() {
-        timeStampValue = null;
-        timeStampFormat = null;
+        timestampValue = null;
+        timestampFormat = null;
         logEntriesCount = 0;
         logEntryFound = false;
     }
@@ -826,18 +820,18 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         selectedElement.updatePreview();
 
-        if (timeStampValue != null && timeStampFormat != null) {
+        if (timestampValue != null && timestampFormat != null) {
             try {
-                TmfTimestampFormat timestampFormat = new TmfTimestampFormat(timeStampFormat);
-                long timestamp = timestampFormat.parseValue(timeStampValue);
-                if (timeStampOutputFormatText.getText().trim().isEmpty()) {
-                    timestampFormat = new TmfTimestampFormat();
+                TmfTimestampFormat format = new TmfTimestampFormat(timestampFormat.toString());
+                long timestamp = format.parseValue(timestampValue.toString());
+                if (timestampOutputFormatText.getText().trim().isEmpty()) {
+                    format = new TmfTimestampFormat();
                 } else {
-                    timestampFormat = new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
+                    format = new TmfTimestampFormat(timestampOutputFormatText.getText().trim());
                 }
-                timestampPreviewText.setText(timestampFormat.format(timestamp));
+                timestampPreviewText.setText(format.format(timestamp));
             } catch (ParseException e) {
-                timestampPreviewText.setText("*parse exception* [" + timeStampValue + "] <> [" + timeStampFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                timestampPreviewText.setText("*parse exception* [" + timestampValue + "] <> [" + timestampFormat + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } catch (IllegalArgumentException e) {
                 timestampPreviewText.setText("*parse exception* [Illegal Argument]"); //$NON-NLS-1$
             }
@@ -994,6 +988,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         tagText.removeModifyListener(updateListener);
                         switch (tagCombo.getSelectionIndex()) {
                         case 0: // Ignore
+                        case 4: // Field names
                             tagLabel.setVisible(false);
                             tagText.setVisible(false);
                             actionCombo.setVisible(false);
@@ -1006,20 +1001,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                             actionCombo.setVisible(true);
                             break;
                         case 2: // Event type
-                            tagLabel.setVisible(false);
-                            tagText.setVisible(false);
-                            actionCombo.setVisible(true);
-                            break;
                         case 3: // Message
-                            tagLabel.setVisible(false);
-                            tagText.setVisible(false);
-                            actionCombo.setVisible(true);
-                            break;
-                        case 4: // Field names
-                            tagLabel.setVisible(false);
-                            tagText.setVisible(false);
-                            actionCombo.setVisible(false);
-                            break;
                         case 5: // Field values
                             tagLabel.setVisible(false);
                             tagText.setVisible(false);
@@ -1103,11 +1085,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 eventTypeButton.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
-                        if (eventTypeButton.getSelection()) {
-                            eventTypeText.setEnabled(true);
-                        } else {
-                            eventTypeText.setEnabled(false);
-                        }
+                        eventTypeText.setEnabled(eventTypeButton.getSelection());
                     }
                 });
                 eventTypeButton.addSelectionListener(updateListener);
@@ -1155,24 +1133,22 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     if (tagCombo.getText().equals(Tag.TIMESTAMP.toString()) && logEntriesCount <= 1) {
                         String value = previewText.getText().trim();
                         if (value.length() != 0) {
+                            String format = tagText.getText().trim();
                             if (actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_SET) {
-                                timeStampValue = value;
-                                timeStampFormat = tagText.getText().trim();
+                                setTsValue(value, format);
                             } else if (actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_APPEND) {
-                                if (timeStampValue != null) {
-                                    timeStampValue += value;
-                                    timeStampFormat += tagText.getText().trim();
+                                if (timestampValue != null) {
+                                    timestampValue.append(value);
+                                    timestampFormat.append(format);
                                 } else {
-                                    timeStampValue = value;
-                                    timeStampFormat = tagText.getText().trim();
+                                    setTsValue(value,format);
                                 }
                             } else if (actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
-                                if (timeStampValue != null) {
-                                    timeStampValue += CustomTraceDefinition.SEPARATOR + value;
-                                    timeStampFormat += CustomTraceDefinition.SEPARATOR + tagText.getText().trim();
+                                if (timestampValue != null) {
+                                    timestampValue.append(CustomTraceDefinition.SEPARATOR).append(value);
+                                    timestampFormat.append(CustomTraceDefinition.SEPARATOR).append(format);
                                 } else {
-                                    timeStampValue = value;
-                                    timeStampFormat = tagText.getText().trim();
+                                    setTsValue(value, format);
                                 }
                             }
                         }
@@ -1185,24 +1161,22 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     if (value.length() != 0) {
                         attribute.previewText.setText(value);
                         if (attribute.tagCombo.getText().equals(Tag.TIMESTAMP.toString()) && logEntriesCount <= 1) {
+                            String format = attribute.tagText.getText().trim();
                             if (attribute.actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_SET) {
-                                timeStampValue = value;
-                                timeStampFormat = attribute.tagText.getText().trim();
+                                setTsValue(value, format);
                             } else if (attribute.actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_APPEND) {
-                                if (timeStampValue != null) {
-                                    timeStampValue += value;
-                                    timeStampFormat += attribute.tagText.getText().trim();
+                                if (timestampValue != null) {
+                                    timestampValue.append(value);
+                                    timestampFormat.append(format);
                                 } else {
-                                    timeStampValue = value;
-                                    timeStampFormat = attribute.tagText.getText().trim();
+                                    setTsValue(value, format);
                                 }
                             } else if (attribute.actionCombo.getSelectionIndex() == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
-                                if (timeStampValue != null) {
-                                    timeStampValue += " | " + value; //$NON-NLS-1$
-                                    timeStampFormat += " | " + attribute.tagText.getText().trim(); //$NON-NLS-1$
+                                if (timestampValue != null) {
+                                    timestampValue.append(CustomTraceDefinition.SEPARATOR).append(value);
+                                    timestampFormat.append(CustomTraceDefinition.SEPARATOR).append(format);
                                 } else {
-                                    timeStampValue = value;
-                                    timeStampFormat = attribute.tagText.getText().trim();
+                                    setTsValue(value, format);
                                 }
                             }
                         }
@@ -1219,6 +1193,11 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             if (logEntryButton != null && logEntryButton.getSelection()) {
                 logEntryFound = false;
             }
+        }
+
+        private void setTsValue(String value, @NonNull String format) {
+            timestampValue = new StringBuilder(value);
+            timestampFormat = new StringBuilder(format);
         }
 
         private void createAddButton() {
@@ -1296,7 +1275,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 }
                 inputElement.setInputAction(actionCombo.getSelectionIndex());
             }
-            inputElement.setAttributes(new ArrayList<CustomXmlInputAttribute>(attributes.size()));
+            inputElement.setAttributes(new ArrayList<>(attributes.size()));
             for (int i = 0; i < attributes.size(); i++) {
                 String inputName = null;
                 String inputFormat = null;
@@ -1429,11 +1408,8 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         actionCombo.setVisible(true);
                         break;
                     case 1: // Event type
-                        tagLabel.setVisible(false);
-                        tagText.setVisible(false);
-                        actionCombo.setVisible(true);
-                        break;
                     case 2: // Message
+                    case 4: // Field values
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         actionCombo.setVisible(true);
@@ -1442,11 +1418,6 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         actionCombo.setVisible(false);
-                        break;
-                    case 4: // Field values
-                        tagLabel.setVisible(false);
-                        tagText.setVisible(false);
-                        actionCombo.setVisible(true);
                         break;
                     case 5: // Other
                         tagLabel.setText(Messages.CustomXmlParserInputWizardPage_name);
@@ -1620,7 +1591,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
     private void validate() {
         definition.categoryName = categoryText.getText().trim();
         definition.definitionName = logtypeText.getText().trim();
-        definition.timeStampOutputFormat = timeStampOutputFormatText.getText().trim();
+        definition.timeStampOutputFormat = timestampOutputFormatText.getText().trim();
 
         if (selectedElement != null) {
             selectedElement.extractInputs();
@@ -1664,7 +1635,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         if (definition.rootInputElement != null) {
             logEntryFound = false;
-            timeStampFound = false;
+            timestampFound = false;
 
             errors.addAll(validateElement(definition.rootInputElement));
 
@@ -1675,17 +1646,17 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     errors.add(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
                 }
 
-                if (timeStampFound && !definition.timeStampOutputFormat.isEmpty()) {
+                if (timestampFound && !definition.timeStampOutputFormat.isEmpty()) {
                     try {
-                        new TmfTimestampFormat(timeStampOutputFormatText.getText().trim());
-                        timeStampOutputFormatText.setBackground(fBGColor);
+                        new TmfTimestampFormat(timestampOutputFormatText.getText().trim());
+                        timestampOutputFormatText.setBackground(fBGColor);
                     } catch (IllegalArgumentException e) {
                         errors.add(Messages.CustomXmlParserInputWizardPage_elementInvalidTimestampFmtError);
-                        timeStampOutputFormatText.setBackground(COLOR_LIGHT_RED);
+                        timestampOutputFormatText.setBackground(COLOR_LIGHT_RED);
                     }
                 } else {
-                    timeStampOutputFormatText.setBackground(fBGColor);
-                    if (!timeStampFound) {
+                    timestampOutputFormatText.setBackground(fBGColor);
+                    if (!timestampFound) {
                         timestampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
                     }
                 }
@@ -1733,7 +1704,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 logEntryFound = true;
             }
             if (inputElement.getInputTag().equals(Tag.TIMESTAMP)) {
-                timeStampFound = true;
+                timestampFound = true;
                 if (inputElement.getInputFormat().length() == 0) {
                     errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_elementMissingTimestampFmtError, getName(inputElement)));
                     if (elementNode != null) {
@@ -1808,7 +1779,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                     }
                 }
                 if (attribute.getInputTag().equals(Tag.TIMESTAMP)) {
-                    timeStampFound = true;
+                    timestampFound = true;
                     if (attribute.getInputFormat().length() == 0) {
                         errors.add(NLS.bind(Messages.CustomXmlParserInputWizardPage_attributeMissingTimestampFmtError, getName(attribute, inputElement)));
                         if (elementNode != null) {

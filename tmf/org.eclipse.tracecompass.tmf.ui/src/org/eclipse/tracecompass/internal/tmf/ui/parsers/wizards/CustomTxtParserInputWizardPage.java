@@ -144,7 +144,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
     private Color fBGColor = null;
 
     // variables used recursively through line traversal
-    private String timeStampFormat;
+    private StringBuilder timeStampFormat;
     private boolean timestampFound;
 
     /**
@@ -645,9 +645,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             Object sel = ((IStructuredSelection) this.selection).getFirstElement();
             if (sel instanceof IFile) {
                 IFile file = (IFile) sel;
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new InputStreamReader(file.getContents()));
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getContents()))) {
                     StringBuilder sb = new StringBuilder();
                     String line = null;
                     while ((line = reader.readLine()) != null) {
@@ -655,17 +653,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         sb.append('\n');
                     }
                     return sb.toString();
-                } catch (CoreException e) {
+                } catch (IOException | CoreException e) {
                     return ""; //$NON-NLS-1$
-                } catch (IOException e) {
-                    return ""; //$NON-NLS-1$
-                } finally {
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                        }
-                    }
                 }
             }
         }
@@ -734,7 +723,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         updatePreviewLine(rootInputLine, matcher, data, rawPos, rootLineMatches);
                         if (rootLineMatches == 1) {
                             firstEntryTimeStamp = data.get(Tag.TIMESTAMP);
-                            firstEntryTimeStampInputFormat = timeStampFormat;
+                            firstEntryTimeStampInputFormat = timeStampFormat.toString();
                         }
                         HashMap<InputLine, Integer> countMap = new HashMap<>();
                         InputLine currentInput = null;
@@ -871,7 +860,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
             if (rootLineMatches == 1) {
                 firstEntryTimeStamp = data.get(Tag.TIMESTAMP);
-                firstEntryTimeStampInputFormat = timeStampFormat;
+                firstEntryTimeStampInputFormat = timeStampFormat.toString();
             }
             if (firstEntryTimeStamp == null) {
                 timestampPreviewText.setText(Messages.CustomTxtParserInputWizardPage_noTimestampGroup);
@@ -926,7 +915,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 if (input.action == CustomTraceDefinition.ACTION_SET) {
                     data.put(key, value);
                     if (input.tag.equals(Tag.TIMESTAMP)) {
-                        timeStampFormat = input.format;
+                        timeStampFormat = new StringBuilder(input.format);
                     }
                 } else if (input.action == CustomTraceDefinition.ACTION_APPEND) {
                     String s = data.get(key);
@@ -937,9 +926,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     }
                     if (input.tag.equals(Tag.TIMESTAMP)) {
                         if (timeStampFormat != null) {
-                            timeStampFormat += input.format;
+                            timeStampFormat.append(input.format);
                         } else {
-                            timeStampFormat = input.format;
+                            timeStampFormat = new StringBuilder(input.format);
                         }
                     }
                 } else if (input.action == CustomTraceDefinition.ACTION_APPEND_WITH_SEPARATOR) {
@@ -951,9 +940,9 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     }
                     if (input.tag.equals(Tag.TIMESTAMP)) {
                         if (timeStampFormat != null) {
-                            timeStampFormat += CustomTraceDefinition.SEPARATOR + input.format;
+                            timeStampFormat.append(CustomTraceDefinition.SEPARATOR).append(input.format);
                         } else {
-                            timeStampFormat = input.format;
+                            timeStampFormat = new StringBuilder(input.format);
                         }
                     }
                 }
@@ -1252,11 +1241,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             eventTypeButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    if (eventTypeButton.getSelection()) {
-                        eventTypeText.setEnabled(true);
-                    } else {
-                        eventTypeText.setEnabled(false);
-                    }
+                    eventTypeText.setEnabled(eventTypeButton.getSelection());
                 }
             });
             eventTypeButton.addSelectionListener(updateListener);
@@ -1376,8 +1361,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 inputLine.cardinality = Cardinality.ONE;
                 break;
             case 4: // (?,?)
-                int min,
-                max;
+                int min;
+                int max;
                 try {
                     min = Integer.parseInt(cardinalityMinText.getText());
                 } catch (NumberFormatException e) {
@@ -1498,11 +1483,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         actionCombo.setVisible(true);
                         break;
                     case 1: // Event type
-                        tagLabel.setVisible(false);
-                        tagText.setVisible(false);
-                        actionCombo.setVisible(true);
-                        break;
                     case 2: // Message
+                    case 4: // Field type
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         actionCombo.setVisible(true);
@@ -1511,11 +1493,6 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         tagLabel.setVisible(false);
                         tagText.setVisible(false);
                         actionCombo.setVisible(false);
-                        break;
-                    case 4: // Field type
-                        tagLabel.setVisible(false);
-                        tagText.setVisible(false);
-                        actionCombo.setVisible(true);
                         break;
                     case 5: // Other
                         tagLabel.setText(Messages.CustomTxtParserInputWizardPage_name);
@@ -1585,7 +1562,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             treeViewer.refresh();
         }
 
-        StringBuffer errors = new StringBuffer();
+        StringBuilder errors = new StringBuilder();
 
         if (definition.categoryName.length() == 0) {
             errors.append("Enter a category for the new trace type. "); //$NON-NLS-1$
@@ -1653,8 +1630,8 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
      *            The name of the line
      * @return The cleaned up line
      */
-    public StringBuffer validateLine(InputLine inputLine, String name) {
-        StringBuffer errors = new StringBuffer();
+    public StringBuilder validateLine(InputLine inputLine, String name) {
+        StringBuilder  errors = new StringBuilder();
         Line line = null;
         if (selectedLine != null && selectedLine.inputLine.equals(inputLine)) {
             line = selectedLine;
