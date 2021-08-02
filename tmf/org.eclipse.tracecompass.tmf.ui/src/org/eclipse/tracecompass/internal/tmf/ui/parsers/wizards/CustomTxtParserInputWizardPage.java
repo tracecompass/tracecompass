@@ -716,7 +716,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                     lineIsNull = false;
                 }
                 int length = line.length();
-                String log = line.replaceAll("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                String log = line.replace("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$
                 for (InputLine rootInputLine : definition.inputs) {
                     Pattern pattern;
                     try {
@@ -746,7 +746,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                         while (scanner.hasNext()) {
                             line = scanner.next();
                             length = line.length();
-                            log = line.replaceAll("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                            log = line.replace("\r", ""); //$NON-NLS-1$ //$NON-NLS-2$
                             boolean processed = false;
                             if (currentInput == null) {
                                 for (InputLine input : definition.inputs) {
