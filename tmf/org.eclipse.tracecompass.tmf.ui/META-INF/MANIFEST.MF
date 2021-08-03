@@ -73,7 +73,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.ui.model;x-int
  org.eclipse.tracecompass.internal.tmf.ui.viewers.tree;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views;x-friends:="org.eclipse.tracecompass.tmf.ui.swtbot.tests",
- org.eclipse.tracecompass.internal.tmf.ui.views.eventdensity,
+ org.eclipse.tracecompass.internal.tmf.ui.views.eventdensity;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views.handler;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views.histogram;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views.statistics;
