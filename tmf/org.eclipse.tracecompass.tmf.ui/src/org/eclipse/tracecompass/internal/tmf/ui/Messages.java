@@ -236,10 +236,10 @@ public class Messages extends NLS {
     public static String CustomTxtParserInputWizardPage_windowTitle;
     public static String CustomTxtParserInputWizardPage_titleEdit;
     public static String CustomTxtParserInputWizardPage_titleNew;
-    public static String CustomTxtParserOutputWizardPage_description;
-    public static String CustomTxtParserOutputWizardPage_moveAfter;
-    public static String CustomTxtParserOutputWizardPage_moveBefore;
-    public static String CustomTxtParserOutputWizardPage_visible;
+    public static String CustomParserOutputWizardPage_description;
+    public static String CustomParserOutputWizardPage_moveAfter;
+    public static String CustomParserOutputWizardPage_moveBefore;
+    public static String CustomParserOutputWizardPage_visible;
     public static String CustomXmlParserInputWizardPage_default;
     public static String CustomXmlParserInputWizardPage_emptyCategoryError;
     public static String CustomXmlParserInputWizardPage_emptyEventTypeError;
@@ -296,10 +296,6 @@ public class Messages extends NLS {
     public static String CustomXmlParserInputWizardPage_titleEdit;
     public static String CustomXmlParserInputWizardPage_titleNew;
     public static String CustomXmlParserInputWizardPage_windowTitle;
-    public static String CustomXmlParserOutputWizardPage_description;
-    public static String CustomXmlParserOutputWizardPage_moveAfter;
-    public static String CustomXmlParserOutputWizardPage_moveBefore;
-    public static String CustomXmlParserOutputWizardPage_visible;
 
     public static String FilterDialog_FilterDialogTitle;
     public static String FilterTreeLabelProvider_AspectHint;

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -40,27 +41,23 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomEventAspects;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.OutputColumn;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition.Tag;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
-import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
-import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTable;
 
 /**
- * Output wizard page for custom text trace parsers.
+ * Output wizard page for custom XML trace parsers.
  *
  * @author Patrick Tasse
  */
-public class CustomTxtParserOutputWizardPage extends WizardPage {
+public class CustomParserOutputWizardPage extends WizardPage {
 
     private static final Image UP_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/up_button.gif"); //$NON-NLS-1$
     private static final Image DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/down_button.gif"); //$NON-NLS-1$
-    private final CustomTxtParserWizard wizard;
-    private CustomTxtTraceDefinition definition;
+    private final ICustomParserInputPage inputPage;
+    private CustomTraceDefinition definition;
     private List<Output> outputs = new ArrayList<>();
     private Composite container;
     private SashForm sash;
@@ -69,18 +66,30 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
     private Composite tableContainer;
     private TmfEventsTable previewTable;
     private File tmpFile;
+    private CustomTraceDefinition fDefinition;
+    private final String fTraceType;
+    private final Function<TraceParams, ITmfTrace> fBuilder;
 
     /**
      * Constructor
      *
-     * @param wizard
-     *            The wizard to which this page belongs
+     * @param inputPage
+     *            The input page for the output.
+     * @param definition
+     *            the definition
+     * @param traceType
+     *            the trace type string, used for error messages.
+     * @param builder
+     *            The trace builder
      */
-    protected CustomTxtParserOutputWizardPage(final CustomTxtParserWizard wizard) {
+    protected CustomParserOutputWizardPage(ICustomParserInputPage inputPage, CustomTraceDefinition definition, String traceType, Function<TraceParams, ITmfTrace> builder) {
         super("CustomParserOutputWizardPage"); //$NON-NLS-1$
-        setTitle(wizard.inputPage.getTitle());
-        setDescription(Messages.CustomTxtParserOutputWizardPage_description);
-        this.wizard = wizard;
+        fDefinition = definition;
+        fBuilder = builder;
+        setTitle(inputPage.getTitle());
+        setDescription(Messages.CustomParserOutputWizardPage_description);
+        this.inputPage = inputPage;
+        fTraceType = traceType;
         setPageComplete(false);
     }
 
@@ -113,11 +122,11 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         tableLayout.marginHeight = 0;
         tableLayout.marginWidth = 0;
         tableContainer.setLayout(tableLayout);
-        previewTable = new TmfEventsTable(tableContainer, 0, CustomEventAspects.generateAspects(new CustomTxtTraceDefinition()));
+        previewTable = new TmfEventsTable(tableContainer, 0, new ArrayList<>());
         previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        if (wizard.definition != null) {
-            loadDefinition(wizard.definition);
+        if (fDefinition != null) {
+            loadDefinition(fDefinition);
         }
         setControl(container);
 
@@ -129,7 +138,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         super.dispose();
     }
 
-    private void loadDefinition(final CustomTxtTraceDefinition def) {
+    private void loadDefinition(final CustomTraceDefinition def) {
         for (final OutputColumn outputColumn : def.outputs) {
             final Output output = new Output(outputsContainer, outputColumn.tag, outputColumn.name);
             outputs.add(output);
@@ -139,8 +148,8 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
     @Override
     public void setVisible(final boolean visible) {
         if (visible) {
-            this.definition = wizard.inputPage.getDefinition();
-            final List<Entry<Tag, String>> inputs = wizard.inputPage.getInputs();
+            this.definition = inputPage.getDefinition();
+            final List<Entry<Tag, String>> inputs = inputPage.getInputs();
 
             // substitute extra field name/value with extra fields tag
             Iterator<Entry<Tag, String>> iterator = inputs.iterator();
@@ -243,35 +252,30 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
         tmpFile = Activator.getDefault().getStateLocation().addTrailingSeparator().append("customwizard.tmp").toFile(); //$NON-NLS-1$
 
         try (final FileWriter writer = new FileWriter(tmpFile);) {
-            writer.write(wizard.inputPage.getInputText());
+            writer.write(inputPage.getInputText());
         } catch (final IOException e) {
-            Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error creating " + fTraceType + ". File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        try {
-            final CustomTxtTrace trace = new CustomTxtTrace(null, definition, tmpFile.getAbsolutePath(), CACHE_SIZE) {
-                @Override
-                protected ITmfTraceIndexer createIndexer(int interval) {
-                    return new TmfCheckpointIndexer(this, interval);
-                }
-            };
-            trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
-            previewTable.dispose();
-            previewTable = new TmfEventsTable(tableContainer, CACHE_SIZE, CustomEventAspects.generateAspects(definition));
-            previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-            previewTable.setTrace(trace, true);
-        } catch (final TmfTraceException e) {
-            Activator.getDefault().logError("Error creating CustomTxtTrace. File:" + tmpFile.getAbsolutePath(), e); //$NON-NLS-1$
+        TraceParams tp = new TraceParams(definition, tmpFile, CACHE_SIZE);
+        final ITmfTrace trace = fBuilder.apply(tp);
+        if (trace == null) {
+            return;
         }
+
+        previewTable.dispose();
+        previewTable = new TmfEventsTable(tableContainer, CACHE_SIZE, CustomEventAspects.generateAspects(definition));
+        previewTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        previewTable.setTrace(trace, true);
 
         tableContainer.layout();
         container.layout();
     }
 
     /**
-     * Extract the list of output columns from the page's contents.
+     * Extract the output columns from the page's current contents.
      *
-     * @return The output columns
+     * @return The list of output columns
      */
     public List<OutputColumn> extractOutputs() {
         final List<OutputColumn> outputColumns = new ArrayList<>();
@@ -297,7 +301,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
             this.name = name;
 
             enabledButton = new Button(parent, SWT.CHECK);
-            enabledButton.setToolTipText(Messages.CustomTxtParserOutputWizardPage_visible);
+            enabledButton.setToolTipText(Messages.CustomParserOutputWizardPage_visible);
             enabledButton.setSelection(true);
             enabledButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -305,9 +309,6 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
                     updatePreviewTable();
                 }
             });
-            //            if (messageOutput != null) {
-            //                enabledButton.moveAbove(messageOutput.enabledButton);
-            //            }
 
             nameLabel = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
             nameLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
@@ -316,7 +317,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
 
             upButton = new Button(parent, SWT.PUSH);
             upButton.setImage(UP_IMAGE);
-            upButton.setToolTipText(Messages.CustomTxtParserOutputWizardPage_moveBefore);
+            upButton.setToolTipText(Messages.CustomParserOutputWizardPage_moveBefore);
             upButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
@@ -327,7 +328,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
 
             downButton = new Button(parent, SWT.PUSH);
             downButton.setImage(DOWN_IMAGE);
-            downButton.setToolTipText(Messages.CustomTxtParserOutputWizardPage_moveAfter);
+            downButton.setToolTipText(Messages.CustomParserOutputWizardPage_moveAfter);
             downButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
@@ -350,7 +351,7 @@ public class CustomTxtParserOutputWizardPage extends WizardPage {
      *
      * @return The trace definition
      */
-    public CustomTxtTraceDefinition getDefinition() {
+    public CustomTraceDefinition getDefinition() {
         return definition;
     }
 

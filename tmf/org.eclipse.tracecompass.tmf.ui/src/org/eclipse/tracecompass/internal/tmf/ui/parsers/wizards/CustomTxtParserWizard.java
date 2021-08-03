@@ -14,13 +14,22 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.parsers.wizards;
 
+import java.util.function.Function;
+
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.parsers.CustomParserUtils;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -32,9 +41,9 @@ import org.eclipse.ui.IWorkbench;
 public class CustomTxtParserWizard extends Wizard implements INewWizard {
 
     CustomTxtParserInputWizardPage inputPage;
-    CustomTxtParserOutputWizardPage outputPage;
+    CustomParserOutputWizardPage outputPage;
     private ISelection selection;
-    CustomTxtTraceDefinition definition;
+    CustomTxtTraceDefinition fDefinition;
     String initialCategoryName;
     String initialDefinitionName;
 
@@ -53,7 +62,7 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
      */
     public CustomTxtParserWizard(CustomTxtTraceDefinition definition) {
         super();
-        this.definition = definition;
+        this.fDefinition = definition;
         if (definition != null) {
             initialCategoryName = definition.categoryName;
             initialDefinitionName = definition.definitionName;
@@ -63,8 +72,8 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
 
     @Override
     public boolean performFinish() {
-        CustomTxtTraceDefinition def = outputPage.getDefinition();
-        if (definition != null) {
+        CustomTraceDefinition def = outputPage.getDefinition();
+        if (fDefinition != null) {
             if (!initialCategoryName.equals(def.categoryName) || !initialDefinitionName.equals(def.definitionName)) {
                 CustomTxtTraceDefinition.delete(initialCategoryName, initialDefinitionName);
             }
@@ -77,9 +86,29 @@ public class CustomTxtParserWizard extends Wizard implements INewWizard {
 
     @Override
     public void addPages() {
-        inputPage = new CustomTxtParserInputWizardPage(selection, definition);
+        String traceType = "CustomTxtTrace"; //$NON-NLS-1$
+        Function<TraceParams, ITmfTrace> builder = (TraceParams tp) -> {
+            CustomTraceDefinition definition = tp.getDefinition();
+            if (definition instanceof CustomTxtTraceDefinition) {
+                CustomTxtTrace trace;
+                try {
+                    trace = new CustomTxtTrace(null, (CustomTxtTraceDefinition) definition, tp.getFile().getAbsolutePath(), tp.getCacheSize()) {
+                        @Override
+                        protected ITmfTraceIndexer createIndexer(int interval) {
+                            return new TmfCheckpointIndexer(this, interval);
+                        }
+                    };
+                    trace.getIndexer().buildIndex(0, TmfTimeRange.ETERNITY, false);
+                    return trace;
+                } catch (TmfTraceException e) {
+                    Activator.getDefault().logError("Error creating" + traceType + ". File:" + tp.getFile().getAbsolutePath() + e); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+            }
+            return null;
+        };
+        inputPage = new CustomTxtParserInputWizardPage(selection, fDefinition);
         addPage(inputPage);
-        outputPage = new CustomTxtParserOutputWizardPage(this);
+        outputPage = new CustomParserOutputWizardPage(inputPage, fDefinition, traceType, builder);
         addPage(outputPage);
     }
 

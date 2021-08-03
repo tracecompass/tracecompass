@@ -98,7 +98,7 @@ import org.osgi.framework.Bundle;
  *
  * @author Patrick Tasse
  */
-public class CustomTxtParserInputWizardPage extends WizardPage {
+public class CustomTxtParserInputWizardPage extends WizardPage implements ICustomParserInputPage {
 
     private static final String DEFAULT_REGEX = "\\s*(.*\\S)"; //$NON-NLS-1$
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
@@ -586,11 +586,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         return getName(inputLine.parentInput) + "." + Integer.toString(inputLine.parentInput.childrenInputs.indexOf(inputLine) + 1); //$NON-NLS-1$
     }
 
-    /**
-     * Get the global list of inputs.
-     *
-     * @return The list of inputs
-     */
+    @Override
     public List<Entry<Tag, String>> getInputs() {
         List<Entry<Tag, String>> inputs = new ArrayList<>();
         for (InputLine inputLine : definition.inputs) {
@@ -1739,20 +1735,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         return errors;
     }
 
-    /**
-     * Get the trace definition.
-     *
-     * @return The trace definition
-     */
-    public CustomTxtTraceDefinition getDefinition() {
+    @Override
+    public CustomTraceDefinition getDefinition() {
         return definition;
     }
 
-    /**
-     * Get the raw text of the input.
-     *
-     * @return The raw input text
-     */
+    @Override
     public char[] getInputText() {
         return inputText.getText().toCharArray();
     }

@@ -107,7 +107,7 @@ import com.google.common.base.Joiner;
  *
  * @author Patrick Tasse
  */
-public class CustomXmlParserInputWizardPage extends WizardPage {
+public class CustomXmlParserInputWizardPage extends WizardPage implements ICustomParserInputPage {
 
     private static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"; //$NON-NLS-1$
     private static final String TIMESTAMP_FORMAT_BUNDLE = "org.eclipse.tracecompass.doc.user"; //$NON-NLS-1$
@@ -668,11 +668,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         super.setVisible(visible);
     }
 
-    /**
-     * Get the global list of inputs.
-     *
-     * @return The list of inputs
-     */
+    @Override
     public List<Entry<Tag, String>> getInputs() {
         return getInputs(definition.rootInputElement);
     }
@@ -1865,20 +1861,13 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         return errors;
     }
 
-    /**
-     * Get the trace definition.
-     *
-     * @return The trace definition
-     */
+    @Override
     public CustomXmlTraceDefinition getDefinition() {
         return definition;
     }
 
-    /**
-     * Get the raw text input.
-     *
-     * @return The raw text input.
-     */
+
+    @Override
     public char[] getInputText() {
         return inputText.getText().toCharArray();
     }
