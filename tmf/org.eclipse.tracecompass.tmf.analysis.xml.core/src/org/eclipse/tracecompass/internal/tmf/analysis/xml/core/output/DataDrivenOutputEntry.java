@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -231,6 +232,31 @@ public class DataDrivenOutputEntry implements IDataDrivenRuntimeObject {
             i++;
         }
 
+        Map<Integer, Long> startTimes = new HashMap<>();
+        Map<Integer, Long> endTimes = new HashMap<>();
+        long startTime = ss.getStartTime();
+        try {
+            Iterable<ITmfStateInterval> iter = ss.query2D(quarks, Arrays.asList(startTime, currentEnd));
+            for (ITmfStateInterval interval : iter) {
+                if (interval.getValue() == null) {
+                    /*
+                     * Adjust the start/end time if a null state crosses one and
+                     * only one start/end boundary. Otherwise leave the default
+                     * to state system start/end time.
+                     */
+                    int quark = interval.getAttribute();
+                    if (!interval.intersects(currentEnd)) {
+                        startTimes.put(quark, interval.getEndTime() + 1);
+                    }
+                    if (!interval.intersects(startTime)) {
+                        endTimes.put(quark, interval.getStartTime());
+                    }
+                }
+            }
+        } catch (StateSystemDisposedException e) {
+            return Collections.emptyList();
+        }
+
         /* Process each quark */
         DataDrivenStateSystemPath displayPath = fDisplay;
         DataDrivenStateSystemPath namePath = fName;
@@ -244,8 +270,8 @@ public class DataDrivenOutputEntry implements IDataDrivenRuntimeObject {
             long id = idGenerator.getIdFor(ss, quark);
             // Get the quark containing the data to display, else there is no display
             int displayQuark = ITmfStateSystem.INVALID_ATTRIBUTE;
-            long entryStart = ss.getStartTime();
-            long entryEnd = currentEnd;
+            long entryStart = startTimes.getOrDefault(quark, startTime);
+            long entryEnd = endTimes.getOrDefault(quark, currentEnd);
             if (displayPath != null) {
                 displayQuark = displayPath.getQuark(quark, container);
                 if (displayQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
@@ -253,33 +279,6 @@ public class DataDrivenOutputEntry implements IDataDrivenRuntimeObject {
                     continue;
                 }
                 callback.registerQuark(id, ss, displayQuark, fDisplayType);
-
-                try {
-
-                    ITmfStateInterval oneInterval = ss.querySingleState(entryStart, displayQuark);
-                    /* The entry start is the first non-null interval */
-                    while (oneInterval.getStateValue().isNull()) {
-                        long ts = oneInterval.getEndTime() + 1;
-                        if (ts > currentEnd) {
-                            break;
-                        }
-                        oneInterval = ss.querySingleState(ts, displayQuark);
-                    }
-                    entryStart = oneInterval.getStartTime();
-
-                    /* The entry end is the last non-null interval */
-                    oneInterval = ss.querySingleState(entryEnd - 1, displayQuark);
-                    while (oneInterval.getStateValue().isNull()) {
-                        long ts = oneInterval.getStartTime() - 1;
-                        if (ts < ss.getStartTime()) {
-                            break;
-                        }
-                        oneInterval = ss.querySingleState(ts, displayQuark);
-                    }
-                    entryEnd = Math.min(oneInterval.getEndTime() + 1, currentEnd);
-
-                } catch (StateSystemDisposedException e) {
-                }
             }
 
             // Get the name of this entry
