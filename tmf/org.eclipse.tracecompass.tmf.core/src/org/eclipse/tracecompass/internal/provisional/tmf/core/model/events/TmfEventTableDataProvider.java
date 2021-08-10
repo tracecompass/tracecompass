@@ -802,11 +802,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             return null;
         }
 
-        /*
-         * startRank + 1 because we do not want to include the start event itself in the
-         * search
-         */
-        EventMatchingRequest req = new EventMatchingRequest(startRank + 1, predicate, monitor);
+        EventMatchingRequest req = new EventMatchingRequest(startRank, predicate, monitor);
         trace.sendRequest(req);
         try {
             req.waitForCompletion();
@@ -847,18 +843,15 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
          */
         int step = trace.getCacheSize();
 
-        /*
-         * If we are close to the beginning of the trace, make sure we only look for the
-         * events before the startRank.
-         */
-        if (startRank < step) {
-            step = (int) startRank;
-        }
-
-        long currentRank = startRank;
+        long currentRank = startRank + 1;
         try {
             while (currentRank > 0) {
-                currentRank = Math.max(currentRank - step, 0);
+
+                currentRank = currentRank - step;
+                if (currentRank < 0) {
+                    step += currentRank;
+                    currentRank = 0;
+                }
 
                 List<WrappedEvent> list = new ArrayList<>(step);
                 ArrayFillingRequest req = new ArrayFillingRequest(currentRank, step, list, monitor);
