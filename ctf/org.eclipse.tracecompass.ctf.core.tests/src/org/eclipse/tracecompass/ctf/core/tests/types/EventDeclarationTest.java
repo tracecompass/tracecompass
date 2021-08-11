@@ -331,7 +331,7 @@ public class EventDeclarationTest {
         assertNotNull(ds.getScopePath());
         assertNotNull(ed.getDeclaration());
         assertNotNull(ed.getFields());
-        assertNull(ed.getContext());
+        assertNotNull(ed.getContext());
         assertNotNull(ed.getPacketContext());
         assertNotNull(ed.getCPU());
         assertNull(ds.lookupDefinition("context"));

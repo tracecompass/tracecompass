@@ -205,7 +205,7 @@ public class CtfTmfEventTest {
     @Test
     public void testToString() {
         String s = fixture.getContent().toString();
-        assertEquals("ret=4132", s);
+        assertEquals("ret=4132, context.cpu_id=1", s);
     }
 
     /**
