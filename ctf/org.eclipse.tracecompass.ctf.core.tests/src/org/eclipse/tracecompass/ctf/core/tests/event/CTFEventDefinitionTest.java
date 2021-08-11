@@ -74,31 +74,31 @@ public class CTFEventDefinitionTest {
         Definition[] eDefs = { pod, ctx };
         Definition[] fDefs = { pid, ctx, pod };
 
-        StructDeclaration pContextDec = new StructDeclaration(8);
+        StructDeclaration pHeaderDec = new StructDeclaration(8);
 
         StructDefinition sContext = new StructDefinition(streamContextDec, null, ILexicalScope.STREAM_PACKET_CONTEXT.getPath(), sDefs);
         StructDefinition eContext = new StructDefinition(eventContextDec, null, ILexicalScope.STREAM_EVENT_CONTEXT.getPath(), eDefs);
-        StructDefinition pContext = new StructDefinition(pContextDec, null, ILexicalScope.FIELDS.getPath(), new Definition[0]);
+        StructDefinition pHeader  = new StructDefinition(pHeaderDec, null, ILexicalScope.FIELDS.getPath(), new Definition[0]);
         StructDefinition fields = new StructDefinition(fDec, null, ILexicalScope.FIELDS.getPath(), fDefs);
 
         int cpu = IEventDefinition.UNKNOWN_CPU;
 
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, null, null, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, null, fields, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, pContext, null, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, pContext, fields, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, pHeader, null, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, null, pHeader, fields, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, eContext, null, null, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, eContext, null, fields, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, eContext, pContext, null, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, eContext, pContext, fields, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, eContext, pHeader, null, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, null, eContext, pHeader, fields, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, null, null, null, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, null, null, fields, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, null, pContext, null, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, null, pContext, fields, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, null, pHeader, null, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, null, pHeader, fields, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, eContext, null, null, null));
         fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, eContext, null, fields, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, eContext, pContext, null, null));
-        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, eContext, pContext, fields, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, eContext, pHeader, null, null));
+        fixture.add(new EventDefinition(eventDeclaration, cpu, 100, null, sContext, eContext, pHeader, fields, null));
     }
 
     /**

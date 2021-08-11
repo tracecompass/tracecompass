@@ -418,6 +418,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      *
      * @return the backing context definition
      */
+    @Override
     public StructDefinition getStreamPacketContextDef() {
         return fStreamPacketContextDef;
     }

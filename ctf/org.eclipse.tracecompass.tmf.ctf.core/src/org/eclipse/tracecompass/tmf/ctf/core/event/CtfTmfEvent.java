@@ -412,6 +412,16 @@ public class CtfTmfEvent extends TmfEvent
     }
 
     /**
+     * Get the packet context
+     *
+     * @return the packet header
+     * @since 7.3
+     */
+    public @Nullable ICompositeDefinition getPacketHeader() {
+        return fEvent.getPacketHeader();
+    }
+
+    /**
      * Get the stream context
      *
      * @return the stream context

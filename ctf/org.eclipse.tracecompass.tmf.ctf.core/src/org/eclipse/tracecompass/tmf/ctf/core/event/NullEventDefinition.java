@@ -44,6 +44,11 @@ final class NullEventDefinition implements IEventDefinition {
     }
 
     @Override
+    public @Nullable ICompositeDefinition getPacketHeader() {
+        return null;
+    }
+
+    @Override
     public Map<String, Object> getPacketAttributes() {
         return Collections.emptyMap();
     }

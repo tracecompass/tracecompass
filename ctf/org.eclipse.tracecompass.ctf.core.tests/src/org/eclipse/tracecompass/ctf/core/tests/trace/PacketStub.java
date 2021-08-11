@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFPacketDescriptor;
+import org.eclipse.tracecompass.ctf.core.event.types.ICompositeDefinition;
 
 /**
  * Internal implementation to test packet index
@@ -71,6 +72,11 @@ class PacketStub implements ICTFPacketDescriptor {
     @Override
     public @NonNull Map<String, Object> getAttributes() {
         return Collections.emptyMap();
+    }
+
+    @Override
+    public ICompositeDefinition getStreamPacketContextDef() {
+        return null;
     }
 
     @Override

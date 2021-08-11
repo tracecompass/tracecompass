@@ -197,7 +197,7 @@ public class CTFStreamPacketOutputWriter {
                         StructDefinition structDefinition = (StructDefinition) eventHeader;
                         def = structDefinition.lookupDefinition(CTFStrings.TIMESTAMP);
                     }
-                    Definition definition = ((StreamInputPacketIndexEntry) entry).getStreamPacketContextDef().getDefinition(CTFStrings.TIMESTAMP_BEGIN);
+                    Definition definition = context.getDefinition(CTFStrings.TIMESTAMP_BEGIN);
                     if (definition != null && def != null && def.size() == definition.size()) {
                         lastLargeTimestamp = timestampInCycles;
                     }

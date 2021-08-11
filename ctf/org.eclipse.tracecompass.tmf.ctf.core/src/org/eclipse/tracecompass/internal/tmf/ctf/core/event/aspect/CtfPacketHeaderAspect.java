@@ -56,11 +56,11 @@ public class CtfPacketHeaderAspect implements ITmfEventAspect<List<ITmfEventFiel
         if (!(event instanceof CtfTmfEvent)) {
             return null;
         }
-        ICompositeDefinition packetContext = ((CtfTmfEvent) event).getPacketContext();
-        if (packetContext == null) {
+        ICompositeDefinition packetHeader = ((CtfTmfEvent) event).getPacketHeader();
+        if (packetHeader == null) {
             return null;
         }
-        Object value = CtfTmfEventField.parseField(packetContext, ANON).getValue();
+        Object value = CtfTmfEventField.parseField(packetHeader, ANON).getValue();
         if(value instanceof ITmfEventField[]) {
             return  Arrays.asList((ITmfEventField[]) value);
         }

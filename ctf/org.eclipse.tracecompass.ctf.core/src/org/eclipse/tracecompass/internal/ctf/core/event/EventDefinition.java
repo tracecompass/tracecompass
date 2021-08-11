@@ -75,6 +75,8 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
 
     private final @NonNull Map<String, Object> fPacketAttributes;
 
+    private final ICompositeDefinition fPacketHeader;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -94,15 +96,15 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
      *            definition
      * @param eventContext
      *            The event context
-     * @param packetContext
-     *            the packet context (the one with content size, not magic
-     *            number)
+     * @param packetHeader
+     *            the packet header (the one with magic number)
      * @param streamContext
      *            the stream context
      * @param fields
      *            The event fields
      * @param packetDescriptor
-     *            descriptor of the packet containing this event
+     *            descriptor of the packet containing this event (containing
+     *            the packet context)
      * @since 2.0
      */
     public EventDefinition(IEventDeclaration declaration,
@@ -111,7 +113,7 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
             ICompositeDefinition eventHeaderDefinition,
             ICompositeDefinition streamContext,
             ICompositeDefinition eventContext,
-            ICompositeDefinition packetContext,
+            ICompositeDefinition packetHeader,
             ICompositeDefinition fields,
             @Nullable ICTFPacketDescriptor packetDescriptor) {
         fDeclaration = declaration;
@@ -120,9 +122,10 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
         fTimestamp = timestamp;
         fFields = fields;
         fEventContext = eventContext;
-        fPacketContext = packetContext;
+        fPacketHeader = packetHeader;
         fStreamContext = streamContext;
         fPacketAttributes = packetDescriptor != null ? packetDescriptor.getAttributes() : Collections.emptyMap();
+        fPacketContext = packetDescriptor != null ? packetDescriptor.getStreamPacketContextDef() : null;
     }
 
     // ------------------------------------------------------------------------
@@ -230,6 +233,11 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
     @Override
     public Map<String, Object> getPacketAttributes() {
         return fPacketAttributes;
+    }
+
+    @Override
+    public ICompositeDefinition getPacketHeader() {
+        return fPacketHeader;
     }
 
     // ------------------------------------------------------------------------
