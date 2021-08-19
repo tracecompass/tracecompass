@@ -19,12 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.model.IOutputElement;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
@@ -38,6 +40,7 @@ import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -63,11 +66,14 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     private @Nullable StateItem @Nullable[] fStateTable = null;
     private StyleManager fStyleManager = new StyleManager(fetchStyles());
 
+    private Function<@Nullable ITimeGraphEntry, @Nullable String> fStateTypeResolver;
+
     /**
      * Constructor
      */
     public BaseDataProviderTimeGraphPresentationProvider() {
         super();
+        fStateTypeResolver = unused -> Messages.BaseDataProviderTimeGraphPresentationProvider_Trace;
     }
 
     /**
@@ -347,4 +353,27 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
             }
         }
     }
+
+    @Override
+    public @Nullable String getStateTypeName(@Nullable ITimeGraphEntry entry) {
+        return fStateTypeResolver.apply(entry);
+    }
+
+    @Override
+    public @Nullable String getStateTypeName() {
+        return getStateTypeName(null);
+    }
+
+    /**
+     * Sets the resolver function for state type names, coupled to UI element
+     * but so is the idea of a presentation provider.
+     *
+     * @param resolver
+     *            the function that takes in a row and says what "type" its
+     *            entries are
+     */
+    public void setStateTypeNameResolver(Function<@Nullable ITimeGraphEntry, @Nullable String> resolver) {
+        fStateTypeResolver = resolver;
+    }
+
 }

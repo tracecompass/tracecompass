@@ -35,6 +35,10 @@ public class Messages extends NLS {
      */
     public static @Nullable String CallStackStateProvider_IncoherentCallstack;
 
+    public static String CallStackDataProvider_toolTipAddress;
+
+    public static String CallStackDataProvider_toolTipState;
+
     /**
      * Name of the data provider shown to the user
      */

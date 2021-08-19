@@ -49,7 +49,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  * presentation provider.
  *
  * @author Patrick Tasse
+ * @deprecated use output styles in the data provider instead
  */
+@Deprecated
 public class CallStackPresentationProvider extends TimeGraphPresentationProvider {
 
     /** Number of colors used for call stack events */

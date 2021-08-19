@@ -26,7 +26,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.base.FlameDefaultPalette;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
@@ -37,6 +39,8 @@ import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
@@ -50,9 +54,9 @@ import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -66,8 +70,9 @@ import com.google.common.collect.Multimap;
  *
  * @author Loic Prieur-Drevon
  */
-public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNull CallStackAnalysis, @NonNull CallStackEntryModel> {
+public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNull CallStackAnalysis, @NonNull CallStackEntryModel> implements IOutputStyleProvider {
 
+    private static final String ADDRESS_FORMAT = "0x%x"; //$NON-NLS-1$
     /**
      * Extension point ID.
      */
@@ -78,15 +83,67 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
 
     private final @NonNull Collection<@NonNull ISymbolProvider> fProviders = new ArrayList<>();
 
-    private final LoadingCache<Pair<Integer, ITmfStateInterval>, @Nullable String> fTimeEventNames = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .build(new CacheLoader<Pair<Integer, ITmfStateInterval>, @Nullable String>() {
-                @Override
-                public @Nullable String load(Pair<Integer, ITmfStateInterval> pidInterval) {
-                    Integer pid = pidInterval.getFirst();
-                    ITmfStateInterval interval = pidInterval.getSecond();
+    private static final class TimePidNameValue {
 
-                    Object nameValue = interval.getValue();
+        private final long fTime;
+        private final int fPid;
+        private final Object fNameValue;
+
+        public TimePidNameValue(int pid, Object nameValue, long time) {
+            fTime = time;
+            fPid = pid;
+            fNameValue = nameValue;
+        }
+
+        /**
+         * @return the time
+         */
+        public long getTime() {
+            return fTime;
+        }
+
+        /**
+         * @return the pid
+         */
+        public int getPid() {
+            return fPid;
+        }
+
+        /**
+         * @return the nameValue
+         */
+        public Object getNameValue() {
+            return fNameValue;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fNameValue, fPid, fTime);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            TimePidNameValue other = (TimePidNameValue) obj;
+            return Objects.equals(fNameValue, other.fNameValue) && fPid == other.fPid && fTime == other.fTime;
+        }
+    }
+
+    private final LoadingCache<TimePidNameValue, @Nullable String> fTimeEventNames = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .build(new CacheLoader<TimePidNameValue, @Nullable String>() {
+                @Override
+                public @Nullable String load(TimePidNameValue value) {
+                    Object nameValue = value.getNameValue();
+
                     Long address = null;
                     String name = null;
                     if (nameValue instanceof String) {
@@ -106,7 +163,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                     }
                     if (address != null) {
                         synchronized (fProviders) {
-                            name = SymbolProviderUtils.getSymbolText(fProviders, pid, interval.getStartTime(), address);
+                            name = SymbolProviderUtils.getSymbolText(fProviders, value.getPid(), value.getTime(), address);
                         }
                     }
                     return name;
@@ -174,7 +231,8 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                 }
                 String threadName = ss.getAttributeName(threadQuark);
                 /*
-                 * Default to process/trace entry, overwrite if a thread entry exists.
+                 * Default to process/trace entry, overwrite if a thread entry
+                 * exists.
                  */
                 long callStackParent = threadParentId;
                 if (threadQuark != processQuark) {
@@ -266,7 +324,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             predicates.putAll(computeRegexPredicate(regexesMap));
         }
 
-        @NonNull List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
+        List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
         for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
             if (subMonitor.isCanceled()) {
                 return null;
@@ -291,14 +349,11 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         Object value = interval.getValue();
         Integer pid = fQuarkToPid.get(interval.getAttribute());
         if (value != null && pid != null) {
-            String name = fTimeEventNames.getUnchecked(new Pair<>(pid, interval));
-            return new TimeGraphState(startTime, duration, getColorValue(name, value), name);
+            String name = fTimeEventNames.getUnchecked(new TimePidNameValue(pid, interval.getValue(), interval.getStartTime()));
+            Object key = name == null ? value : name;
+            return new TimeGraphState(startTime, duration, name, FlameDefaultPalette.getStyleFor(key));
         }
         return new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
-    }
-
-    private static int getColorValue(String name, Object value) {
-        return 31 * (name != null ? name.hashCode() : value.hashCode());
     }
 
     @Override
@@ -345,8 +400,8 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
      *            selection start time
      * @param forward
      *            if going to next or previous
-     * @return the next / previous state encapsulated in a row if it exists, else
-     *         null
+     * @return the next / previous state encapsulated in a row if it exists,
+     *         else null
      * @throws StateSystemDisposedException
      */
     private static List<ITimeGraphRowModel> getFollowEvent(ITmfStateSystem ss, Entry<Long, Integer> entry, long time, boolean forward) throws StateSystemDisposedException {
@@ -378,6 +433,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         List<@NonNull Long> times = DataProviderParameterUtils.extractTimeRequested(parameters);
         if (selected != null && times != null) {
             Map<@NonNull Long, @NonNull Integer> md = getSelectedEntries(selected);
+            ITmfTrace trace = getTrace();
             for (Long time : times) {
                 for (Entry<@NonNull Long, @NonNull Integer> entry : md.entrySet()) {
                     Long result = analysis.resolveDeviceId(entry.getValue(), time);
@@ -385,7 +441,6 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                         String deviceId = String.valueOf(result);
                         String deviceType = analysis.resolveDeviceType(entry.getValue(), time);
                         tooltips.put(deviceType, deviceId);
-                        ITmfTrace trace = getTrace();
                         Iterable<@NonNull CallsiteAnalysis> csas = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallsiteAnalysis.class);
                         for (CallsiteAnalysis csa : csas) {
                             List<@NonNull ITmfCallsite> res = csa.getCallsites(String.valueOf(trace.getUUID()), deviceType, deviceId, time);
@@ -395,10 +450,36 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                         }
                         return new TmfModelResponse<>(tooltips, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
                     }
+
+                    ITmfStateSystem stateSystem = analysis.getStateSystem();
+                    if (stateSystem != null) {
+                        try {
+                            Collection<@NonNull ISymbolProvider> symbolProviders = SymbolProviderManager.getInstance().getSymbolProviders(trace);
+                            ITmfStateInterval interval = stateSystem.querySingleState(Objects.requireNonNull(time), Objects.requireNonNull(entry.getValue()));
+                            Object value = interval.getValue();
+                            if (value instanceof Number) {
+                                long longValue = ((Number) value).longValue();
+                                for (ISymbolProvider provider : symbolProviders) {
+                                    TmfResolvedSymbol symbol = provider.getSymbol(longValue);
+                                    if (symbol != null) {
+                                        tooltips.put(Messages.CallStackDataProvider_toolTipState, symbol.getSymbolName());
+                                        tooltips.put(Messages.CallStackDataProvider_toolTipAddress, String.format(ADDRESS_FORMAT, symbol.getBaseAddress()));
+                                        break;
+                                    }
+                                }
+                                tooltips.computeIfAbsent(Messages.CallStackDataProvider_toolTipState, unused -> String.format(ADDRESS_FORMAT, longValue));
+                            } else {
+                                tooltips.put(Messages.CallStackDataProvider_toolTipState, interval.getValueString());
+                            }
+                        } catch (StateSystemDisposedException e) {
+                            Activator.getInstance().logError("State System Disposed", e); //$NON-NLS-1$
+                        }
+                    }
+
                 }
             }
         }
-        return new TmfModelResponse<>(Collections.emptyMap(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(tooltips, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     @Override
@@ -406,4 +487,8 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         return true;
     }
 
+    @Override
+    public @NonNull TmfModelResponse<@NonNull OutputStyleModel> fetchStyle(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return new TmfModelResponse<>(new OutputStyleModel(FlameDefaultPalette.getStyles()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+    }
 }

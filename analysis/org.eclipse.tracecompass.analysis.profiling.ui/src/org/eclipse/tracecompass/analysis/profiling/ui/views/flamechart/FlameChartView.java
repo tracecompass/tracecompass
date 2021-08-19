@@ -17,6 +17,8 @@
 
 package org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -45,6 +48,7 @@ import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provi
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider.CallStackEntryModel;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.Messages;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -160,6 +164,21 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
     private static final Image STACKFRAME_IMAGE = Objects.requireNonNull(Activator.getDefault()).getImageFromPath("icons/obj16/stckframe_obj.gif"); //$NON-NLS-1$
 
     private static final String IMPORT_BINARY_ICON_PATH = "icons/obj16/binaries_obj.gif"; //$NON-NLS-1$
+
+    private static final Function<@Nullable ITimeGraphEntry, @Nullable String> RESOLVER = (entry) -> {
+        if (entry instanceof TimeGraphEntry) {
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
+            if (model instanceof CallStackEntryModel) {
+                int type = ((CallStackEntryModel) model).getStackLevel();
+                if (type >= 0) {
+                    return Messages.CallStackPresentationProvider_Thread;
+                } else if (type == -1) {
+                    return Messages.CallStackPresentationProvider_Process;
+                }
+            }
+        }
+        return null;
+    };
 
     // ------------------------------------------------------------------------
     // Fields
@@ -282,7 +301,7 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
      * Default constructor
      */
     public FlameChartView() {
-        this(ID, new CallStackPresentationProvider(), CallStackDataProvider.ID);
+        this(ID, new BaseDataProviderTimeGraphPresentationProvider(), CallStackDataProvider.ID);
     }
 
     /**
@@ -304,6 +323,7 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
         setEntryComparator(new CallStackComparator());
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new CallStackTreeLabelProvider());
+        setStateTypeNameSupplier(RESOLVER);
     }
 
     // ------------------------------------------------------------------------
@@ -435,17 +455,16 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
 
     @Override
     protected TimeEvent createTimeEvent(@Nullable TimeGraphEntry entry, @Nullable ITimeGraphState state) {
-        if (state == null) {
-            throw new NullPointerException("state should not be null when creating time event"); //$NON-NLS-1$
-        }
-        if (state.getValue() == Integer.MIN_VALUE) {
+        requireNonNull(state, "state should not be null when creating time event"); //$NON-NLS-1$
+
+        String label = state.getLabel();
+        if (state.getValue() == Integer.MIN_VALUE && label == null && state.getStyle() == null) {
             return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
         }
-        String label = state.getLabel();
         if (label != null) {
-            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label, state.getActiveProperties());
+            return new NamedTimeEvent(entry, label, state);
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), state.getActiveProperties());
+        return new TimeEvent(entry, state);
     }
 
     /**
@@ -644,6 +663,15 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
         }
 
         return prevAction;
+    }
+
+    /**
+     * Sets the state type name supplier, useful for customized flamecharts.
+     *
+     * @since 3.0
+     */
+    protected void setStateTypeNameSupplier(Function<@Nullable ITimeGraphEntry, @Nullable String> resolver) {
+        ((BaseDataProviderTimeGraphPresentationProvider) getPresentationProvider()).setStateTypeNameResolver(resolver);
     }
 
     // ------------------------------------------------------------------------

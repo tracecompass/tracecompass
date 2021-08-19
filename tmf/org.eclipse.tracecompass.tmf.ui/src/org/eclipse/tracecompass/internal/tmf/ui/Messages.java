@@ -25,6 +25,7 @@ public class Messages extends NLS {
     public static String AddBookmarkDialog_Color;
     public static String AddBookmarkDialog_Message;
     public static String AddBookmarkDialog_Title;
+
     public static String ManageCustomParsersDialog_ConflictMessage;
     public static String ManageCustomParsersDialog_ConflictRenameButtonLabel;
     public static String ManageCustomParsersDialog_ConflictSkipButtonLabel;
@@ -370,6 +371,8 @@ public class Messages extends NLS {
     public static String TmfSourceLookup_OpenSourceCodeActionText;
     public static String TmfSourceLookup_OpenSourceCodeNotFound;
     public static String TmfSourceLookup_OpenSourceCodeSelectFileDialogTitle;
+
+    public static String BaseDataProviderTimeGraphPresentationProvider_Trace;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

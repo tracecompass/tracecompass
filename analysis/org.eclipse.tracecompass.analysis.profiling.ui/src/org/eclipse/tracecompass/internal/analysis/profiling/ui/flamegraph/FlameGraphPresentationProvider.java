@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 Ericsson
+ * Copyright (c) 2016, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -12,15 +12,24 @@ package org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph;
 
 import java.text.Format;
 import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tracecompass.analysis.profiling.core.base.FlameDefaultPalette;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunctionStatistics;
-import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.ITimeGraphStylePresentationProvider;
+import org.eclipse.tracecompass.tmf.core.model.IOutputElement;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
-import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
-import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
+import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -34,16 +43,19 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Sonia Farrah
  */
-public class FlameGraphPresentationProvider extends TimeGraphPresentationProvider {
-    /** Number of colors used for flameGraph events */
-    public static final int NUM_COLORS = 360;
+public class FlameGraphPresentationProvider extends TimeGraphPresentationProvider implements ITimeGraphStylePresentationProvider {
+
+    private static final OutputElementStyle TRANSPARENT_STYLE = new OutputElementStyle(null, ImmutableMap.of());
 
     private static final Format FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
+    private StyleManager fStyleManager = new StyleManager(FlameDefaultPalette.getStyles());
+    private Map<String, Integer> fKeyToIndex = new HashMap<>();
+
+    /** Number of colors used for flameGraph events */
+    public static final int NUM_COLORS = FlameDefaultPalette.getStyles().size() + 1;
 
     private final StateItem[] fStateTable;
     private FlameGraphView fView;
-
-    private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
 
     private enum State {
         MULTIPLE(new RGB(100, 100, 100)), EXEC(new RGB(0, 200, 0));
@@ -59,17 +71,103 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
      * Constructor
      */
     public FlameGraphPresentationProvider() {
-        fStateTable = new StateItem[NUM_COLORS + 1];
+        fStateTable = new StateItem[NUM_COLORS];
         fStateTable[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
-        int i = 1;
-        for (RGBAColor color : fPalette.get()) {
-            fStateTable[i] = new StateItem(RGBAUtil.fromRGBAColor(color).rgb, color.toString());
-            i++;
+        getStateTable();
+    }
+
+    @Override
+    public @NonNull StyleManager getStyleManager() {
+        return fStyleManager;
+    }
+
+    @Override
+    public @Nullable Object getStyle(OutputElementStyle elementStyle, String property) {
+        return fStyleManager.getStyle(elementStyle, property);
+    }
+
+    @Override
+    public @Nullable Float getFloatStyle(OutputElementStyle elementStyle, String property) {
+        return fStyleManager.getFactorStyle(elementStyle, property);
+    }
+
+    @Override
+    public @Nullable RGBAColor getColorStyle(OutputElementStyle elementStyle, String property) {
+        return fStyleManager.getColorStyle(elementStyle, property);
+    }
+
+
+    @Override
+    public @Nullable OutputElementStyle getElementStyle(ITimeEvent event) {
+        if (event instanceof NullTimeEvent) {
+            return null;
         }
+
+        if (event instanceof FlamegraphEvent) {
+            IOutputElement model = ((FlamegraphEvent) event).getModel();
+            OutputElementStyle eventStyle = model.getStyle();
+            if (eventStyle == null) {
+                String name = event.getLabel();
+                Object key = name == null ? model.getValue() : name;
+                eventStyle = FlameDefaultPalette.getStyleFor(key);
+            }
+            return eventStyle;
+        }
+        return TRANSPARENT_STYLE;
     }
 
     @Override
     public StateItem[] getStateTable() {
+        if (fStateTable[1] == null) {
+            Map<@NonNull String, @NonNull OutputElementStyle> styles = FlameDefaultPalette.getStyles();
+            if (styles.isEmpty()) {
+                for (int i = 0; i < NUM_COLORS; i++) {
+                    fStateTable[i + 1] = new StateItem(Collections.emptyMap());
+                }
+                return fStateTable;
+            }
+            int tableIndex = 1;
+            for (Entry<@NonNull String, @NonNull OutputElementStyle> styleEntry : styles.entrySet()) {
+                String styleKey = styleEntry.getKey();
+                fKeyToIndex.put(styleKey, tableIndex);
+                OutputElementStyle elementStyle = styleEntry.getValue();
+                Map<String, Object> styleMap = new HashMap<>();
+                RGBAColor bgColor = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
+                if (bgColor != null) {
+                    RGB rgb = new RGB(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue());
+                    styleMap.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(rgb));
+                }
+                RGBAColor color = getColorStyle(elementStyle, StyleProperties.COLOR);
+                if (color != null) {
+                    RGB rgb = new RGB(color.getRed(), color.getGreen(), color.getBlue());
+                    styleMap.put(StyleProperties.COLOR, ColorUtils.toHexColor(rgb));
+                }
+                Object styleName = getStyle(elementStyle, StyleProperties.STYLE_NAME);
+                if (styleName instanceof String) {
+                    styleMap.put(StyleProperties.STYLE_NAME, styleName);
+                } else {
+                    styleMap.put(StyleProperties.STYLE_NAME, styleEntry.getKey());
+                }
+                Float height = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
+                if (height != null) {
+                    styleMap.put(StyleProperties.HEIGHT, height);
+                }
+                Float width = getFloatStyle(elementStyle, StyleProperties.WIDTH);
+                if (width != null) {
+                    styleMap.put(StyleProperties.WIDTH, width.intValue());
+                }
+                Object symbolType = getStyle(elementStyle, StyleProperties.SYMBOL_TYPE);
+                if (symbolType instanceof String) {
+                    styleMap.put(StyleProperties.SYMBOL_TYPE, symbolType);
+                }
+                Object styleGroup = getStyle(elementStyle, StyleProperties.STYLE_GROUP);
+                if (styleGroup != null) {
+                    styleMap.put(StyleProperties.STYLE_GROUP, styleGroup);
+                }
+                fStateTable[tableIndex] = new StateItem(styleMap);
+                tableIndex++;
+            }
+        }
         return fStateTable;
     }
 
@@ -110,7 +208,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof FlamegraphEvent) {
             FlamegraphEvent flameGraphEvent = (FlamegraphEvent) event;
-            return Math.floorMod(flameGraphEvent.getValue(), fPalette.get().size()) + 1;
+            return Math.floorMod(String.valueOf(flameGraphEvent.getValue()).hashCode(), NUM_COLORS) + 1;
         } else if (event instanceof NullTimeEvent) {
             return INVISIBLE;
         }
