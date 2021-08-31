@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.eclipse.tracecompass</groupId>
     <artifactId>org.eclipse.tracecompass.pcap-parent</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.tracecompass.tmf.pcap.core.tests</artifactId>
