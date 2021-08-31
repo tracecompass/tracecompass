@@ -87,15 +87,15 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     /**
      * Constructs a new import operation
      *
+     * @param filePath
+     *            absolute path to the archive file containing the trace package.
      * @param importTraceElements
-     *            the trace element to be imported
-     * @param fileName
-     *            the output file name
+     *            the trace elements to be imported. Trace elements are the traces and the supplementary files (.idx and .ht files)
      * @param tmfTraceFolder
-     *            the destination folder
+     *            the destination folder (in the TmfProject) to which the trace package files should be imported.
      */
-    public TracePackageImportOperation(String fileName, TracePackageElement[] importTraceElements, TmfTraceFolder tmfTraceFolder) {
-        super(fileName);
+    public TracePackageImportOperation(String filePath, TracePackageElement[] importTraceElements, TmfTraceFolder tmfTraceFolder) {
+        super(filePath);
         fImportTraceElements = importTraceElements;
         fTmfTraceFolder = tmfTraceFolder;
         fTmfExperimentFolder = checkNotNull(tmfTraceFolder.getProject().getExperimentsFolder());
