@@ -468,7 +468,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                                     }
                                 }
                                 tooltips.computeIfAbsent(Messages.CallStackDataProvider_toolTipState, unused -> String.format(ADDRESS_FORMAT, longValue));
-                            } else {
+                            } else if (value != null ) {
                                 tooltips.put(Messages.CallStackDataProvider_toolTipState, interval.getValueString());
                             }
                         } catch (StateSystemDisposedException e) {
