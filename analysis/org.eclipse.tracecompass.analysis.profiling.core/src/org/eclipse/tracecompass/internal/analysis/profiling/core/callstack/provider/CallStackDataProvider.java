@@ -29,6 +29,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.base.FlameDefaultPalette;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.Activator;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
@@ -431,6 +432,13 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         Map<String, String> tooltips = new HashMap<>();
         List<@NonNull Long> selected = DataProviderParameterUtils.extractSelectedItems(parameters);
         List<@NonNull Long> times = DataProviderParameterUtils.extractTimeRequested(parameters);
+
+        // This data provider doesn't have any annotations or arrows
+        Object element = parameters.get(DataProviderParameterUtils.REQUESTED_ELEMENT_KEY);
+        if (element instanceof IAnnotation || element instanceof ITimeGraphArrow) {
+            return new TmfModelResponse<>(tooltips, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        }
+
         if (selected != null && times != null) {
             Map<@NonNull Long, @NonNull Integer> md = getSelectedEntries(selected);
             ITmfTrace trace = getTrace();
