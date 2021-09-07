@@ -36,9 +36,9 @@ public class TimeQueryFilter {
     private final long[] fTimesRequested;
 
     /**
-     * Constructor. Given a start value, end value and n entries, this constructor
-     * will set its property to an array of n entries uniformly distributed and
-     * ordered ascendingly.
+     * Constructor. Given a start value, end value and n entries, this
+     * constructor will set its property to an array of n entries uniformly
+     * distributed and ordered ascendingly.
      *
      * @param start
      *            The starting value
@@ -92,12 +92,13 @@ public class TimeQueryFilter {
     }
 
     /**
-     * Given a start and end value, this method will create an array of n entries
-     * uniformly distributed. First entry of resulting array is start and last entry
-     * is end. Example : start = 1, end = 15, n = 5, resulting array will be : [1,
-     * 5, 8, 12, 15]. <br/>
-     * If n is equal to 1, this method will return an array of size 1 ONLY if start
-     * and end are equal. Otherwise, an IllegalArgumentException will be thrown.
+     * Given a start and end value, this method will create an array of n
+     * entries uniformly distributed. First entry of resulting array is start
+     * and last entry is end. Example : start = 1, end = 15, n = 5, resulting
+     * array will be : [1, 5, 8, 12, 15]. <br/>
+     * If n is equal to 1, this method will return an array of size 1 ONLY if
+     * start and end are equal. Otherwise, an IllegalArgumentException will be
+     * thrown.
      *
      * @param start
      *            The starting value
