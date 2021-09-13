@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.P
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
+import org.eclipse.tracecompass.statesystem.core.backend.ICustomStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -109,7 +110,13 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         /** Null history */
         NULL,
         /** State system backed with partial history */
-        PARTIAL
+        PARTIAL,
+        /**
+         * Custom backend on its own. If one uses it then they need to override
+         * {@link TmfStateSystemAnalysisModule#getCustomBackend(String, ITmfStateProvider)}
+         * @since 7.1
+         */
+        CUSTOM
     }
 
     /**
@@ -294,6 +301,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             case NULL:
                 createNullHistory(id, provider);
                 break;
+            case CUSTOM:
+                createCustomHistory(id, provider);
+                break;
             default:
                 break;
             }
@@ -477,6 +487,41 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         fStateSystem = StateSystemFactory.newStateSystem(backend);
         provider.assignTargetStateSystem(fStateSystem);
         build(provider);
+    }
+
+    private void createCustomHistory(String id, ITmfStateProvider provider) throws TmfTraceException {
+        ICustomStateHistoryBackend backend = getCustomBackend(id, provider);
+        if (backend.isBuilt()) {
+            try {
+                fStateSystem = StateSystemFactory.newStateSystem(backend, false);
+                analysisReady(true);
+                return;
+            } catch (IOException e) {
+                throw new TmfTraceException("Could not create custom backend", e); //$NON-NLS-1$
+            }
+        }
+        @NonNull ITmfStateSystemBuilder stateSystemBuilder = StateSystemFactory.newStateSystem(backend);
+        fStateSystem = stateSystemBuilder;
+        provider.assignTargetStateSystem(stateSystemBuilder);
+        build(provider);
+    }
+
+    /**
+     * If analysis uses custom backend it must override this method to create
+     * the backend and prepare it for incoming data.
+     *
+     * @param id
+     *            the ID of the analysis module
+     * @param provider
+     *            the state provider to be used for analysis
+     * @return The state system backend.
+     * @throws TmfTraceException
+     *             In case of issues while creating custom backend.
+     * @since 7.1
+     */
+    protected ICustomStateHistoryBackend getCustomBackend(String id, ITmfStateProvider provider)
+            throws TmfTraceException {
+        throw new TmfTraceException("Custom backend is not implemented"); //$NON-NLS-1$
     }
 
     private void disposeProvider(boolean deleteFiles) {
@@ -838,6 +883,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
             break;
         case INMEM:
         case NULL:
+        case CUSTOM:
         default:
             break;
 

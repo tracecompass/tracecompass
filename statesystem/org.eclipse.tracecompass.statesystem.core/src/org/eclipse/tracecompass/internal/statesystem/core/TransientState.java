@@ -312,7 +312,7 @@ public class TransientState {
                 throw new StateValueTypeException(fBackend.getSSID() + " Quark:" + quark + ", Type:" + value.getClass() + ", Expected:" + expectedSvType); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
-            if (Objects.equals(fOngoingStateInfo.get(quark),value)) {
+            if (Objects.equals(fOngoingStateInfo.get(quark),value) && !fBackend.canInsertBackwards()) {
                 /*
                  * This is the case where the new value and the one already
                  * present in the Builder are the same. We do not need to create
@@ -332,8 +332,15 @@ public class TransientState {
                         fOngoingStateInfo.get(quark)); /* StateValue */
 
                 fOngoingStateStartTimes.set(quark, eventTime);
+                fOngoingStateInfo.set(quark, value);
+            } else if (fOngoingStateStartTimes.get(quark) == eventTime || !fBackend.canInsertBackwards()) {
+                fOngoingStateInfo.set(quark, value);
+            } else {
+                fBackend.insertPastState(fOngoingStateStartTimes.get(quark),
+                        eventTime - 1, /* End Time */
+                        quark, /* attribute quark */
+                        value); /* StateValue */
             }
-            fOngoingStateInfo.set(quark, value);
 
             /* Update the Transient State's lastestTime, if needed */
             if (fLatestTime < eventTime) {

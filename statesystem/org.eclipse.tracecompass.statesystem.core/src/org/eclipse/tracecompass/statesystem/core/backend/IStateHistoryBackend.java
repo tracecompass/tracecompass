@@ -225,4 +225,15 @@ public interface IStateHistoryBackend {
             throws TimeRangeException {
         return query2D(quarkCondition, timeCondition);
     }
+
+    /**
+     * Defines whether backend is able to insert states before existing states.
+     *
+     * @return {@code true} if backend is able to insert states in the past,
+     *             {@code false} otherwise.
+     * @since 5.1
+     */
+    default boolean canInsertBackwards() {
+        return false;
+    }
 }
