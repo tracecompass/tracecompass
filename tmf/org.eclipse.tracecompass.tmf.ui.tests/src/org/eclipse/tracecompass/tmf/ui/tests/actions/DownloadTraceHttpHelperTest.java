@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -37,9 +37,9 @@ import org.junit.Test;
  */
 public class DownloadTraceHttpHelperTest {
 
-    private static String fTestTrace1Url = "http://archive.eclipse.org/tracecompass/test-traces/tmf/syslog";
-    private static String fTestTrace2Url = "http://archive.eclipse.org/tracecompass/test-traces/tmf/syslog_collapse";
-    private static String fTraceArchiveUrl = "http://archive.eclipse.org/tracecompass/test-traces/tmf/syslogs.zip";
+    private static String fTestTrace1Url = "https://archive.eclipse.org/tracecompass/test-traces/tmf/syslog";
+    private static String fTestTrace2Url = "https://archive.eclipse.org/tracecompass/test-traces/tmf/syslog_collapse";
+    private static String fTraceArchiveUrl = "https://archive.eclipse.org/tracecompass/test-traces/tmf/syslogs.zip";
     private static String fDestinationDirectory;
 
     /**
