@@ -67,7 +67,7 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="tracecompass-e4.20"
+      defaultValue="tracecompass-e4.21"
       storageURI="scope://Workspace"
       label="Target Platform">
     <choice
@@ -107,6 +107,9 @@
         value="tracecompass-e4.20"
         label="Trace Compass Eclipse 2021-06 - 4.20"/>
     <choice
+        value="tracecompass-e4.21"
+        label="Trace Compass Eclipse 2021-09 - 4.21"/>
+    <choice
         value="tracecompass-eStaging"
         label="Trace Compass Eclipse Latest"/>
     <description>Choose the compatibly level of the target platform</description>
@@ -143,15 +146,15 @@
     <setupTask
         xsi:type="pde:TargetPlatformTask"
         id="tracecompass-baseline-resolve"
-        name="tracecompass-baseline-7.0.0"
+        name="tracecompass-baseline-7.1.0"
         activate="false">
       <description>Trace Compass Baseline</description>
     </setupTask>
     <setupTask
         xsi:type="pde:APIBaselineFromTargetTask"
-        id="tracecompass-baseline-7.0.0"
+        id="tracecompass-baseline-7.1.0"
         name="Trace Compass Baseline"
-        targetName="tracecompass-baseline-7.0.0">
+        targetName="tracecompass-baseline-7.1.0">
       <description>Trace Compass Baseline</description>
     </setupTask>
     <setupTask
