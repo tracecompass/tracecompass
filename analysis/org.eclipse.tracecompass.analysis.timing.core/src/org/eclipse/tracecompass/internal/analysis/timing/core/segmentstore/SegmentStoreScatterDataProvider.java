@@ -85,6 +85,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider"; //$NON-NLS-1$
 
     private static final String DEFAULT_CATEGORY = "default"; //$NON-NLS-1$
+    private static final String GROUP_PREFIX = "group";
     private static final AtomicLong ENTRY_ID = new AtomicLong();
 
     private final ISegmentStoreProvider fProvider;
@@ -291,10 +292,11 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
                     break;
                 }
                 String name = String.valueOf(aspect.resolve(series.getValue()));
-                Long uniqueId = map.get(name);
+                String key = GROUP_PREFIX + name;
+                Long uniqueId = map.get(key);
                 if (uniqueId == null) {
-                    uniqueId = getUniqueId(name);
-                    map.put(name, uniqueId);
+                    uniqueId = getUniqueId(key);
+                    map.put(key, uniqueId);
                     nodes.add(new TmfTreeDataModel(uniqueId, parentId, name));
                 }
                 parentId = uniqueId;
