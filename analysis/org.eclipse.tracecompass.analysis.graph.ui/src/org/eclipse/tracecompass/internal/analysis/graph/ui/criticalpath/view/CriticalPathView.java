@@ -25,9 +25,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
 import org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider.CriticalPathDataProvider;
 import org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider.CriticalPathEntry;
+import org.eclipse.tracecompass.internal.analysis.graph.ui.Activator;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -250,6 +252,16 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
         if (manager == null) {
             return;
         }
+
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(getClass().getName());
+        if (section == null) {
+            section = settings.addNewSection(getClass().getName());
+        }
+
+        IAction hideArrowsAction = getTimeGraphViewer().getHideArrowsAction(section);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, hideArrowsAction);
+
         IAction followArrowBwdAction = getTimeGraphViewer().getFollowArrowBwdAction();
         followArrowBwdAction.setText(Messages.CriticalPathView_followArrowBwdText);
         followArrowBwdAction.setToolTipText(Messages.CriticalPathView_followArrowBwdText);
