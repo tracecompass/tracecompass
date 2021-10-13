@@ -17,11 +17,11 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -97,16 +97,17 @@ public class OpenAnalysisHelpHandler extends AbstractHandler {
         return null;
     }
 
-    private static void displayHelpMsg(final String errorMsg) {
-        Display.getDefault().asyncExec(() -> {
+    private static void displayHelpMsg(final String helpMsg) {
+        Display display = Display.getDefault();
+        display.asyncExec(() -> {
             /*
              * TODO: A message box is not the best place to show help.
              * Something should be done with the Eclipse help
              */
-            final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-            mb.setText(Messages.AnalysisModule_Help);
-            mb.setMessage(errorMsg);
-            mb.open();
+            MessageDialog.openInformation(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    Messages.AnalysisModule_Help,
+                    helpMsg);
         });
     }
 
