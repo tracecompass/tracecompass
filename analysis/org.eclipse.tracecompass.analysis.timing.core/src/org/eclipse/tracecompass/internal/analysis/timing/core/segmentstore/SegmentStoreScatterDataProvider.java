@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IGroupingSegmentAspect;
@@ -54,6 +55,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -250,6 +252,14 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     @Override
     public TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
+        if (provider instanceof IAnalysisModule) {
+            IAnalysisModule module = (IAnalysisModule) provider;
+            IProgressMonitor mon = monitor != null ? monitor : new NullProgressMonitor();
+            module.waitForCompletion(mon);
+            if (mon.isCanceled()) {
+                return new TmfModelResponse<>(null, Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+            }
+        }
         ISegmentStore<ISegment> segStore = provider.getSegmentStore();
 
         if (segStore == null) {
@@ -474,20 +484,24 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         Map<String, Series> segmentTypes = new HashMap<>();
-        for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
-            String string = fIdToType.get(id);
-            if (string == null) {
-                continue;
-            }
+        synchronized (fIdToType) {
+            for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
+                String string = fIdToType.get(id);
+                if (string == null) {
+                    continue;
+                }
 
-            String name = prefix + string;
-            segmentTypes.put(name, new Series(id));
+                String name = prefix + string;
+                segmentTypes.put(name, new Series(id));
+            }
         }
         return segmentTypes;
     }
 
     private long getUniqueId(String name) {
-        return fIdToType.inverse().computeIfAbsent(name, n -> ENTRY_ID.getAndIncrement());
+        synchronized (fIdToType) {
+            return fIdToType.inverse().computeIfAbsent(name, n -> ENTRY_ID.getAndIncrement());
+        }
     }
 
     private static Iterable<ISegment> compactList(final long startTime, final Iterable<@NonNull ISegment> iterableToCompact, long pixelSize) {
@@ -500,6 +514,13 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     @Override
     public String getId() {
         return fId;
+    }
+
+    @Override
+    public void dispose() {
+        synchronized (fIdToType) {
+            fIdToType.clear();
+        }
     }
 
 }
