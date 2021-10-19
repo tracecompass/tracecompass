@@ -43,46 +43,6 @@
               <configuration>
                 <artifacts>
                   <artifact>
-                    <file>tracecompass-e4.8.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.8</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.9.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.9</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.10.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.10</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.11.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.11</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.12.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.12</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.13.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.13</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.14.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.14</classifier>
-                  </artifact>
-                  <artifact>
-                    <file>tracecompass-e4.15.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.15</classifier>
-                  </artifact>
-                  <artifact>
                     <file>tracecompass-e4.16.target</file>
                     <type>target</type>
                     <classifier>tracecompass-e4.16</classifier>

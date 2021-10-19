@@ -58,7 +58,7 @@
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/tracecompass/org.eclipse.tracecompass.git</tycho.scmUrl>
     <cbi-plugins.version>1.3.1</cbi-plugins.version>
     <target-platform>tracecompass-e4.21</target-platform>
-    <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.8</help-docs-eclipserun-repo>
+    <help-docs-eclipserun-repo>http://download.eclipse.org/eclipse/updates/4.20</help-docs-eclipserun-repo>
 
     <rcptt-version>2.2.0</rcptt-version>
     <!-- Disable GTK3 because it's not quite usable yet and it can make the tests hang (bug in IcedTea http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1736) -->
