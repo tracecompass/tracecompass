@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2018 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2021 Ericsson, École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -23,6 +23,8 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.io.File;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,9 +73,6 @@ import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor
 import org.eclipse.ui.IActionFilter;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
-
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.NumberFormat;
 
 /**
  * Implementation of trace model element representing a trace. It provides
