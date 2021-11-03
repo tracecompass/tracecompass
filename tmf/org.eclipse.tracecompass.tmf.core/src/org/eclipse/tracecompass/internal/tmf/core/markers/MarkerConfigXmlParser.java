@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -23,7 +23,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -92,19 +94,23 @@ public class MarkerConfigXmlParser {
      * @return the list of marker sets
      */
     public static @NonNull List<MarkerSet> getMarkerSets() {
-        List<MarkerSet> markers = new ArrayList<>();
-
-        // add the MarkerSets from the editable marker config file
-        if (MARKER_CONFIG_FILE.exists()) {
-            markers.addAll(parse(MARKER_CONFIG_FILE.getAbsolutePath()));
-        }
+        Map<String, MarkerSet> markerSets = new LinkedHashMap<>();
 
         // add the MarkerSets from the extension point
         for (String extensionBookmark : getExtensionDefinitionsPaths()) {
-            markers.addAll(parse(extensionBookmark));
+            for (MarkerSet markerSet : parse(extensionBookmark)) {
+                markerSets.put(markerSet.getId(), markerSet);
+            }
         }
 
-        return markers;
+        // add the MarkerSets from the editable marker config file
+        if (MARKER_CONFIG_FILE.exists()) {
+            for (MarkerSet markerSet : parse(MARKER_CONFIG_FILE.getAbsolutePath())) {
+                markerSets.put(markerSet.getId(), markerSet);
+            }
+        }
+
+        return new ArrayList<>(markerSets.values());
     }
 
     /**

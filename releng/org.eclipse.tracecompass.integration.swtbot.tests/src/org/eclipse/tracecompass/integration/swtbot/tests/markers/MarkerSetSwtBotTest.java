@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -69,8 +69,9 @@ public class MarkerSetSwtBotTest {
     private static final String UST_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
     private static SWTWorkbenchBot fBot;
     private static SWTBotView fViewBot;
+    // "Example" is pre-defined by extension in plug-in o.e.t.tmf.core.tests
     private static String[] MENU_ITEMS_NO_MARKERS_SET = new String[] { "None", "Example", "", "Edit..." };
-    private static String[] MENU_ITEMS_2_MARKERS_SET = new String[] { "None", "Set A", "Set B","Example", "", "Edit..." };
+    private static String[] MENU_ITEMS_2_MARKERS_SET = new String[] { "None", "Example", "Set A", "Set B","", "Edit..." };
     private static long fStart;
     private static TmfTimeRange fFullRange;
 
