@@ -147,12 +147,17 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
             selectedThreadValues.put(name, new YModel(entry.getKey(), getTrace().getName() + ':' + name, new double[xValues.length]));
         }
 
-        long prevTime = Math.max(filter.getStart(), ss.getStartTime());
+        long prevTime = Math.max(getInitialPrevTime(filter), ss.getStartTime());
         long currentEnd = ss.getCurrentEndTime();
 
-        for (int i = 1; i < xValues.length; i++) {
+        for (int i = 0; i < xValues.length; i++) {
             long time = xValues[i];
-            if (time >= ss.getStartTime() && time <= currentEnd && prevTime < time) {
+            if (time < ss.getStartTime() || time > currentEnd) {
+                /* Leave empty if time xValue is out of bounds */
+                prevTime = time;
+                continue;
+            }
+            if (prevTime < time) {
                 Map<String, Long> cpuUsageMap = Maps.filterKeys(getAnalysisModule().getCpuUsageInRange(cpus, prevTime, time),
                     key -> key.startsWith(KernelCpuUsageAnalysis.TOTAL)
                 );
@@ -174,8 +179,14 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
                     }
                 }
                 totalValues[i] = normalize(prevTime, time, totalCpu);
-                prevTime = time;
+            } else if (i > 0) {
+                /* In case of duplicate time xValue copy previous yValues */
+                for (IYModel values : selectedThreadValues.values()) {
+                    values.getData()[i] = values.getData()[i - 1];
+                }
+                totalValues[i] = totalValues[i - 1];
             }
+            prevTime = time;
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
@@ -189,6 +200,20 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
         }
 
         return ySeries.build();
+    }
+
+    private static long getInitialPrevTime(SelectionTimeQueryFilter filter) {
+        /*
+         * Subtract from start time the same interval as the interval from start
+         * time to next time, ignoring duplicates in the times requested.
+         */
+        long startTime = filter.getStart();
+        for (long time : filter.getTimesRequested()) {
+            if (time > startTime) {
+                return startTime - (time - startTime);
+            }
+        }
+        return startTime;
     }
 
     private static double normalize(long prevTime, long time, long value) {
