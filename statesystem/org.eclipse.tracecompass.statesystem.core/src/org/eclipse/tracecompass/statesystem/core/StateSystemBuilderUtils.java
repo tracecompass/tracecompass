@@ -78,4 +78,32 @@ public final class StateSystemBuilderUtils {
         ssb.modifyAttribute(t, prevValue + increment, attributeQuark);
     }
 
+    /**
+     * Increments attribute by a certain double value. Reads the current value
+     * of a given attribute as a double, and increment it by a certain increment.
+     *
+     * @param ssb
+     *            The state system builder
+     * @param t
+     *            The time at which to do the increment
+     * @param attributeQuark
+     *            The quark of the attribute to increment
+     * @param increment
+     *            The value to increment. This value can be negative.
+     * @throws StateValueTypeException
+     *             If the attribute already exists but is not of type Integer
+     * @since 5.1
+     */
+    public static void incrementAttributeDouble(ITmfStateSystemBuilder ssb, long t, int attributeQuark, double increment)
+            throws StateValueTypeException {
+        @Nullable Object stateValue = ssb.queryOngoing(attributeQuark);
+
+        /* if the attribute was previously null, start counting at 0 */
+        double prevValue = 0.0;
+        if (stateValue instanceof Double) {
+            prevValue = (double) stateValue;
+        }
+        ssb.modifyAttribute(t, prevValue + increment, attributeQuark);
+    }
+
 }

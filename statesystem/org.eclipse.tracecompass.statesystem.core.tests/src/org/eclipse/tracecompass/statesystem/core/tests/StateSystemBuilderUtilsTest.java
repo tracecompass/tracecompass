@@ -118,4 +118,37 @@ public class StateSystemBuilderUtilsTest {
         value = ss.queryOngoingState(quark);
         assertEquals(TmfStateValue.newValueInt(increment + increment2 + increment3), value);
     }
+
+    /**
+     * Test the
+     * {@link StateSystemBuilderUtils#incrementAttributeDouble(ITmfStateSystemBuilder, long, int, double)}
+     * method
+     */
+    @Test
+    public void testIncrementDouble() {
+        ITmfStateSystemBuilder ss = fStateSystem;
+        int quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING);
+
+        /* Value should be null at the beginning */
+        ITmfStateValue value = ss.queryOngoingState(quark);
+        assertEquals(TmfStateValue.nullValue(), value);
+
+        /* Increment by 3 */
+        double increment = 3.0;
+        StateSystemBuilderUtils.incrementAttributeDouble(ss, START_TIME + TIME_INCREMENT, quark, increment);
+        value = ss.queryOngoingState(quark);
+        assertEquals(TmfStateValue.newValueDouble(increment), value);
+
+        /* Increment by 1000 */
+        double increment2 = 1000.0;
+        StateSystemBuilderUtils.incrementAttributeDouble(ss, START_TIME + TIME_INCREMENT, quark, increment2);
+        value = ss.queryOngoingState(quark);
+        assertEquals(TmfStateValue.newValueDouble(increment + increment2), value);
+
+        /* Increment by a negative value */
+        double increment3 = -500.0;
+        StateSystemBuilderUtils.incrementAttributeDouble(ss, START_TIME + TIME_INCREMENT, quark, increment3);
+        value = ss.queryOngoingState(quark);
+        assertEquals(TmfStateValue.newValueDouble(increment + increment2 + increment3), value);
+    }
 }
