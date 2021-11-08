@@ -177,16 +177,18 @@ public class EventAnnotationProvider<@NonNull M extends TimeGraphEntryModel> imp
                         Object value = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), fAspect, event);
                         if (value != null && !values.contains(value)) {
                             values.add(value);
-                            Collection<Annotation> markerList = markers.computeIfAbsent(String.valueOf(event.getTrace().getName()), string -> new ArrayList<>());
-                            TimeGraphEntryModel entryModel = rowMap.get(value);
-                            if (entryModel != null) {
-                                String name = event.getName();
-                                Map<String, Object> style = new HashMap<>();
-                                style.put(StyleProperties.SYMBOL_TYPE, SymbolType.INVERTED_TRIANGLE);
-                                style.put(StyleProperties.COLOR, getMarkerColor(name));
-                                style.put(StyleProperties.HEIGHT, 0.3);
-                                style.put(StyleProperties.VERTICAL_ALIGN, StyleProperties.VerticalAlign.TOP);
-                                markerList.add(new Annotation(event.getTimestamp().toNanos(), 0L, entryModel.getId(), AnnotationType.CHART, name, new OutputElementStyle(name, style)));
+                            synchronized (markers) {
+                                Collection<Annotation> markerList = markers.computeIfAbsent(String.valueOf(event.getTrace().getName()), string -> new ArrayList<>());
+                                TimeGraphEntryModel entryModel = rowMap.get(value);
+                                if (entryModel != null) {
+                                    String name = event.getName();
+                                    Map<String, Object> style = new HashMap<>();
+                                    style.put(StyleProperties.SYMBOL_TYPE, SymbolType.INVERTED_TRIANGLE);
+                                    style.put(StyleProperties.COLOR, getMarkerColor(name));
+                                    style.put(StyleProperties.HEIGHT, 0.3);
+                                    style.put(StyleProperties.VERTICAL_ALIGN, StyleProperties.VerticalAlign.TOP);
+                                    markerList.add(new Annotation(event.getTimestamp().toNanos(), 0L, entryModel.getId(), AnnotationType.CHART, name, new OutputElementStyle(name, style)));
+                                }
                             }
                         }
 
