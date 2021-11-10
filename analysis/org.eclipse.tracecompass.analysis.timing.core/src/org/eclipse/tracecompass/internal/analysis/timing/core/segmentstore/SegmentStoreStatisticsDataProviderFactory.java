@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -11,23 +11,33 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
+import org.eclipse.tracecompass.internal.tmf.core.model.DataProviderDescriptor;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.component.DataProviderConstants;
+import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor;
+import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor.ProviderType;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 /**
@@ -93,6 +103,27 @@ public class SegmentStoreStatisticsDataProviderFactory implements IDataProviderF
         }
         module.schedule();
         return new SegmentStoreStatisticsDataProvider(trace, module, composedId);
+    }
+
+    @Override
+    public Collection<IDataProviderDescriptor> getDescriptors(ITmfTrace trace) {
+        Iterable<ISegmentStoreProvider> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, ISegmentStoreProvider.class);
+        List<IDataProviderDescriptor> descriptors = new ArrayList<>();
+        Set<String> existingModules = new HashSet<>();
+        for (ISegmentStoreProvider module : modules) {
+            IAnalysisModule analysis = (IAnalysisModule) module;
+            // Only add analysis once per trace (which could be an experiment)
+            if (!existingModules.contains(analysis.getId())) {
+                DataProviderDescriptor.Builder builder = new DataProviderDescriptor.Builder();
+                builder.setId(SegmentStoreStatisticsDataProvider.ID + DataProviderConstants.ID_SEPARATOR + analysis.getId())
+                    .setName(Objects.requireNonNull(NLS.bind(Messages.SegmentStoreStatisticsDataProvider_title, analysis.getName())))
+                    .setDescription(Objects.requireNonNull(NLS.bind(Messages.SegmentStoreStatisticsDataProvider_description, analysis.getHelpText())))
+                    .setProviderType(ProviderType.DATA_TREE);
+                descriptors.add(builder.build());
+                existingModules.add(analysis.getId());
+            }
+        }
+        return descriptors;
     }
 
 }

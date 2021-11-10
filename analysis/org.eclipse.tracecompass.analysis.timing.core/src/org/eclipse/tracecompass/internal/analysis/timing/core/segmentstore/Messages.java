@@ -52,6 +52,16 @@ public class Messages extends NLS {
     public static @Nullable String SegmentStoreDataProvider_SegmentNotAvailable;
 
     /**
+     * Title of the data provider
+     */
+    public static @Nullable String SegmentStoreStatisticsDataProvider_title;
+
+    /**
+     * Description of the data provider
+     */
+    public static @Nullable String SegmentStoreStatisticsDataProvider_description;
+
+    /**
      * Externalized name of the Selection entry
      */
     public static @Nullable String SegmentStoreStatisticsDataProvider_Selection;
