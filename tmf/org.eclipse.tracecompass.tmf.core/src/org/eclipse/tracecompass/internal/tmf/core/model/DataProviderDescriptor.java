@@ -66,6 +66,15 @@ public class DataProviderDescriptor implements IDataProviderDescriptor {
     }
 
     @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        return getClass().getSimpleName() + " [fName=" + getName()
+                + ", fDescription=" + getDescription() + ", fType=" + getType()
+                +  ", fId=" + getId()
+                + "]";
+    }
+
+    @Override
     public boolean equals(@Nullable Object arg0) {
         if (!(arg0 instanceof DataProviderDescriptor)) {
             return false;
