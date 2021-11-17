@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsViewer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsDataProviderFactory;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -48,7 +48,7 @@ public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
      *            The analysis ID
      */
     public void updateViewer(String analysisId) {
-        setProviderId(XmlPatternLatencyStatisticsDataProviderFactory.ID + ':' + analysisId);
+        setProviderId(SegmentStoreStatisticsDataProvider.ID + ':' + analysisId);
 
         ITmfTrace trace = getTrace();
         if (trace == null) {
