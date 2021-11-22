@@ -16,12 +16,12 @@
   <parent>
     <groupId>org.eclipse.tracecompass</groupId>
     <artifactId>org.eclipse.tracecompass.tmf-parent</artifactId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.2.0-SNAPSHOT</version>
 
   </parent>
 
   <artifactId>org.eclipse.tracecompass.tmf.ui.tests</artifactId>
-  <version>1.0.17-SNAPSHOT</version>
+  <version>1.0.18-SNAPSHOT</version>
 
   <properties>
     <skipTests>${skip-short-tc-ui-tests}</skipTests>
