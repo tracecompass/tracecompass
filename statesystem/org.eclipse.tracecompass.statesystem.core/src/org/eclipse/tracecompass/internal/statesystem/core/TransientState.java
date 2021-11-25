@@ -340,6 +340,7 @@ public class TransientState {
                         eventTime - 1, /* End Time */
                         quark, /* attribute quark */
                         value); /* StateValue */
+                fOngoingStateStartTimes.set(quark, eventTime);
             }
 
             /* Update the Transient State's lastestTime, if needed */
