@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICall
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.eclipse.tracecompass.tmf.core.symbols.DefaultSymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
@@ -80,6 +81,10 @@ public final class SymbolAspect implements ISegmentAspect {
                 if (symbol instanceof Long) {
                     Long longAddress = (Long) symbol;
                     Collection<ISymbolProvider> providers = SymbolProviderManager.getInstance().getSymbolProviders(trace);
+                    if (providers.size() > 1) {
+                        // remove default symbol provider
+                        providers.removeIf(p -> p.getClass().equals(DefaultSymbolProvider.class));
+                    }
 
                     // look for a symbol for a given process, if available
                     long time = segment.getStart();

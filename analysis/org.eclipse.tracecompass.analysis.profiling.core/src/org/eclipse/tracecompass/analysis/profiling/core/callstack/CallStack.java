@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 public class CallStack {
 
     private final List<Integer> fQuarks;
+    private final IProfilingElement fSymbolKeyElement;
 
     /**
      * Constructor
@@ -50,6 +51,7 @@ public class CallStack {
      */
     public CallStack(ITmfStateSystem ss, List<Integer> quarks, IProfilingElement element, IHostIdProvider hostIdProvider, @Nullable IThreadIdProvider threadIdProvider) {
         fQuarks = quarks;
+        fSymbolKeyElement = element;
     }
 
     /**
@@ -71,6 +73,18 @@ public class CallStack {
      */
     public void updateAttributes(List<Integer> subAttributes) {
         fQuarks.addAll(fQuarks.size(), subAttributes.subList(fQuarks.size(), subAttributes.size()));
+    }
+
+    /**
+     * Get the key for symbol resolution at a given time
+     *
+     * @param time
+     *            The time at which to get the symbol key
+     * @return The symbol key at time
+     * @since 2.2
+     */
+    public int getSymbolKeyAt(long time) {
+        return fSymbolKeyElement.getSymbolKeyAt(time);
     }
 
 }

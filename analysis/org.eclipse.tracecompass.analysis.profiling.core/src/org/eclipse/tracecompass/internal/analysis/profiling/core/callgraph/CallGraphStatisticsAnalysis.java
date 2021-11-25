@@ -50,7 +50,7 @@ public class CallGraphStatisticsAnalysis extends AbstractSegmentStatisticsAnalys
     protected @Nullable String getSegmentType(@NonNull ISegment segment) {
         if (segment instanceof ICalledFunction) {
             ICalledFunction calledFunction = (ICalledFunction) segment;
-            return String.valueOf(calledFunction.getSymbol());
+            return String.valueOf(calledFunction.getName());
         }
         return null;
     }

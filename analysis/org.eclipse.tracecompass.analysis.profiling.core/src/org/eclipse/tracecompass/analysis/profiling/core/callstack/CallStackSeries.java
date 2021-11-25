@@ -520,7 +520,6 @@ public class CallStackSeries implements ISegmentStore<ISegment> {
                 });
         return quarkToElement;
     }
-
     @Override
     public Iterable<ISegment> getIntersectingElements(long start, long end) {
         ITmfStateSystem stateSystem = fRootGroup.getStateSystem();
@@ -538,7 +537,8 @@ public class CallStackSeries implements ISegmentStore<ISegment> {
                 if (callstack == null) {
                     throw new NullPointerException("The quark was in that map in the first place, there must be a callstack to go with it!"); //$NON-NLS-1$
                 }
-                return CalledFunctionFactory.create(interval.getStartTime(), interval.getEndTime() + 1, Integer.parseInt(stateSystem.getAttributeName(interval.getAttribute())), Objects.requireNonNull(interval.getValue()), -1, null);
+                int pid = callstack.getSymbolKeyAt(interval.getStartTime());
+                return CalledFunctionFactory.create(interval.getStartTime(), interval.getEndTime() + 1, Integer.parseInt(stateSystem.getAttributeName(interval.getAttribute())), Objects.requireNonNull(interval.getValue()), pid, null);
             };
             return Iterables.transform(query2d, fct);
         } catch (StateSystemDisposedException e) {
