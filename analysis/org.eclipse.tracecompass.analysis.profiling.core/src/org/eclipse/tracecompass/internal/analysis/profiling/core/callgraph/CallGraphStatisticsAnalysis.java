@@ -50,10 +50,14 @@ public class CallGraphStatisticsAnalysis extends AbstractSegmentStatisticsAnalys
     protected @Nullable String getSegmentType(@NonNull ISegment segment) {
         if (segment instanceof ICalledFunction) {
             ICalledFunction calledFunction = (ICalledFunction) segment;
-            return String.valueOf(calledFunction.getName());
+            StringBuilder builder = new StringBuilder(calledFunction.getName());
+            if (calledFunction.getProcessId() != -1) {
+                // Create different segment type for each PID
+                builder.append(" [").append(calledFunction.getProcessId()).append(']'); //$NON-NLS-1$
+            }
+            return builder.toString();
         }
         return null;
     }
-
 
 }
