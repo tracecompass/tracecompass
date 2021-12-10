@@ -114,7 +114,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         /**
          * Custom backend on its own. If one uses it then they need to override
          * {@link TmfStateSystemAnalysisModule#getCustomBackend(String, ITmfStateProvider)}
-         * @since 7.1
+         * @since 7.2
          */
         CUSTOM
     }
@@ -517,7 +517,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * @return The state system backend.
      * @throws TmfTraceException
      *             In case of issues while creating custom backend.
-     * @since 7.1
+     * @since 7.2
      */
     protected ICustomStateHistoryBackend getCustomBackend(String id, ITmfStateProvider provider)
             throws TmfTraceException {
