@@ -91,6 +91,9 @@ public class Activator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
+        // CVE-2021-44228
+        System.setProperty("log4j2.formatMsgNoLookups", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        System.setProperty("log4j.formatMsgNoLookups", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         setDefault(this);
         TmfCoreTracer.init();
         /* Initialize the trace manager */
