@@ -97,7 +97,7 @@ public interface IEventDefinition {
      * Get the packet header.
      *
      * @return the packet header (containing magic and stream id)
-     * @since 7.3
+     * @since 4.1
      */
     default @Nullable ICompositeDefinition getPacketHeader() {
         return null;

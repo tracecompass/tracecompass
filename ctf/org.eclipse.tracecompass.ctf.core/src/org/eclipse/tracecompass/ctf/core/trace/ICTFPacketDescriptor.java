@@ -98,7 +98,7 @@ public interface ICTFPacketDescriptor {
      * Retrieve the packet context definition.
      *
      * @return the packet context
-     * @since 7.3
+     * @since 4.1
      */
     default @Nullable ICompositeDefinition getStreamPacketContextDef() {
         return null;
