@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -180,7 +182,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         }
     }
 
-    private synchronized void updateDisplay(String name, SegmentStoreWithRange<ISegment> data) {
+    private synchronized void updateDisplay(String name, Iterable<ISegment> data) {
         ISeries<Integer> series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries(name);
         int barWidth = 4;
         int preWidth = fOverrideNbPoints == 0 ? fChart.getPlotArea().getSize().x / barWidth : fOverrideNbPoints;
@@ -192,11 +194,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         double[] yOrigSeries = new double[width];
         // Set a positive value that is greater than 0 and less than 1.0
         Arrays.fill(yOrigSeries, Double.MIN_VALUE);
-        data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
-        ISegment maxSegment = data.getElement(SegmentStoreWithRange.LAST);
+        Optional<ISegment> maxSegment = StreamSupport.stream(data.spliterator(), false).max(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
         long maxLength = Long.MIN_VALUE;
-        if (maxSegment != null) {
-            maxLength = maxSegment.getLength();
+        if (maxSegment.isPresent()) {
+            maxLength = maxSegment.get().getLength();
         } else {
             for (ISegment segment : data) {
                 maxLength = Math.max(maxLength, segment.getLength());
@@ -257,13 +258,11 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         }
         fChart.getAxisSet().getYAxis(0).setRange(new Range(0.9, Math.max(1.0, maxY)));
         fChart.getAxisSet().getYAxis(0).enableLogScale(true);
-        fChart.redraw();
         new Thread(() -> {
             for (ISegmentStoreDensityViewerDataListener l : fListeners) {
                 l.chartUpdated();
             }
         }).start();
-
     }
 
     private ISeries<Integer> createSeries() {
@@ -392,6 +391,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
 
     private void applyData(final Map<String, SegmentStoreWithRange<ISegment>> map) {
         Set<Entry<String, SegmentStoreWithRange<ISegment>>> entrySet = map.entrySet();
+        if (entrySet.isEmpty()) {
+            return;
+        }
         entrySet.parallelStream().forEach(entry -> {
             SegmentStoreWithRange<ISegment> data = Objects.requireNonNull(entry.getValue());
             data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
@@ -405,6 +407,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
                 l.viewDataChanged(data);
             }
         });
+        fChart.redraw();
     }
 
     /**
