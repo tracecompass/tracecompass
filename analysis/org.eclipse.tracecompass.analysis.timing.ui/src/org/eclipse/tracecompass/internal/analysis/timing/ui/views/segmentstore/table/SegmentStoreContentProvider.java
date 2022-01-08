@@ -234,7 +234,10 @@ public class SegmentStoreContentProvider implements ISortingLazyContentProvider 
         if (tableViewer == null || store == null) {
             return;
         }
-        tableViewer.replace(store.getElement(index), index);
+        ISegment element = store.getElement(index);
+        if (element != null) {
+            tableViewer.replace(element, index);
+        }
     }
 
     @Override
