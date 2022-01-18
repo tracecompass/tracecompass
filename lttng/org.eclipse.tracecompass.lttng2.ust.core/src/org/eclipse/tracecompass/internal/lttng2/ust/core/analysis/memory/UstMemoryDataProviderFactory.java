@@ -44,7 +44,7 @@ public class UstMemoryDataProviderFactory implements IDataProviderFactory {
     private static final Predicate<? super ITmfTrace> PREDICATE = t -> TmfTraceUtils.getAnalysisModuleOfClass(t, UstMemoryAnalysisModule.class, UstMemoryAnalysisModule.ID) != null;
 
     private static final IDataProviderDescriptor DESCRIPTOR = new DataProviderDescriptor.Builder()
-            .setId(UstMemoryAnalysisModule.ID)
+            .setId(UstMemoryUsageDataProvider.ID)
             .setName(Objects.requireNonNull(Messages.MemoryUsageDataProvider_Title))
             .setDescription(Objects.requireNonNull(Messages.UstMemoryDataProviderFactory_DescriptionText))
             .setProviderType(ProviderType.TREE_TIME_XY)
