@@ -143,7 +143,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <feature id="org.eclipse.ecf.filetransfer.feature"/>
       <feature id="org.eclipse.tracecompass.rcp.incubator"/>
       <feature id="org.eclipse.tracecompass.jsontrace"/>
-      <feature id="org.eclipse.ecf.filetransfer.httpclient5.feature"/>
+      <feature id="org.eclipse.ecf.filetransfer.httpclient45.feature"/>
       <feature id="org.eclipse.tracecompass.tmf.cli"/>
    </features>
 
