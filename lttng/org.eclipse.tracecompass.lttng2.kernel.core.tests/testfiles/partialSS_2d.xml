@@ -1,0 +1,125 @@
+<!--*******************************************************************************
+* Copyright (c) 2022 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License 2.0 which
+* accompanies this distribution, and is available at
+* https://www.eclipse.org/legal/epl-2.0/
+*
+* SPDX-License-Identifier: EPL-2.0
+*******************************************************************************-->
+<trace>
+<set_aspects>
+<field name="cpu" value="1" type="int" />
+</set_aspects>
+<event timestamp="10" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="proc1" type="string" />
+<field name="prev_tid" value="100" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc2" type="string" />
+<field name="next_tid" value="200" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="10" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc3" type="string" />
+<field name="prev_tid" value="300" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc4" type="string" />
+<field name="next_tid" value="400" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="15" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc4" type="string" />
+<field name="prev_tid" value="400" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="4" type="long" />
+<field name="next_comm" value="proc3" type="string" />
+<field name="next_tid" value="300" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="20" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc3" type="string" />
+<field name="prev_tid" value="300" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc4" type="string" />
+<field name="next_tid" value="400" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="20" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="proc2" type="string" />
+<field name="prev_tid" value="200" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="3" type="long" />
+<field name="next_comm" value="proc1" type="string" />
+<field name="next_tid" value="100" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="25" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc4" type="string" />
+<field name="prev_tid" value="400" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="4" type="long" />
+<field name="next_comm" value="proc3" type="string" />
+<field name="next_tid" value="300" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="30" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc3" type="string" />
+<field name="prev_tid" value="300" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc4" type="string" />
+<field name="next_tid" value="400" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="30" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="proc1" type="string" />
+<field name="prev_tid" value="100" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc2" type="string" />
+<field name="next_tid" value="200" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="35" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc4" type="string" />
+<field name="prev_tid" value="400" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="4" type="long" />
+<field name="next_comm" value="proc3" type="string" />
+<field name="next_tid" value="300" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="40" name="sched_switch">
+<field name="cpu" value="0" type="int" />
+<field name="prev_comm" value="proc2" type="string" />
+<field name="prev_tid" value="200" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc1" type="string" />
+<field name="next_tid" value="100" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="40" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="proc3" type="string" />
+<field name="prev_tid" value="300" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="proc4" type="string" />
+<field name="next_tid" value="400" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+</trace>

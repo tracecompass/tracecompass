@@ -38,11 +38,13 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
+import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialInMemoryBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.ICustomStateHistoryBackend;
+import org.eclipse.tracecompass.statesystem.core.backend.IPartialStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -441,14 +443,18 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         /* 3a */
         ITmfStateProvider partialProvider = provider.getNewInstance();
 
-        /* 3b-3c, constructor automatically uses a NullBackend */
-        PartialStateSystem pss = new PartialStateSystem();
+        /*
+         * 3b-3c, constructor needs PartialInMemoryBackend in order to save
+         * temporary the intervals requested by the query2D()
+         */
+        IPartialStateHistoryBackend backend = new PartialInMemoryBackend("partial", 0L); //$NON-NLS-1$
+        PartialStateSystem pss = new PartialStateSystem(backend);
 
         /* 3d */
         partialProvider.assignTargetStateSystem(pss);
 
         /* 3 */
-        IStateHistoryBackend partialBackend = new PartialHistoryBackend(id + ".partial", partialProvider, pss, realBackend, granularity); //$NON-NLS-1$
+        IStateHistoryBackend partialBackend = new PartialHistoryBackend(id + ".partial", partialProvider, pss, realBackend, granularity, backend); //$NON-NLS-1$
 
         /* 4 */
         ITmfStateSystemBuilder realSS = StateSystemFactory.newStateSystem(partialBackend);

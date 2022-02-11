@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.internal.statesystem.core.AttributeTree;
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
+import org.eclipse.tracecompass.statesystem.core.backend.IPartialStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 
@@ -41,24 +41,27 @@ public class PartialStateSystem extends StateSystem {
 
     private static final String ERR_MSG = "Partial state system should not modify the attribute tree!"; //$NON-NLS-1$
 
-    private final CountDownLatch ssAssignedLatch = new CountDownLatch(1);
-    private final Lock queryLock = new ReentrantLock();
+    private final CountDownLatch fSSAssignedLatch = new CountDownLatch(1);
+    private final Lock fQueryLock = new ReentrantLock();
 
     /**
      * Reference to the real upstream state system. This is used so we can read
      * its attribute tree.
      */
-    private StateSystem realStateSystem = null;
+    private StateSystem fRealStateSystem = null;
 
     /**
      * Constructor
+     *
+     * @param backend
+     *            The backend used for storage
      */
-    public PartialStateSystem() {
+    public PartialStateSystem(@NonNull IPartialStateHistoryBackend backend) {
         /*
-         * We use a Null back end here : we only use this state system for its
-         * "ongoing" values, so no need to save the changes that are inserted.
+         * We use a PartialInMemoryBackend here : we only save the requested
+         * intervals by the query2D()
          */
-        super(StateHistoryBackendFactory.createNullBackend("partial")); //$NON-NLS-1$
+        super(backend);
     }
 
     /**
@@ -71,12 +74,12 @@ public class PartialStateSystem extends StateSystem {
         if (!(ss instanceof StateSystem)) {
             throw new IllegalArgumentException("Partial state system's upstream state system should be of class StateSystem. This one is " + ss.getClass()); //$NON-NLS-1$
         }
-        realStateSystem = (StateSystem) ss;
-        ssAssignedLatch.countDown();
+        fRealStateSystem = (StateSystem) ss;
+        fSSAssignedLatch.countDown();
     }
 
     ITmfStateSystem getUpstreamSS() {
-        return realStateSystem;
+        return fRealStateSystem;
     }
 
     // ------------------------------------------------------------------------
@@ -109,7 +112,7 @@ public class PartialStateSystem extends StateSystem {
      */
     public void takeQueryLock() {
         try {
-            queryLock.lockInterruptibly();
+            fQueryLock.lockInterruptibly();
         } catch (InterruptedException e) {
             // Do nothing
         }
@@ -119,13 +122,13 @@ public class PartialStateSystem extends StateSystem {
      * Release the query lock, when you are done with your query.
      */
     public void releaseQueryLock() {
-        queryLock.unlock();
+        fQueryLock.unlock();
     }
 
     @Override
     public AttributeTree getAttributeTree() {
         waitUntilReady();
-        return realStateSystem.getAttributeTree();
+        return fRealStateSystem.getAttributeTree();
     }
 
     /*
@@ -142,7 +145,7 @@ public class PartialStateSystem extends StateSystem {
     public int getQuarkAbsoluteAndAdd(String... attribute) {
         waitUntilReady();
         try {
-            return realStateSystem.getQuarkAbsolute(attribute);
+            return fRealStateSystem.getQuarkAbsolute(attribute);
         } catch (AttributeNotFoundException e) {
             throw new RuntimeException(ERR_MSG);
         }
@@ -152,7 +155,7 @@ public class PartialStateSystem extends StateSystem {
     public int getQuarkRelativeAndAdd(int startingNodeQuark, String... subPath) {
         waitUntilReady();
         try {
-            return realStateSystem.getQuarkRelative(startingNodeQuark, subPath);
+            return fRealStateSystem.getQuarkRelative(startingNodeQuark, subPath);
         } catch (AttributeNotFoundException e) {
             throw new RuntimeException(ERR_MSG);
         }
@@ -160,10 +163,9 @@ public class PartialStateSystem extends StateSystem {
 
     private void waitUntilReady() {
         try {
-            ssAssignedLatch.await();
+            fSSAssignedLatch.await();
         } catch (InterruptedException e) {
             // Do nothing
         }
     }
-
 }

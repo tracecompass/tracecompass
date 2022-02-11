@@ -23,7 +23,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -39,37 +38,37 @@ import org.junit.Test;
  *
  * @author Alexandre Montplaisir
  */
-@Ignore
+
 public class PartialStateSystemTest extends StateSystemTest {
 
     private static final @NonNull String TEST_FILE_NAME = "test-partial";
 
-    private static CtfTmfTrace trace;
-    private static File stateFile;
-    private static TestLttngKernelAnalysisModule module;
+    private static CtfTmfTrace fTrace;
+    private static File fStateFile;
+    private static TestLttngKernelAnalysisModule fModule;
 
     /**
      * Test class setup
      */
     @BeforeClass
     public static void initialize() {
-        trace = CtfTmfTestTraceUtils.getTrace(testTrace);
+        fTrace = CtfTmfTestTraceUtils.getTrace(testTrace);
 
-        stateFile = new File(TmfTraceManager.getSupplementaryFileDir(trace) + TEST_FILE_NAME);
-        if (stateFile.exists()) {
-            stateFile.delete();
+        fStateFile = new File(TmfTraceManager.getSupplementaryFileDir(fTrace) + TEST_FILE_NAME);
+        if (fStateFile.exists()) {
+            fStateFile.delete();
         }
 
-        module = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
+        fModule = new TestLttngKernelAnalysisModule(TEST_FILE_NAME);
         try {
-            assertTrue(module.setTrace(trace));
+            assertTrue(fModule.setTrace(fTrace));
         } catch (TmfAnalysisException e) {
             fail();
         }
-        module.schedule();
-        assertTrue(module.waitForCompletion());
+        fModule.schedule();
+        assertTrue(fModule.waitForCompletion());
 
-        fixture = module.getStateSystem();
+        fixture = fModule.getStateSystem();
     }
 
     /**
@@ -77,83 +76,49 @@ public class PartialStateSystemTest extends StateSystemTest {
      */
     @AfterClass
     public static void cleanup() {
-        if (module != null) {
-            module.dispose();
+        if (fModule != null) {
+            fModule.dispose();
         }
-        if (stateFile != null) {
-            stateFile.delete();
+        if (fStateFile != null) {
+            fStateFile.delete();
         }
         if (fixture != null) {
             fixture.dispose();
         }
-        if (trace != null) {
-            trace.dispose();
+        if (fTrace != null) {
+            fTrace.dispose();
         }
-        module = null;
+        fModule = null;
         fixture = null;
-        trace = null;
-    }
-
-    /**
-     * Partial histories cannot get the intervals' end times. The fake value that
-     * is returned is equal to the query's timestamp. So override this here
-     * so that {@link #testFullQueryThorough} keeps working.
-     */
-    @Override
-    protected long getEndTimes(int idx) {
-        return interestingTimestamp1;
-    }
-
-    // ------------------------------------------------------------------------
-    // Skip tests using single-queries (unsupported in partial history)
-    // ------------------------------------------------------------------------
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSingleQuery1() {
-        super.testSingleQuery1();
+        fTrace = null;
     }
 
     @Override
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
+    @Ignore /*
+             * Test passes but takes many minutes to complete (~10 min) since it
+             * does many singular "slow" queries, remove this Ignore and the
+             * time out rule in StateSystemTest if you can wait
+             */
     public void testRangeQuery1() {
         super.testRangeQuery1();
     }
 
     @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQuery2() {
-        super.testRangeQuery2();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
+    @Ignore /*
+             * Test passes but takes many minutes (~3 min) to complete since it
+             * does many singular "slow" queries, remove this Ignore and the
+             * time out rule in StateSystemTest if you can wait
+             */
     public void testRangeQuery3() {
         super.testRangeQuery3();
     }
 
     @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSingleQueryInvalidTime1() throws TimeRangeException {
-        super.testSingleQueryInvalidTime1();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testSingleQueryInvalidTime2() throws TimeRangeException {
-        super.testSingleQueryInvalidTime2();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQueryInvalidTime1() throws TimeRangeException {
-        super.testRangeQueryInvalidTime1();
-    }
-
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRangeQueryInvalidTime2() throws TimeRangeException {
-        super.testRangeQueryInvalidTime2();
+    @Test
+    public void testFullQueryThorough() {
+        super.testFullQueryThorough();
     }
 
     @NonNullByDefault
