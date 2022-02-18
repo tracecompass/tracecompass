@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -520,8 +521,37 @@ public class CallStackSeries implements ISegmentStore<ISegment> {
                 });
         return quarkToElement;
     }
+
     @Override
     public Iterable<ISegment> getIntersectingElements(long start, long end) {
+        return getIntersectingElements(start, end, x -> true);
+    }
+
+    /**
+     * Retrieve all elements that inclusively cross another segment and evaluate
+     * a predicate to true. We define this target segment by its start and end
+     * positions.
+     *
+     * This effectively means, all elements that respect *all* conditions:
+     *
+     * <ul>
+     * <li>Their end is after the 'start' parameter</li>
+     * <li>Their start is before the 'end' parameter</li>
+     * <li>They match the predicate</li>
+     * </ul>
+     *
+     * @param start
+     *            The target start position
+     * @param end
+     *            The target end position
+     * @param intervalTest
+     *            A {@link Predicate} object. The predicate must evaluate to
+     *            true in order to consider the interval, otherwise the interval
+     *            is ignored
+     * @return The elements overlapping with this segment
+     * @since 2.2
+     */
+    protected Iterable<ISegment> getIntersectingElements(long start, long end, Predicate<ITmfStateInterval> intervalTest) {
         ITmfStateSystem stateSystem = fRootGroup.getStateSystem();
         long startTime = Math.max(SaturatedArithmetic.add(start, -1L), stateSystem.getStartTime());
         long endTime = Math.min(end, stateSystem.getCurrentEndTime());
@@ -531,7 +561,7 @@ public class CallStackSeries implements ISegmentStore<ISegment> {
         Map<Integer, CallStack> quarksToElement = getCallStackQuarks();
         try {
             Iterable<ITmfStateInterval> query2d = stateSystem.query2D(quarksToElement.keySet(), startTime, endTime);
-            query2d = Iterables.filter(query2d, interval -> !interval.getStateValue().isNull());
+            query2d = Iterables.filter(query2d, interval -> !interval.getStateValue().isNull() && intervalTest.test(interval));
             Function<ITmfStateInterval, ICalledFunction> fct = interval -> {
                 CallStack callstack = quarksToElement.get(interval.getAttribute());
                 if (callstack == null) {
