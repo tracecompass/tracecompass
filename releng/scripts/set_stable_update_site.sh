@@ -1,6 +1,6 @@
 #!/bin/bash
 ###############################################################################
-# Copyright (c) 2016 Ericsson
+# Copyright (c) 2016, 2022 Ericsson
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,7 @@
 # meant to be used when the master branch is being branched into a stable
 # branch.
 
-files=("../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product" "../../rcp/org.eclipse.tracecompass.rcp.product/legacy/tracing.product")
+files=("../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product" "../../rcp/org.eclipse.tracecompass.rcp.product/staging/tracing.product")
 
 for file in "${files[@]}"
 do

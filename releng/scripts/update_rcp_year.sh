@@ -1,6 +1,6 @@
 #!/bin/sh
 ###############################################################################
-# Copyright (c) 2019 Ericsson
+# Copyright (c) 2019, 2022 Ericsson
 #
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License 2.0
@@ -21,8 +21,8 @@ echo Changing copyright year to $newYear
 #Update year in product file
 sed -i -e "s/\([0-9]\{4\}\)\sEricsson/$newYear Ericsson/g" ../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product
 
-#Update year in legacy product file
-sed -i -e "s/\([0-9]\{4\}\)\sEricsson/$newYear Ericsson/g" ../../rcp/org.eclipse.tracecompass.rcp.product/legacy/tracing.product
+#Update year in legacy/staging product files
+sed -i -e "s/\([0-9]\{4\}\)\sEricsson/$newYear Ericsson/g" ../../rcp/org.eclipse.tracecompass.rcp.product/*/tracing.product
 
 #Update branding plugin.xml
 sed -i -e "s/\([0-9]\{4\}\)\sEricsson/$newYear Ericsson/g" ../../rcp/org.eclipse.tracecompass.rcp.branding/plugin.xml
