@@ -14,7 +14,7 @@
 # meant to be used when the master branch is being branched into a stable
 # branch.
 
-files=("../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product" "../../rcp/org.eclipse.tracecompass.rcp.product/staging/tracing.product")
+files=("../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product" "../../rcp/org.eclipse.tracecompass.rcp.product/*/tracing.product")
 
 for file in "${files[@]}"
 do
