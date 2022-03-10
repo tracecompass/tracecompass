@@ -115,26 +115,49 @@ public class DataProviderManager {
     }
 
     /**
-     * Get the data provider for the given trace.
+     * Get or creates the data provider for the given trace.
      * <p>
      * This method should never be called from within a {@link TmfSignalHandler}.
      *
      * @param trace
-     *            The trace
+     *            An instance of {@link ITmfTrace}.
+     *            Note, that trace can be an instance of TmfExperiment, too.
      * @param id
      *            Id of the data provider. This ID can be the concatenation of a
      *            provider ID + ':' + a secondary ID used to differentiate multiple
      *            instances of a same provider.
      * @param dataProviderClass
      *            Returned data provider must extend this class
-     * @return Data provider
+     * @return the data provider or null if no data provider is found for the input parameter.
      * @since 4.0
+     * @deprecated use {@link #getOrCreateDataProvider(ITmfTrace, String, Class)} instead
      */
+    @Deprecated
     public synchronized @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
-        for (ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider : fInstances.get(trace)) {
-            if (id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
-                return dataProviderClass.cast(dataProvider);
-            }
+        return getOrCreateDataProvider(trace, id, dataProviderClass);
+    }
+
+    /**
+     * Gets or creates the data provider for the given trace.
+     * <p>
+     * This method should never be called from within a {@link TmfSignalHandler}.
+     *
+     * @param trace
+     *            An instance of {@link ITmfTrace}.
+     *            Note, that trace can be an instance of TmfExperiment, too.
+     * @param id
+     *            Id of the data provider. This ID can be the concatenation of a
+     *            provider ID + ':' + a secondary ID used to differentiate multiple
+     *            instances of a same provider.
+     * @param dataProviderClass
+     *            Returned data provider must extend this class
+     * @return the data provider or null if no data provider is found for the input parameter.
+     * @since 7.2
+     */
+    public synchronized @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getOrCreateDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
+        ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = getExistingDataProvider(trace, id, dataProviderClass);
+        if (dataProvider != null) {
+            return dataProviderClass.cast(dataProvider);
         }
         String[] ids = id.split(DataProviderConstants.ID_SEPARATOR, 2);
         for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
@@ -142,13 +165,41 @@ public class DataProviderManager {
                 /* if this trace or an experiment containing this trace is opened */
                 IDataProviderFactory providerFactory = fDataProviderFactories.get(ids[0]);
                 if (providerFactory != null) {
-                    ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = ids.length > 1 ? providerFactory.createProvider(trace, String.valueOf(ids[1])) : providerFactory.createProvider(trace);
+                    dataProvider = ids.length > 1 ? providerFactory.createProvider(trace, String.valueOf(ids[1])) : providerFactory.createProvider(trace);
                     if (dataProvider != null && id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
                         fInstances.put(trace, dataProvider);
                         return dataProviderClass.cast(dataProvider);
                     }
                 }
                 return null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get a data provider for the given trace if it already exists due to
+     * calling {@link #getOrCreateDataProvider(ITmfTrace, String, Class)} before.
+     *
+     * <p>
+     * This method should never be called from within a {@link TmfSignalHandler}.
+     *
+     * @param trace
+     *            An instance of {@link ITmfTrace}.
+     *            Note, that trace can be an instance of TmfExperiment, too.
+     * @param id
+     *            Id of the data provider. This ID can be the concatenation of a
+     *            provider ID + ':' + a secondary ID used to differentiate multiple
+     *            instances of a same provider.
+     * @param dataProviderClass
+     *            Returned data provider must extend this class
+     * @return the data provider or null
+     * @since 7.2
+     */
+    public synchronized @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getExistingDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
+        for (ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider : fInstances.get(trace)) {
+            if (id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
+                return dataProviderClass.cast(dataProvider);
             }
         }
         return null;

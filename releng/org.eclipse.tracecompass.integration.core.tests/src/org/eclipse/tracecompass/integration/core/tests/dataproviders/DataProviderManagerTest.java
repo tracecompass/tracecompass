@@ -11,12 +11,15 @@
 
 package org.eclipse.tracecompass.integration.core.tests.dataproviders;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.model.DataProviderDescriptor;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.lttng2.lttng.kernel.core.tests.shared.LttngKernelTestTraceUtils;
@@ -27,6 +30,8 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor.ProviderType;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -47,13 +52,15 @@ public class DataProviderManagerTest {
     private static final Set<IDataProviderDescriptor> EXPECTED_KERNEL_DP_DESCRIPTORS = new HashSet<>();
     private static final Set<IDataProviderDescriptor> EXPECTED_UST_DP_DESCRIPTORS = new HashSet<>();
 
+    private static final String CPU_USAGE_DP_ID = "org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider";
+
     static {
         // Kernel Trace
         DataProviderDescriptor.Builder builder = new DataProviderDescriptor.Builder();
         builder.setName("CPU Usage")
                 .setDescription("Show the CPU usage of a Linux kernel trace, returns the CPU usage per process and can be filtered by CPU core")
                 .setProviderType(ProviderType.TREE_TIME_XY)
-                .setId("org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider");
+                .setId(CPU_USAGE_DP_ID);
         EXPECTED_KERNEL_DP_DESCRIPTORS.add(builder.build());
         builder = new DataProviderDescriptor.Builder();
         builder.setName("Disk I/O View")
@@ -226,4 +233,24 @@ public class DataProviderManagerTest {
         }
     }
 
+    /**
+     * Test different get methods
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testGetter() {
+        ITmfTrace trace = fKernelTrace;
+        assertNotNull(trace);
+        ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> dp = DataProviderManager.getInstance().getExistingDataProvider(trace, CPU_USAGE_DP_ID, ITmfTreeXYDataProvider.class);
+        assertNull(dp);
+        dp = DataProviderManager.getInstance().getOrCreateDataProvider(trace, CPU_USAGE_DP_ID, ITmfTreeXYDataProvider.class);
+        assertNotNull(dp);
+        ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> dp2 = DataProviderManager.getInstance().getExistingDataProvider(trace, CPU_USAGE_DP_ID, ITmfTreeXYDataProvider.class);
+        assertNotNull(dp2);
+        assertTrue(dp == dp2);
+        ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> dp3 = DataProviderManager.getInstance().getOrCreateDataProvider(trace, CPU_USAGE_DP_ID, ITmfTreeXYDataProvider.class);
+        assertNotNull(dp3);
+        assertTrue(dp == dp3);
+        assertTrue(dp == dp2);
+    }
 }
