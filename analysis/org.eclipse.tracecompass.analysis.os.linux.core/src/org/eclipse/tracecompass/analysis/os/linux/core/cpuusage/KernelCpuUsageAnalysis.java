@@ -216,6 +216,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
 
             long countAtStart, countAtEnd;
 
+            final int tidIdle = Integer.parseInt(TID_ZERO);
             for (Entry<Integer, List<Integer>> entry : tidsPerCpu.entrySet()) {
                 int cpuNode = Objects.requireNonNull(entry.getKey());
                 List<Integer> tidNodes = Objects.requireNonNull(entry.getValue());
@@ -291,12 +292,14 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
                                 "usage", currentCount * 100.0 / (endTime - startTime)); //$NON-NLS-1$
                         currentCount = 0;
                     }
-                    cpuTotal += currentCount;
+                    if (tid != tidIdle) {
+                        cpuTotal += currentCount;
+                    }
                     map.put(curCpuName + SPLIT_STRING + curTidName, currentCount);
                     addToMap(totalMap, curTidName, currentCount);
-                    totalTime += (currentCount);
                 }
                 map.put(curCpuName, cpuTotal);
+                totalTime += cpuTotal;
             }
 
             /* Add the totals to the map */
