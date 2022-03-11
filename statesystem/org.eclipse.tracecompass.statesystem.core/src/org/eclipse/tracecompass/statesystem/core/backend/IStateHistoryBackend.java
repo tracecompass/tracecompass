@@ -155,6 +155,23 @@ public interface IStateHistoryBackend {
      * return. DO NOT 'new' currentStateInfo, it will be lost and nothing will
      * be returned!
      *
+     * An example query would be at time 20 (see the X in the plot) would return
+     * [{start:10, end:22, value:a, attribute:0},
+     * {start:5, end:22, value:c, attribute:1},
+     * {start:20, end:27, value:d, attribute:2}]
+     *
+     * <pre>
+     * ╔════════╦════╦════╦════╦════╗
+     * ║        ║ 10 ║ 20 ║ 30 ║ 40 ║
+     * ╠════════╬════╩════X════╩════╣
+     * ║ FOO(0) ║    [  a *][  b ]  ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAR(1) ║  [   c  *]        ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAZ(2) ║       [ *d  ]     ║
+     * ╚════════╩═══════════════════╝
+     * </pre>
+     *
      * @param currentStateInfo
      *            List of StateValues (index == quark) to fill up
      * @param t
@@ -172,6 +189,20 @@ public interface IStateHistoryBackend {
      * single StateValue instead of updating the whole list. If the method to
      * use is the same, then feel free to just implement this as a wrapper using
      * doQuery().
+     *
+     * An example query would be at time 20 for 0 (see the X in the plot) would return {start:10, end:22, value:a, attribute:0}
+     * <pre>
+     * ╔════════╦════╦════╦════╦════╗
+     * ║        ║ 10 ║ 20 ║ 30 ║ 40 ║
+     * ╠════════╬════╩════X════╩════╣
+     * ║ FOO(0) X    [  a *][  b ]  ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAR(1) ║  [   c   ]        ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAZ(2) ║       [  d  ]     ║
+     * ╚════════╩═══════════════════╝
+     * </pre>
+     *
      *
      * @param t
      *            The target timestamp of the query.
@@ -191,6 +222,24 @@ public interface IStateHistoryBackend {
      * Generalized 2D iterable query method. Iterates over intervals that match
      * the conditions on quarks and times with no guaranteed order.
      *
+     * An example query would be at time [8,20,30], on quarks [0,1] (see the Xs
+     * in the plot) would return, in unspecified iteration order
+     * [{start:5, end:22, value:c, attribute:1}, {start:0, end:9, value:null, attribute:0},
+     * {start:10, end:27, value:a, attribute:0}, {start:10, end:27, value:a, attribute:0},
+     * {start:23, end:27, value:null, attribute:1}]
+     *
+     * <pre>
+     * ╔════════╦════╦════╦════╦════╗
+     * ║        ║ 10 ║ 20 ║ 30 ║ 40 ║
+     * ╠════════╬═══X╩════X════X════╣
+     * ║ FOO(0) X   *[  a *][ b* ]  ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAR(1) X  [*  c  *]   *    ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAZ(2) ║       [  d  ]     ║
+     * ╚════════╩═══════════════════╝
+     * </pre>
+     *
      * @param quarkCondition
      *            Condition on the quarks for returned intervals.
      * @param timeCondition
@@ -209,6 +258,23 @@ public interface IStateHistoryBackend {
      * Generalized 2D iterable query method. Iterates over intervals that match
      * the conditions on quarks and times with no guaranteed order.
      *
+     * An example query would be at time [8,20,30], on quarks [0,1] (see the Xs
+     * in the plot) would return, in unspecified iteration order
+     * [{start:5, end:22, value:c, attribute:1}, {start:0, end:9, value:null, attribute:0},
+     * {start:10, end:27, value:a, attribute:0}, {start:10, end:27, value:a, attribute:0},
+     * {start:23, end:27, value:null, attribute:1}]
+     *
+     * <pre>
+     * ╔════════╦════╦════╦════╦════╗
+     * ║        ║ 10 ║ 20 ║ 30 ║ 40 ║
+     * ╠════════╬═══X╩════X════X════╣
+     * ║ FOO(0) X   *[  a *][ b* ]  ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAR(1) X  [*  c  *]   *    ║
+     * ╠════════╬═══════════════════╣
+     * ║ BAZ(2) ║       [  d  ]     ║
+     * ╚════════╩═══════════════════╝
+     * </pre>
      * @param quarkCondition
      *            Condition on the quarks for returned intervals.
      * @param timeCondition
