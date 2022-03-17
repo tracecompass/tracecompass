@@ -549,7 +549,7 @@ public class CallStackSeries implements ISegmentStore<ISegment> {
      *            true in order to consider the interval, otherwise the interval
      *            is ignored
      * @return The elements overlapping with this segment
-     * @since 2.2
+     * @since 2.3
      */
     protected Iterable<ISegment> getIntersectingElements(long start, long end, Predicate<ITmfStateInterval> intervalTest) {
         ITmfStateSystem stateSystem = fRootGroup.getStateSystem();
