@@ -10,6 +10,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -28,17 +29,35 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Bernd Hufmann
  */
-/* public */ final class SegmentStoreStatisticsAspects {
+public final class SegmentStoreStatisticsAspects {
 
     private Function<Number, String> fMapper;
     private Function<String, String> fLabelMapper;
     private List<IDataAspect<NamedStatistics>> fAspects;
 
+    /**
+     * Default constructor. An object created with this constructor provides the
+     * default aspects for statistics generated from a segment store.
+     */
     public SegmentStoreStatisticsAspects() {
+        this(Collections.emptyList());
+    }
+
+    /**
+     * An object created with this constructor provides the default aspects for
+     * statistics generated from a segment store and the user defined aspects
+     * provided as parameters.
+     *
+     * @param userDefinedAspects
+     *            a list of user defined aspects that will be added to the
+     *            default ones
+     */
+    public SegmentStoreStatisticsAspects(List<IDataAspect<NamedStatistics>> userDefinedAspects) {
         fMapper = e -> String.format("%s", DataTypeUtils.getFormat(DataType.DURATION, "").format(e)); //$NON-NLS-1$ //$NON-NLS-2$
         fLabelMapper = e -> e;
-        fAspects = createAspects();
+        fAspects = createAspects(userDefinedAspects);
     }
+
     /**
      * Set a mapper function to convert a statistics Number to String.
      * Used for minimum, maximum, average, standard deviation and total.
@@ -70,7 +89,7 @@ import com.google.common.collect.ImmutableList;
         return fAspects;
     }
 
-    private List<IDataAspect<NamedStatistics>> createAspects() {
+    private List<IDataAspect<NamedStatistics>> createAspects(List<IDataAspect<NamedStatistics>> userDefinedAspects) {
         ImmutableList.Builder<IDataAspect<NamedStatistics>> aspectsBuilder = new ImmutableList.Builder<>();
         aspectsBuilder.add(new IDataAspect<NamedStatistics>() {
             @Override
@@ -147,6 +166,8 @@ import com.google.common.collect.ImmutableList;
                 return fMapper.apply(input.getStatistics().getTotal());
             }
         });
+
+        aspectsBuilder.addAll(userDefinedAspects);
 
         return aspectsBuilder.build();
     }

@@ -101,6 +101,7 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         // TODO experiment support.
         return PROVIDER_MAP.computeIfAbsent(module, p -> new SegmentStoreStatisticsDataProvider(trace, p, module.getId() + STATISTICS_SUFFIX));
     }
+
     /**
      * Constructor
      *
@@ -116,6 +117,24 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         fId = id;
         fProvider = provider;
         fModule = provider instanceof IAnalysisModule ? (IAnalysisModule) provider : null;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param trace
+     *            the trace for which this provider will supply info
+     * @param provider
+     *            the segment statistics module from which to get data
+     * @param id
+     *            the extension point ID
+     * @param userDefinedAspects
+     *            a list of user defined aspects that will be added to the
+     *            default ones
+     */
+    public SegmentStoreStatisticsDataProvider(ITmfTrace trace, IStatisticsAnalysis provider, String id, List<IDataAspect<NamedStatistics>> userDefinedAspects) {
+        this(trace, provider, id);
+        fAspects = new SegmentStoreStatisticsAspects(userDefinedAspects);
     }
 
     @Override

@@ -28,7 +28,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @param <E>
  *            The type of object as input for resolving
  */
-/* public */ interface IDataAspect<E> extends Function<E, @Nullable Object> {
+public interface IDataAspect<E> extends Function<E, @Nullable Object> {
 
     /**
      * Get the name of this aspect. This name will be user-visible and, as such,

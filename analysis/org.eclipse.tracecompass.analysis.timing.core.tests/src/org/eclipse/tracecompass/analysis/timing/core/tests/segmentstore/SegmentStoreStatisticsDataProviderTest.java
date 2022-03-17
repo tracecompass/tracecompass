@@ -13,17 +13,23 @@ package org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore.statistics.StubSegmentStatisticsAnalysis;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.IDataAspect;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsAspects.NamedStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TableColumnDescriptor;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
@@ -67,14 +73,14 @@ public class SegmentStoreStatisticsDataProviderTest {
 
     private static final @NonNull List<@NonNull StatisticsHolder> EXPECTED_STATS_FULL = Arrays.asList(
             new StatisticsHolder("", 0, -1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("Total", 2, 0, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("even", 3, 2, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("odd", 4, 2, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
+            new StatisticsHolder("Total", 3, 0, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("even", 4, 3, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("odd", 5, 3, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
 
     private static final @NonNull List<@NonNull StatisticsHolder> EXPECTED_STATS_SELECTION = Arrays.asList(
-            new StatisticsHolder("Selection", 5, 0, 512, 4096, 2304.0, 1035.04, 3585, 8259840.0, 512, 1024, 4096, 8192),
-            new StatisticsHolder("even", 6, 5, 512, 4096, 2304.0, 1035.48, 1793, 4131072.0, 512, 1024, 4096, 8192),
-            new StatisticsHolder("odd", 7, 5, 513, 4095, 2304.0, 1034.9, 1792, 4128768.0, 513, 1026, 4095, 8190));
+            new StatisticsHolder("Selection", 6, 0, 512, 4096, 2304.0, 1035.04, 3585, 8259840.0, 512, 1024, 4096, 8192),
+            new StatisticsHolder("even", 7, 6, 512, 4096, 2304.0, 1035.48, 1793, 4131072.0, 512, 1024, 4096, 8192),
+            new StatisticsHolder("odd", 8, 6, 513, 4095, 2304.0, 1034.9, 1792, 4128768.0, 513, 1026, 4095, 8190));
 
     private static final List<@NonNull List<@NonNull String>> LIST_OF_EXPECTED_LABELS_WITH_MAPPER_FULL = Arrays.asList(
             Arrays.asList("My", "0", "65534", "32767.0", "18918.46928268775", "65535", "2.147385345E9"),
@@ -84,14 +90,30 @@ public class SegmentStoreStatisticsDataProviderTest {
 
     private static final @NonNull List<@NonNull StatisticsHolder> EXPECTED_STATS_WITH_MAPPER_FULL = Arrays.asList(
             new StatisticsHolder("My", 1, -1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("MyTotal", 8, 1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("Myeven", 9, 8, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("Myodd", 10, 8, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
+            new StatisticsHolder("MyTotal", 9, 1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("Myeven", 10, 9, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("Myodd", 11, 9, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
+
+    private static final String USER_DEFINED_EXTRA_HEADER = "userDefinedHeader";
+    private static final String USER_DEFINED_EXTRA_VALUE = "userDefinedValue";
+    private static final @NonNull List<@NonNull String> EXPECTED_HEADER_LIST_USER_DEFINED = Stream.concat(EXPECTED_HEADER_LIST.stream(), Stream.of(USER_DEFINED_EXTRA_HEADER)).collect(Collectors.toList());
+    private static final @NonNull List<@NonNull String> EXPECTED_TOOLTIP_LIST_USER_DEFINED = Stream.concat(EXPECTED_TOOLTIP_LIST.stream(), Stream.of("")).collect(Collectors.toList());
+    private static final List<@NonNull List<@NonNull String>> LIST_OF_EXPECTED_LABELS_FULL_USER_DEFINED = LIST_OF_EXPECTED_LABELS_FULL.stream()
+            .map(list -> Stream.concat(list.stream(), Stream.of(USER_DEFINED_EXTRA_VALUE))
+                    .collect(Collectors.toList()))
+            .collect(Collectors.toList());
+    private static final @NonNull List<@NonNull StatisticsHolderUserDefined> EXPECTED_STATS_FULL_USER_DEFINED = Arrays.asList(
+            new StatisticsHolderUserDefined("", 2, -1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068, USER_DEFINED_EXTRA_VALUE),
+            new StatisticsHolderUserDefined("Total", 12, 2, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068, USER_DEFINED_EXTRA_VALUE),
+            new StatisticsHolderUserDefined("even", 13, 12, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068, USER_DEFINED_EXTRA_VALUE),
+            new StatisticsHolderUserDefined("odd", 14, 12, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066, USER_DEFINED_EXTRA_VALUE));
 
     private static List<ITableColumnDescriptor> fExpectedDescriptors;
+    private static List<ITableColumnDescriptor> fExpectedDescriptorsUserDefined;
 
     private static SegmentStoreStatisticsDataProvider fTestDataProvider;
     private static SegmentStoreStatisticsDataProvider fTestDataProvider2;
+    private static SegmentStoreStatisticsDataProvider fTestDataProviderWithUserDefinedAspect;
 
     private static TmfXmlTraceStub fTrace;
 
@@ -113,6 +135,13 @@ public class SegmentStoreStatisticsDataProviderTest {
                     .setTooltip(EXPECTED_TOOLTIP_LIST.get(i))
                     .build());
         }
+        fExpectedDescriptorsUserDefined = new ArrayList<>();
+        for (int i = 0; i < EXPECTED_HEADER_LIST_USER_DEFINED.size(); i++) {
+            fExpectedDescriptorsUserDefined.add(new TableColumnDescriptor.Builder()
+                    .setText(EXPECTED_HEADER_LIST_USER_DEFINED.get(i))
+                    .setTooltip(EXPECTED_TOOLTIP_LIST_USER_DEFINED.get(i))
+                    .build());
+        }
 
         fTrace = new TmfXmlTraceStubNs();
         @NonNull
@@ -123,6 +152,18 @@ public class SegmentStoreStatisticsDataProviderTest {
         fTestDataProvider2 = new SegmentStoreStatisticsDataProvider(trace, fixture, "org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore");
         fTestDataProvider2.setLabelMapper(e -> "My" + e);
         fTestDataProvider2.setMapper(String::valueOf);
+        @NonNull IDataAspect<@NonNull NamedStatistics> userDefinedAspect = new IDataAspect<@NonNull NamedStatistics>() {
+            @Override
+            public String getName() {
+                return USER_DEFINED_EXTRA_HEADER;
+            }
+
+            @Override
+            public @Nullable Object apply(NamedStatistics input) {
+                return USER_DEFINED_EXTRA_VALUE;
+            }
+        };
+        fTestDataProviderWithUserDefinedAspect = new SegmentStoreStatisticsDataProvider(trace, fixture, "org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore", Arrays.asList(userDefinedAspect));
     }
 
     /**
@@ -134,8 +175,12 @@ public class SegmentStoreStatisticsDataProviderTest {
             fTestDataProvider.dispose();
         }
 
-        if (fTestDataProvider != null) {
+        if (fTestDataProvider2 != null) {
             fTestDataProvider2.dispose();
+        }
+
+        if (fTestDataProviderWithUserDefinedAspect != null) {
+            fTestDataProviderWithUserDefinedAspect.dispose();
         }
 
         if (fTrace != null) {
@@ -257,6 +302,39 @@ public class SegmentStoreStatisticsDataProviderTest {
                 EXPECTED_STATS_WITH_MAPPER_FULL.size());
     }
 
+    /**
+     * Test to verify {@link SegmentStoreStatisticsDataProvider} with user
+     * defined aspects for the full trace
+     */
+    @Test
+    public void testFetchTreeWithUserDefinedAspectsFullRange() {
+        Map<@NonNull String, @NonNull Object> fetchParameters = new HashMap<>();
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull SegmentStoreStatisticsModel>> response = fTestDataProviderWithUserDefinedAspect.fetchTree(fetchParameters, new NullProgressMonitor());
+        assertNotNull(response);
+
+        TmfTreeModel<@NonNull SegmentStoreStatisticsModel> treeModel = response.getModel();
+        assertNotNull(treeModel);
+
+        assertEquals("Header list size", EXPECTED_HEADER_LIST_USER_DEFINED.size(), treeModel.getHeaders().size());
+        assertEquals("Header list", EXPECTED_HEADER_LIST_USER_DEFINED, treeModel.getHeaders());
+
+        List<@NonNull ITableColumnDescriptor> columnDescriptors = treeModel.getColumnDescriptors();
+        assertEquals("Header descriptor list size", EXPECTED_HEADER_LIST_USER_DEFINED.size(), columnDescriptors.size());
+
+        assertEquals("Column descriptor list", fExpectedDescriptorsUserDefined, columnDescriptors);
+
+        assertNull("Scope", treeModel.getScope());
+
+        List<@NonNull SegmentStoreStatisticsModel> entries = treeModel.getEntries();
+        assertNotNull("Entries", entries);
+
+        verifyEntriesWithUserDefinedAspect(LIST_OF_EXPECTED_LABELS_FULL_USER_DEFINED,
+                EXPECTED_STATS_FULL_USER_DEFINED,
+                entries,
+                0,
+                EXPECTED_STATS_FULL_USER_DEFINED.size());
+    }
+
     // ------------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------------
@@ -294,6 +372,18 @@ public class SegmentStoreStatisticsDataProviderTest {
         }
     }
 
+    private static void verifyEntriesWithUserDefinedAspect(List<@NonNull List<@NonNull String>> expectedLabels,
+            @NonNull List<@NonNull StatisticsHolderUserDefined> expectedEntriesUserDefined, List<@NonNull SegmentStoreStatisticsModel> entries, int startIndex, int nbEntries) {
+        @NonNull List<@NonNull StatisticsHolder> expectedEntries = expectedEntriesUserDefined.stream().collect(Collectors.toList());
+        verifyEntries(expectedLabels, expectedEntries, entries, startIndex, nbEntries);
+        for (int i = 0; i < expectedLabels.size(); i++) {
+            String expectedUserDefinedValue = expectedEntriesUserDefined.get(i).fUserDefinedField;
+            int index = startIndex + i;
+            SegmentStoreStatisticsModel entry = entries.get(index);
+            assertTrue("User defined aspect not found (index " + index + ")", entry.getLabels().stream().anyMatch(s -> s.equals(expectedUserDefinedValue)));
+        }
+    }
+
     private static class StatisticsHolder {
         String fName;
         long fId;
@@ -326,4 +416,14 @@ public class SegmentStoreStatisticsDataProviderTest {
             fMaxEnd = maxEnd;
         }
     }
+
+    private static class StatisticsHolderUserDefined extends StatisticsHolder {
+        String fUserDefinedField;
+        public StatisticsHolderUserDefined(String name, long id, long parentId, long min, long max, double average,
+                double stdDev, long nbElements, double total, long minStart, long minEnd, long maxStart, long maxEnd, String userDefinedField) {
+            super(name, id, parentId, min, max, average, stdDev, nbElements, total, minStart, minEnd, maxStart, maxEnd);
+            fUserDefinedField = userDefinedField;
+        }
+    }
+
 }
