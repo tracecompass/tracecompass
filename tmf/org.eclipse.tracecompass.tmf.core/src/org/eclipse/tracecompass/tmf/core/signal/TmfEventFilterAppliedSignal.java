@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2022 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -14,7 +14,7 @@
 
 package org.eclipse.tracecompass.tmf.core.signal;
 
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public class TmfEventFilterAppliedSignal extends TmfSignal {
 
     private final ITmfTrace fTrace;
-    private final ITmfFilter fEventFilter;
+    private final @Nullable ITmfFilter fEventFilter;
 
     /**
      * Constructor for a new signal.
@@ -36,9 +36,9 @@ public class TmfEventFilterAppliedSignal extends TmfSignal {
      * @param trace
      *            The trace to which filter is applied
      * @param filter
-     *            The applied event filter or null
+     *            The applied event filter or null if cleared
      */
-    public TmfEventFilterAppliedSignal(Object source, ITmfTrace trace, @NonNull ITmfFilter filter) {
+    public TmfEventFilterAppliedSignal(Object source, ITmfTrace trace, @Nullable ITmfFilter filter) {
         super(source);
         fTrace = trace;
         fEventFilter = filter;
@@ -54,11 +54,11 @@ public class TmfEventFilterAppliedSignal extends TmfSignal {
     }
 
     /**
-     * Get the event filter being applied
+     * Get the event filter being applied, or null if filters are cleared
      *
-     * @return The filter
+     * @return The filter, or null
      */
-    public ITmfFilter getEventFilter() {
+    public @Nullable ITmfFilter getEventFilter() {
         return fEventFilter;
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2019 Ericsson and others.
+ * Copyright (c) 2010, 2022 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -1958,12 +1958,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * Send an event indicating a filter has been applied.
      *
      * @param filter
-     *            The filter that was just applied
+     *            The filter that was just applied, or null if cleared
      */
     protected void fireFilterApplied(final ITmfFilter filter) {
-        if (filter == null) {
-            return;
-        }
         broadcast(new TmfEventFilterAppliedSignal(this, fTrace, filter));
     }
 
