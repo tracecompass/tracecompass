@@ -152,7 +152,7 @@ public class DataProviderManager {
      * @param dataProviderClass
      *            Returned data provider must extend this class
      * @return the data provider or null if no data provider is found for the input parameter.
-     * @since 7.3
+     * @since 8.0
      */
     public synchronized @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getOrCreateDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
         ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = getExistingDataProvider(trace, id, dataProviderClass);
@@ -194,7 +194,7 @@ public class DataProviderManager {
      * @param dataProviderClass
      *            Returned data provider must extend this class
      * @return the data provider or null
-     * @since 7.3
+     * @since 8.0
      */
     public synchronized @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getExistingDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
         for (ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider : fInstances.get(trace)) {

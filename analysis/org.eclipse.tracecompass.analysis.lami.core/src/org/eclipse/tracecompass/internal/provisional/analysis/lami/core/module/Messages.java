@@ -35,6 +35,16 @@ public class Messages extends NLS {
 
     public static String LamiAnalysis_ExtendedTableNamePrefix;
 
+    public static String LamiAnalysis_AnyTrace;
+    public static String LamiAnalysis_Compatible;
+    public static String LamiAnalysis_Incompatible;
+    public static String LamiAnalysis_Metadata;
+    public static String LamiAnalysis_NoTest;
+    public static String LamiAnalysis_NotFound;
+    public static String LamiAnalysis_OpenTrace;
+    public static String LamiAnalysis_ParsingError;
+    public static String LamiAnalysis_Unsupported;
+
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }

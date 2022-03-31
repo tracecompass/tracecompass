@@ -38,6 +38,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.process.ProcessUtils;
@@ -137,6 +139,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
 
     /* Cache: true if the initialization process took place already. */
     private boolean fInitialized = false;
+    private String fHelpMessage = ""; //$NON-NLS-1$
 
     /*
      * Cache: assigns a boolean to a trace which indicates if this analysis can
@@ -216,11 +219,34 @@ public class LamiAnalysis implements IOnDemandAnalysis {
                 .add(TEST_COMPATIBILITY_FLAG)
                 .add(tracePath)
                 .build();
-        final boolean isCompatible = (getOutputFromCommand(commandLine) != null);
+        boolean isCompatible = false;
+
+        String commandOutput = getOutputFromCommand(commandLine, true);
+        if (commandOutput != null) {
+            isCompatible = commandOutput.trim().isEmpty();
+            if (!isCompatible) {
+                StringBuilder outputBuilder = new StringBuilder();
+                try {
+                    JSONObject json = new JSONObject(commandOutput);
+                    isCompatible = !json.has(LamiStrings.ERROR_MESSAGE);
+                } catch (JSONException e) {
+                    outputBuilder.append(e.getMessage());
+                    outputBuilder.append("\n\n"); //$NON-NLS-1$
+                }
+                outputBuilder.append(commandOutput);
+                commandOutput = outputBuilder.toString();
+            }
+        }
 
         /* Add this result to the compatibility cache. */
         fTraceCompatibilityCache.put(trace, isCompatible);
 
+        if (isCompatible) {
+            fHelpMessage = NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_Compatible, getName(), trace.getName()));
+        } else {
+            Object[] bindings = { getName(), trace.getName(), commandOutput };
+            fHelpMessage = NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_Incompatible, bindings));
+        }
         return isCompatible;
     }
 
@@ -238,10 +264,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         }
 
         if (!fFeatures.contains(Features.TEST_COMPATIBILITY)) {
-            /*
-             * No support for dynamic compatibility testing: suppose this
-             * analysis can run on any trace.
-             */
+            fHelpMessage = acceptAll(trace);
             return true;
         }
 
@@ -254,6 +277,14 @@ public class LamiAnalysis implements IOnDemandAnalysis {
          * Test compatibility since it's supported.
          */
         return testCompatibility(trace);
+    }
+
+    private String acceptAll(ITmfTrace trace) {
+        StringBuilder helpBuilder = new StringBuilder();
+        helpBuilder.append(NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_NoTest, getName())));
+        helpBuilder.append(" "); //$NON-NLS-1$
+        helpBuilder.append(NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_AnyTrace, trace.getName())));
+        return helpBuilder.toString();
     }
 
     private void setFeatures() {
@@ -332,7 +363,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         final boolean executableExists = executableExists(executable);
 
         if (!executableExists) {
-            /* Script is not found */
+            fHelpMessage = NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_NotFound, getName()));
             return;
         }
 
@@ -348,7 +379,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         setFeatures();
 
         if (!fFeatures.contains(Features.VERSION_IS_SUPPORTED)) {
-            /* Unsupported LAMI version */
+            fHelpMessage = NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_Unsupported, getName()));
             return;
         }
 
@@ -378,6 +409,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, RUNNING_METADATA_COMMAND, COMMAND, command);
         String output = getOutputFromCommand(command);
         if (output == null || output.isEmpty()) {
+            fHelpMessage = noMetadata(NonNullUtils.nullToEmptyString(Messages.LamiAnalysis_ErrorNoOutput));
             return false;
         }
 
@@ -461,9 +493,18 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         } catch (JSONException e) {
             /* Error in the parsing of the JSON, script is broken? */
             TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, ERROR_PARSING_METADATA, e.getMessage());
+            fHelpMessage = noMetadata(NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_ParsingError, e.getMessage())));
             return false;
         }
         return true;
+    }
+
+    private String noMetadata(String reason) {
+        StringBuilder helpBuilder = new StringBuilder();
+        helpBuilder.append(NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_Metadata, getName())));
+        helpBuilder.append(" "); //$NON-NLS-1$
+        helpBuilder.append(reason);
+        return helpBuilder.toString();
     }
 
     private static List<LamiTableEntryAspect> getAspectsFromColumnDescriptions(JSONArray columnDescriptions) throws JSONException {
@@ -825,6 +866,16 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         return tableClass;
     }
 
+    @Nullable
+    private static String getOutputFromCommand(List<String> command, boolean orError) {
+        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, LOG_RUNNING_MESSAGE, COMMAND, command);
+        List<String> lines = ProcessUtils.getOutputFromCommand(command, orError);
+        if (lines == null) {
+            return null;
+        }
+        return String.join("", lines); //$NON-NLS-1$
+    }
+
     /**
      * Get the output of an external command, used for getting the metadata.
      * Cannot be cancelled, and will not report errors, simply returns null if
@@ -835,14 +886,8 @@ public class LamiAnalysis implements IOnDemandAnalysis {
      *            {@link ProcessBuilder}
      * @return The command output as a string
      */
-    @VisibleForTesting
     protected @Nullable String getOutputFromCommand(List<String> command) {
-        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, LOG_RUNNING_MESSAGE, COMMAND, command);
-        List<String> lines = ProcessUtils.getOutputFromCommand(command);
-        if (lines == null) {
-            return null;
-        }
-        return String.join("", lines); //$NON-NLS-1$
+        return getOutputFromCommand(command, false);
     }
 
     /**
@@ -937,4 +982,14 @@ public class LamiAnalysis implements IOnDemandAnalysis {
         return fIsUserDefined;
     }
 
+    @Override
+    public String getHelpText() {
+        return NonNullUtils.nullToEmptyString(NLS.bind(Messages.LamiAnalysis_OpenTrace, getName()));
+    }
+
+    @Override
+    public String getHelpText(ITmfTrace trace) {
+        canExecute(trace);
+        return fHelpMessage;
+    }
 }

@@ -34,6 +34,7 @@ public interface LamiStrings {
     String CLASS = "class";
     String DATA = "data";
     String INHERIT = "inherit";
+    String ERROR_MESSAGE = "error-message";
 
     /* Data types */
     String VALUE = "value";

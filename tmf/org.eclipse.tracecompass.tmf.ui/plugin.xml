@@ -1014,10 +1014,15 @@
                   </count>
                   <iterate
                         ifEmpty="false"
-                        operator="and">
-                     <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
-                     </instanceof>
+                        operator="or">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysisElement">
+                        </instanceof>
+                     </or>
                   </iterate>
                </with>
             </visibleWhen>
@@ -1449,10 +1454,15 @@
                      value="1">
                </count>
                <iterate
-                     operator="and">
-                  <instanceof
-                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
-                  </instanceof>
+                     operator="or">
+                  <or>
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysisElement">
+                     </instanceof>
+                  </or>
                </iterate>
             </and>
          </activeWhen>

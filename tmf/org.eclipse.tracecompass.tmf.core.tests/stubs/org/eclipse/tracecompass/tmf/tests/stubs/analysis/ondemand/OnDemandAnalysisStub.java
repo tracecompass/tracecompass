@@ -57,4 +57,14 @@ public class OnDemandAnalysisStub implements IOnDemandAnalysis {
     public boolean isUserDefined() {
         return false;
     }
+
+    @Override
+    public String getHelpText() {
+        return getName();
+    }
+
+    @Override
+    public String getHelpText(ITmfTrace trace) {
+        return getHelpText();
+    }
 }

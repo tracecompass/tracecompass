@@ -76,6 +76,29 @@ public interface IOnDemandAnalysis {
     boolean canExecute(ITmfTrace trace);
 
     /**
+     * Gets a generic help message/documentation for this analysis.
+     *
+     * This help text will be displayed to the user.
+     *
+     * @return The generic help text
+     * @since 8.0
+     */
+    String getHelpText();
+
+    /**
+     * Gets a help text specific for a given trace.
+     *
+     * For instance, it may explain why the analysis cannot be executed on a
+     * trace and how to correct this.
+     *
+     * @param trace
+     *            The trace to analyze
+     * @return A help text with information on a specific trace
+     * @since 8.0
+     */
+    String getHelpText(ITmfTrace trace);
+
+    /**
      * Execute the analysis on the given trace.
      *
      * It should have been ensured that the analysis can run first on this

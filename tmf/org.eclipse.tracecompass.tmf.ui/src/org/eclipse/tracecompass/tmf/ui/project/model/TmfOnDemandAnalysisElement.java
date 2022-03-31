@@ -142,4 +142,18 @@ public abstract class TmfOnDemandAnalysisElement extends TmfProjectModelElement
     public boolean canRun() {
         return fCanRun;
     }
+
+    /**
+     * Gets the help message for this analysis
+     *
+     * @return The help message
+     * @since 8.0
+     */
+    public String getHelpMessage() {
+        ITmfTrace trace = getParent().getParent().getTrace();
+        if (trace != null) {
+            return getAnalysis().getHelpText(trace);
+        }
+        return getAnalysis().getHelpText();
+    }
 }

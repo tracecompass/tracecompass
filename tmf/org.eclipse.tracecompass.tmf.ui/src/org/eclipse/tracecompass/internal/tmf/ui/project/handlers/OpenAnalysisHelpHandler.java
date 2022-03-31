@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysisElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -36,6 +37,7 @@ import org.eclipse.ui.PlatformUI;
 public class OpenAnalysisHelpHandler extends AbstractHandler {
 
     private TmfAnalysisElement fAnalysis;
+    private TmfOnDemandAnalysisElement fOnDemandAnalysis;
 
     @Override
     public boolean isEnabled() {
@@ -59,16 +61,19 @@ public class OpenAnalysisHelpHandler extends AbstractHandler {
 
         // Make sure there is only one selection and that it is a trace
         fAnalysis = null;
+        fOnDemandAnalysis = null;
         if (selection instanceof TreeSelection) {
             final TreeSelection sel = (TreeSelection) selection;
             // There should be only one item selected as per the plugin.xml
             final Object element = sel.getFirstElement();
             if (element instanceof TmfAnalysisElement) {
                 fAnalysis = (TmfAnalysisElement) element;
+            } else if (element instanceof TmfOnDemandAnalysisElement) {
+                fOnDemandAnalysis = (TmfOnDemandAnalysisElement) element;
             }
         }
 
-        return (fAnalysis != null);
+        return (fAnalysis != null || fOnDemandAnalysis != null);
     }
 
     @Override
@@ -81,14 +86,18 @@ public class OpenAnalysisHelpHandler extends AbstractHandler {
         }
 
         // Check that the trace is valid
-        if (fAnalysis == null) {
+        if (fAnalysis == null && fOnDemandAnalysis == null) {
             return null;
         }
 
         Thread thread = new Thread() {
             @Override
             public void run() {
-                displayHelpMsg(fAnalysis.getHelpMessage());
+                if (fAnalysis != null) {
+                    displayHelpMsg(fAnalysis.getHelpMessage());
+                } else {
+                    displayHelpMsg(fOnDemandAnalysis.getHelpMessage());
+                }
             }
         };
 

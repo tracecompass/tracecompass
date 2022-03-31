@@ -51,13 +51,18 @@ public final class ProcessUtils {
 
     /**
      * Simple output-getting command. Cannot be cancelled, and will return null
-     * if the external process exits with a non-zero return code.
+     * if the external process exits with a non-zero return code, unless orError
+     * is set to true. In the latter case, returns the output that may contain
+     * an error message, which the caller has to parse (for potential errors).
      *
      * @param command
      *            The command (executable + arguments) to launch
-     * @return The process's standard output upon completion
+     * @param orError
+     *            Whether or not to return output if error, or null otherwise
+     * @return The process' standard output upon completion
+     * @since 5.0
      */
-    public static @Nullable List<String> getOutputFromCommand(List<String> command) {
+    public static @Nullable List<String> getOutputFromCommand(List<String> command, boolean orError) {
         try (TraceCompassLogUtils.ScopeLog sl = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ProcessUtils#getOutputFromComment", "args", command)) { //$NON-NLS-1$ //$NON-NLS-2$
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);
@@ -78,11 +83,26 @@ public final class ProcessUtils {
                 }
 
                 int ret = p.waitFor();
-                return (ret == 0 ? output : null);
+                if (ret == 0 || orError) {
+                    return output;
+                }
+                return null;
             }
         } catch (IOException | InterruptedException e) {
             return null;
         }
+    }
+
+    /**
+     * Simple output-getting command. Cannot be cancelled, and will return null
+     * if the external process exits with a non-zero return code.
+     *
+     * @param command
+     *            The command (executable + arguments) to launch
+     * @return The process' standard output upon completion
+     */
+    public static @Nullable List<String> getOutputFromCommand(List<String> command) {
+        return getOutputFromCommand(command, false);
     }
 
     /**
