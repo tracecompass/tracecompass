@@ -306,6 +306,31 @@
         <sonar.skip>true</sonar.skip>
       </properties>
     </profile>
+
+    <profile>
+        <id>build-api-docs</id>
+        <build>
+            <plugins>
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-javadoc-plugin</artifactId>
+                   <version>3.1.0</version>
+                   <configuration>
+                      <excludePackageNames>org.eclipse.tracecompass.internal.*:*.test*:*.test:*.example:*.alltests:*.alltests.*:*.stubs</excludePackageNames>
+                      <overview>overview.html</overview>
+                      <noindex>true</noindex>
+                      <nodeprecated>false</nodeprecated>
+                      <nodeprecatedlist>false</nodeprecatedlist>
+                      <nohelp>true</nohelp>
+                      <notree>true</notree>
+                      <doctitle>Trace Compass API</doctitle>
+                      <show>public</show>
+                      <verbose>true</verbose>
+                   </configuration>
+                </plugin>
+            </plugins>
+        </build>
+     </profile>
   </profiles>
 
   <modules>
