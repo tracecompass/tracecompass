@@ -14,8 +14,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.analysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -28,7 +32,11 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisModuleOutputs;
 import org.eclipse.tracecompass.tmf.ui.project.model.Messages;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
+import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -113,6 +121,47 @@ public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtens
     protected IViewPart openView() throws PartInitException {
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        IViewReference[] views = activePage.getViewReferences();
+
+        String id = getId();
+        List<IViewReference> correctTypeViews = new ArrayList<>();
+        for (IViewReference view : views) {
+            String openedViewId;
+            if (view.getSecondaryId() != null) {
+                // Filter out secondary id that are trace UUIDs.
+                try {
+                    UUID.fromString(Objects.requireNonNull(view.getSecondaryId()));
+                    openedViewId = view.getId();
+                }
+                catch(IllegalArgumentException exception) {
+                    openedViewId = view.getId() + TmfView.VIEW_ID_SEPARATOR + view.getSecondaryId().split(TmfViewFactory.INTERNAL_SECONDARY_ID_SEPARATOR)[0];
+                }
+            } else {
+                openedViewId = view.getId();
+            }
+            if (openedViewId.equals(id)) {
+                correctTypeViews.add(view);
+            }
+        }
+
+        // If the view is not pinned select that one.
+        for (IViewReference view: correctTypeViews) {
+            IViewPart viewPart = view.getView(false);
+            if (viewPart instanceof TmfView) {
+                TmfView pinnableView = (TmfView) viewPart;
+                if (!pinnableView.isPinned()) {
+                    return activePage.showView(view.getId(), view.getSecondaryId(), IWorkbenchPage.VIEW_ACTIVATE);
+                }
+            }
+        }
+        // If there is already a view but it is pinned create a new one.
+        if (correctTypeViews.size() > 0) {
+            IViewPart newViewPart = TmfViewFactory.newView(id, true);
+            if (newViewPart != null) {
+                IViewSite viewSite = newViewPart.getViewSite();
+                return activePage.showView(viewSite.getId(), viewSite.getSecondaryId(), IWorkbenchPage.VIEW_ACTIVATE);
+            }
+        }
         return activePage.showView(getId());
     }
 
