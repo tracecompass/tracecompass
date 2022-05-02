@@ -82,6 +82,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     /**
      * Extension point ID.
+     *
      * @since 4.0
      */
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider"; //$NON-NLS-1$
@@ -118,8 +119,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     }
 
     /**
-     * An iterator over a segment store that returns segments from a segment store
-     * only if they do not overlap
+     * An iterator over a segment store that returns segments from a segment
+     * store only if they do not overlap
      */
     private static class SegmentStoreIterator implements Iterator<@NonNull ISegment> {
 
@@ -174,8 +175,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         /*
-         * Returns whether two segments overlaps or not by comparing start/end of last
-         * and start/end of next.
+         * Returns whether two segments overlaps or not by comparing start/end
+         * of last and start/end of next.
          */
         private boolean overlaps(@Nullable ISegment last, ISegment next) {
             if (last == null) {
@@ -218,16 +219,16 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @since 4.0
      */
     public static @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> create(ITmfTrace trace, String secondaryId) {
-        // The trace can be an experiment, so we need to know if there are multiple
-        // analysis modules with the same ID
+        // The trace can be an experiment, so we need to know if there are
+        // multiple analysis modules with the same ID
         Iterable<ISegmentStoreProvider> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, ISegmentStoreProvider.class);
         Iterable<ISegmentStoreProvider> filteredModules = Iterables.filter(modules, m -> ((IAnalysisModule) m).getId().equals(secondaryId));
         Iterator<ISegmentStoreProvider> iterator = filteredModules.iterator();
         if (iterator.hasNext()) {
             ISegmentStoreProvider module = iterator.next();
             if (iterator.hasNext()) {
-                // More than one module, must be an experiment, return null so the factory can
-                // try with individual traces
+                // More than one module, must be an experiment, return null so
+                // the factory can try with individual traces
                 return null;
             }
             ((IAnalysisModule) module).schedule();
@@ -316,16 +317,16 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), nodes.build()), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
-                complete ? CommonStatusMessage.COMPLETED: CommonStatusMessage.RUNNING);
+                complete ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING);
     }
 
     @Override
     public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
 
-        // FIXME: There is no way to get the running status of a segment store analysis,
-        // so we need to wait for completion before going forward, to be sure the
-        // segment store is available.
+        // FIXME: There is no way to get the running status of a segment store
+        // analysis, so we need to wait for completion before going forward, to
+        // be sure the segment store is available.
         if ((provider instanceof IAnalysisModule) && !((IAnalysisModule) provider).waitForCompletion()) {
             return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
         }
@@ -355,9 +356,9 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
         long start = filter.getStart();
         long end = filter.getEnd();
-        // The types in the tree do not contain the trace name for sake of readability,
-        // but
-        // the name of the series in XY model should be unique per trace
+        // The types in the tree do not contain the trace name for sake of
+        // readability, but the name of the series in XY model should be unique
+        // per trace
         String prefix = getTrace().getName() + '/';
         Map<String, Series> types = initTypes(prefix, filter);
         if (types.isEmpty()) {
@@ -374,7 +375,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         IAnalysisModule module = (fProvider instanceof IAnalysisModule) ? (IAnalysisModule) fProvider : null;
         boolean complete = module == null ? true : module.isQueryable(filter.getEnd());
 
-        // For each visible segments, add start time to x value and duration for y value
+        // For each visible segments, add start time to x value and duration for
+        // y value
         for (ISegment segment : displayData) {
             if (monitor != null && monitor.isCanceled()) {
                 return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
@@ -414,11 +416,11 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @param key
      *            The timegraph entry model id
      * @param predicates
-     *            The predicates used to filter the timegraph state. It is a map of
-     *            predicate by property. The value of the property is an integer
-     *            representing a bitmask associated to that property. The status of
-     *            each property will be set for the timegraph state according to the
-     *            associated predicate test result.
+     *            The predicates used to filter the timegraph state. It is a map
+     *            of predicate by property. The value of the property is an
+     *            integer representing a bitmask associated to that property.
+     *            The status of each property will be set for the timegraph
+     *            state according to the associated predicate test result.
      * @param monitor
      *            The progress monitor
      */
@@ -429,8 +431,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             // Get the filter external input data
             Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(fProvider, segment);
 
-            // Test each predicates and set the status of the property associated to the
-            // predicate
+            // Test each predicates and set the status of the property
+            // associated to the predicate
             int mask = 0;
             for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
                 Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());

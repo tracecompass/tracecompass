@@ -63,5 +63,4 @@ public class TmfXyModel implements ITmfXyModel {
     public boolean hasCommonXAxis() {
         return false;
     }
-
 }

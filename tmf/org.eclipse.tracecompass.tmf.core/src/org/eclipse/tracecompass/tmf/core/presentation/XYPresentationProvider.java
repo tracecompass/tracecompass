@@ -68,7 +68,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
             return appearance;
         }
 
-        if(!SUPPORTED_TYPES.contains(type)) {
+        if (!SUPPORTED_TYPES.contains(type)) {
             throw new UnsupportedOperationException("Series type: " + type + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
@@ -106,8 +106,8 @@ public class XYPresentationProvider implements IXYPresentationProvider {
     }
 
     /**
-     * By using a Round Robin technique on all available colors supported, it will
-     * return a color depending of the number of series already present
+     * By using a Round Robin technique on all available colors supported, it
+     * will return a color depending of the number of series already present
      *
      * @return An instance of {@link RGB} that represent the color
      */
@@ -117,14 +117,15 @@ public class XYPresentationProvider implements IXYPresentationProvider {
     }
 
     /**
-     * By using a Round Robin technique on all available styles supported, it will
-     * return a style depending of the number of series already present and
+     * By using a Round Robin technique on all available styles supported, it
+     * will return a style depending of the number of series already present and
      * depending on the series type.
      *
      * @param type
-     *            Series type. Indeed, we want to apply style only on type different
-     *            than scatter
-     * @return A string defining the style. See {@link IYAppearance.Style}'s strings
+     *            Series type. Indeed, we want to apply style only on type
+     *            different than scatter
+     * @return A string defining the style. See {@link IYAppearance.Style}'s
+     *         strings
      */
     private String generateStyle(String type) {
         if (!StyleProperties.SeriesType.SCATTER.equals(type)) {

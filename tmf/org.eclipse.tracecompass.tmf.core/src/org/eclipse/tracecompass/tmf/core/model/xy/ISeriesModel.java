@@ -108,7 +108,8 @@ public interface ISeriesModel {
     /**
      * Get the array of properties for each data point in the series. There
      * should be the same number of points in the properties as in the series.
-     * See {@link CoreFilterProperty} for some values that the properties can take.
+     * See {@link CoreFilterProperty} for some values that the properties can
+     * take.
      *
      * @return The values of the properties for each data point
      * @since 4.2
