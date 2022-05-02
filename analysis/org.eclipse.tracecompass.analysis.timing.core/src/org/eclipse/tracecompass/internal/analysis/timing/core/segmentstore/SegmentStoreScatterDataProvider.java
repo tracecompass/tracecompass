@@ -52,6 +52,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel.DisplayType;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -470,6 +471,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
         public SeriesModel build() {
             SeriesModelBuilder builder = new SeriesModel.SeriesModelBuilder(getId(), String.valueOf(getId()), Longs.toArray(fXValues), Doubles.toArray(fYValues));
+            builder.seriesDisplayType(DisplayType.SCATTER);
             builder.setProperties(Ints.toArray(fProperties)).build();
             return builder.setProperties(Ints.toArray(fProperties)).build();
         }
