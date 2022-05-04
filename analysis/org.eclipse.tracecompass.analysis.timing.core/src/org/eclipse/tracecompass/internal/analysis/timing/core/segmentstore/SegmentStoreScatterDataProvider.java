@@ -391,7 +391,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
                 continue;
             }
 
-            addPoint(thisSeries, segment, predicates, monitor);
+            addPoint(thisSeries, segment, predicates);
         }
 
         List<ISeriesModel> seriesModelMap = new ArrayList<>();
@@ -422,10 +422,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      *            integer representing a bitmask associated to that property.
      *            The status of each property will be set for the timegraph
      *            state according to the associated predicate test result.
-     * @param monitor
-     *            The progress monitor
      */
-    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Multimap<String, Object>>> predicates, @Nullable IProgressMonitor monitor) {
+    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Multimap<String, Object>>> predicates) {
 
         if (!predicates.isEmpty()) {
 
