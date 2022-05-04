@@ -89,7 +89,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider"; //$NON-NLS-1$
 
     private static final String DEFAULT_CATEGORY = "default"; //$NON-NLS-1$
-    private static final String GROUP_PREFIX = "group";
+    private static final String GROUP_PREFIX = "group"; //$NON-NLS-1$
     private static final AtomicLong ENTRY_ID = new AtomicLong();
 
     private final ISegmentStoreProvider fProvider;
