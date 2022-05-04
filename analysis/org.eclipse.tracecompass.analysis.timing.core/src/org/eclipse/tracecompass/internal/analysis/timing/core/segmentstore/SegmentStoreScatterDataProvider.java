@@ -277,7 +277,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
         Map<String, INamedSegment> segmentTypes = new HashMap<>();
         IAnalysisModule module = (provider instanceof IAnalysisModule) ? (IAnalysisModule) provider : null;
-        boolean complete = module == null ? true : module.isQueryable(filter.getEnd());
+        boolean complete = module == null || module.isQueryable(filter.getEnd());
 
         // Create the list of segment types that will each create a series
         for (INamedSegment segment : Iterables.filter(intersectingElements, INamedSegment.class)) {
@@ -374,7 +374,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         final Iterable<ISegment> displayData = compactList(start, intersectingElements, pixelSize);
 
         IAnalysisModule module = (fProvider instanceof IAnalysisModule) ? (IAnalysisModule) fProvider : null;
-        boolean complete = module == null ? true : module.isQueryable(filter.getEnd());
+        boolean complete = module == null || module.isQueryable(filter.getEnd());
 
         // For each visible segments, add start time to x value and duration for
         // y value
