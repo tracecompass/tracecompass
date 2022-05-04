@@ -367,7 +367,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Collections.emptyList(), true);
         }
         long pixelSize = Math.max(1, (end - start) / filter.getTimesRequested().length);
-        final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end, SegmentComparators.INTERVAL_START_COMPARATOR), (segment) -> {
+        final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end, SegmentComparators.INTERVAL_START_COMPARATOR), segment -> {
             CheckSegmentType cs = new CheckSegmentType(prefix, types.keySet());
             return cs.test(segment);
         });
