@@ -48,22 +48,22 @@ public interface IYAppearance {
         /**
          * Line series
          */
-        public static final String LINE = "line"; //$NON-NLS-1$
+        public static final String LINE = StyleProperties.SeriesType.LINE;
 
         /**
          * Area series
          */
-        public static final String AREA = "area"; //$NON-NLS-1$
+        public static final String AREA = StyleProperties.SeriesType.AREA;
 
         /**
          * Scatter series
          */
-        public static final String SCATTER = "scatter"; //$NON-NLS-1$
+        public static final String SCATTER = StyleProperties.SeriesType.SCATTER;
 
         /**
          * Bar series
          */
-        public static final String BAR = "bar"; //$NON-NLS-1$
+        public static final String BAR = StyleProperties.SeriesType.BAR;
 
         /**
          * Constructor
@@ -84,32 +84,32 @@ public interface IYAppearance {
         /**
          * No line
          */
-        public static final String NONE = "NONE"; //$NON-NLS-1$
+        public static final String NONE = StyleProperties.SeriesStyle.NONE;
 
         /**
          * Solid line
          */
-        public static final String SOLID = "SOLID"; //$NON-NLS-1$
+        public static final String SOLID = StyleProperties.SeriesStyle.SOLID;
 
         /**
          * Dotted line
          */
-        public static final String DOT = "DOT"; //$NON-NLS-1$
+        public static final String DOT = StyleProperties.SeriesStyle.DOT;
 
         /**
          * Dashed line
          */
-        public static final String DASH = "DASH"; //$NON-NLS-1$
+        public static final String DASH = StyleProperties.SeriesStyle.DASH;
 
         /**
          * Dashed Dot (-.-.-.-) line
          */
-        public static final String DASHDOT = "DASHDOT"; //$NON-NLS-1$
+        public static final String DASHDOT = StyleProperties.SeriesStyle.DASHDOT;
 
         /**
          * Dashed Dot Dot (-..-..-..) line
          */
-        public static final String DASHDOTDOT = "DASHDOTDOT"; //$NON-NLS-1$
+        public static final String DASHDOTDOT = StyleProperties.SeriesStyle.DASHDOTDOT;
 
         /**
          * Constructor
@@ -132,25 +132,25 @@ public interface IYAppearance {
         public static final String NONE = "NONE"; //$NON-NLS-1$
 
         /** Diamond tick */
-        public static final String DIAMOND = "DIAMOND"; //$NON-NLS-1$
+        public static final String DIAMOND = StyleProperties.SymbolType.DIAMOND;
 
         /** Circle tick */
-        public static final String CIRCLE = "CIRCLE"; //$NON-NLS-1$
+        public static final String CIRCLE = StyleProperties.SymbolType.CIRCLE;
 
         /** Square tick */
-        public static final String SQUARE = "SQUARE"; //$NON-NLS-1$
+        public static final String SQUARE = StyleProperties.SymbolType.SQUARE;
 
         /** triangle tick */
-        public static final String TRIANGLE = "TRIANGLE"; //$NON-NLS-1$
+        public static final String TRIANGLE = StyleProperties.SymbolType.TRIANGLE;
 
         /** inverted triangle */
-        public static final String INVERTED_TRIANGLE = "INVERTED_TRIANGLE"; //$NON-NLS-1$
+        public static final String INVERTED_TRIANGLE = StyleProperties.SymbolType.INVERTED_TRIANGLE;
 
         /** st andrews cross, like an X */
-        public static final String CROSS = "CROSS"; //$NON-NLS-1$
+        public static final String CROSS = StyleProperties.SymbolType.CROSS;
 
         /** Plus tick */
-        public static final String PLUS = "PLUS"; //$NON-NLS-1$
+        public static final String PLUS = StyleProperties.SymbolType.PLUS;
 
         /** Constructor */
         private SymbolStyle() {
