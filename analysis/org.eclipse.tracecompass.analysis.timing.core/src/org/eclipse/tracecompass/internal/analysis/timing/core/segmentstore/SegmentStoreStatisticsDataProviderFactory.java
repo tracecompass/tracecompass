@@ -64,6 +64,7 @@ public class SegmentStoreStatisticsDataProviderFactory implements IDataProviderF
             return null;
         }
 
+        @Deprecated
         @Override
         protected @Nullable ISegmentStoreProvider getSegmentProviderAnalysis(@NonNull ITmfTrace trace) {
             IAnalysisModule segmentStoreModule = trace.getAnalysisModule(fSecondaryId);

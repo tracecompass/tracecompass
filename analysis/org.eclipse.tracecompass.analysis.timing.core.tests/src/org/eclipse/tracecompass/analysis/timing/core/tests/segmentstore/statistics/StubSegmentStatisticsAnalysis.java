@@ -108,6 +108,7 @@ public class StubSegmentStatisticsAnalysis extends AbstractSegmentStatisticsAnal
         return segment.getLength() % 2 == 0 ? "even" : "odd";
     }
 
+    @Deprecated
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentProviderAnalysis(@NonNull ITmfTrace trace) {
         return fSegmentStoreProvider;

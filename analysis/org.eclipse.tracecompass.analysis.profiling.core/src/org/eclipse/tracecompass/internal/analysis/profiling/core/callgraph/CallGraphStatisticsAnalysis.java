@@ -32,6 +32,7 @@ public class CallGraphStatisticsAnalysis extends AbstractSegmentStatisticsAnalys
     /** The analysis module ID */
     public static final String ID = CallGraphAnalysis.ID + ".statistics"; //$NON-NLS-1$
 
+    @Deprecated
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentProviderAnalysis(@NonNull ITmfTrace trace) {
         // FIXME: Return the CallStackAnalysis when the segment store comes from there

@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnalysisModule implements IStatisticsAnalysis<ISegment> {
 
-    private @Nullable ISegmentStoreProvider fSegmentStoreProviderModule;
+    private @Nullable ISegmentStoreProvider fSegmentStoreProvider;
 
     private @Nullable IStatistics<ISegment> fTotalStats;
 
@@ -62,8 +62,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
         ITmfTrace trace = getTrace();
         if (trace != null) {
-            ISegmentStoreProvider provider = getSegmentProviderAnalysis(trace);
-            fSegmentStoreProviderModule = provider;
+            ISegmentStoreProvider provider = getSegmentStoreProvider(trace);
+            fSegmentStoreProvider = provider;
             if (provider instanceof IAnalysisModule) {
                 return ImmutableList.of((IAnalysisModule) provider);
             }
@@ -170,16 +170,16 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      * @return The segment store
      */
     private @Nullable Iterable<@NonNull ISegment> getSegmentStore(long start, long end) {
-        ISegmentStoreProvider segmentStoreProviderModule = fSegmentStoreProviderModule;
-        if (segmentStoreProviderModule == null) {
+        ISegmentStoreProvider segmentStoreProvider = fSegmentStoreProvider;
+        if (segmentStoreProvider == null) {
             return null;
         }
-        if (segmentStoreProviderModule instanceof IAnalysisModule) {
-            ((IAnalysisModule) segmentStoreProviderModule).waitForCompletion();
+        if (segmentStoreProvider instanceof IAnalysisModule) {
+            ((IAnalysisModule) segmentStoreProvider).waitForCompletion();
         }
         long t0 = Long.min(start, end);
         long t1 = Long.max(start, end);
-        ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProviderModule.getSegmentStore();
+        ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProvider.getSegmentStore();
         return segmentStore != null ?
                 isEternity(t0, t1) ?
                         segmentStore :
@@ -232,8 +232,24 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      *            The active trace
      *
      * @return The segment store provider
+     * @deprecated use {@link #getSegmentStoreProvider(ITmfTrace)} instead
      */
+    @Deprecated
     protected abstract @Nullable ISegmentStoreProvider getSegmentProviderAnalysis(ITmfTrace trace);
+
+    /**
+     * Find the segment store provider used for this analysis
+     *
+     * @param trace
+     *            The active trace
+     *
+     * @return The segment store provider
+     * @since 5.2
+     */
+    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
+        // TODO: make getSegmentStoreProvider abstract when removing the following:
+        return getSegmentProviderAnalysis(trace);
+    }
 
     @Override
     protected void canceling() {

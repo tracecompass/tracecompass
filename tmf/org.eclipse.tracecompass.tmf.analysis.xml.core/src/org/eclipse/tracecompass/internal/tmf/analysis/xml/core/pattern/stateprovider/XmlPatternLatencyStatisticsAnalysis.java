@@ -47,6 +47,7 @@ public class XmlPatternLatencyStatisticsAnalysis extends AbstractSegmentStatisti
         return null;
     }
 
+    @Deprecated
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentProviderAnalysis(@NonNull ITmfTrace trace) {
         return fPatternAnalysisId != null ? TmfTraceUtils.getAnalysisModuleOfClass(trace, XmlPatternAnalysis.class, fPatternAnalysisId) : null;
