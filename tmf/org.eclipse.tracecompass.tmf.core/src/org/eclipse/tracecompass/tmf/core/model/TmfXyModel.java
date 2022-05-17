@@ -59,6 +59,10 @@ public class TmfXyModel implements ITmfXyModel {
         return fSeries;
     }
 
+    /**
+     * @deprecated As currently unused, at least in o.e.tracecompass.
+     */
+    @Deprecated
     @Override
     public boolean hasCommonXAxis() {
         return false;

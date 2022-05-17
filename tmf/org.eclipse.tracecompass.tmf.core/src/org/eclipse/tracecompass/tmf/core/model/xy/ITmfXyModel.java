@@ -43,7 +43,9 @@ public interface ITmfXyModel {
      *
      * @return True if X values are common
      * @since 5.0
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     default boolean hasCommonXAxis() {
         return false;
     }
