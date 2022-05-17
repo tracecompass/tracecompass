@@ -19,7 +19,9 @@ import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
  *
  * @author Yonni Chen
  * @since 3.1
+ * @deprecated As currently unused, at least in o.e.tracecompass.
  */
+@Deprecated
 public class YAppearance implements IYAppearance {
 
     private final String fName;
