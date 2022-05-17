@@ -78,7 +78,9 @@ public interface IYAppearance {
      * example solid, dash, dot, etc.
      *
      * @author Yonni Chen
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     public final class Style {
 
         /**
@@ -128,7 +130,12 @@ public interface IYAppearance {
      */
     public final class SymbolStyle {
 
-        /** No tick */
+        /**
+         * No tick
+         *
+         * @deprecated As currently unused, at least in o.e.tracecompass.
+         */
+        @Deprecated
         public static final String NONE = "NONE"; //$NON-NLS-1$
 
         /** Diamond tick */
@@ -162,21 +169,27 @@ public interface IYAppearance {
      * Gets the Y series name
      *
      * @return the name of the Y serie
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     String getName();
 
     /**
      * Gets the Y series line style. Serie style can be DOT, DOTDOT, DASH, etc.
      *
      * @return the style of the Y serie
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     String getStyle();
 
     /**
      * Gets the Y serie color
      *
      * @return the color of the Y serie
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     RGBAColor getColor();
 
     /**
@@ -184,14 +197,18 @@ public interface IYAppearance {
      * Scatter, etc.
      *
      * @return the type of the Y serie
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     String getType();
 
     /**
      * Gets Y serie width.
      *
      * @return the width of the Y serie
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     int getWidth();
 
     /**
@@ -211,7 +228,9 @@ public interface IYAppearance {
      *
      * @return the appearance
      * @since 4.1
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     default String getSymbolStyle() {
         return SymbolStyle.NONE;
     }
@@ -221,7 +240,9 @@ public interface IYAppearance {
      *
      * @return the size of the symbol in pixels
      * @since 4.1
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     default int getSymbolSize() {
         return 3;
     }
@@ -231,7 +252,9 @@ public interface IYAppearance {
      *
      * @return The OutputElementStyle from this style
      * @since 6.0
+     * @deprecated As currently unused, at least in o.e.tracecompass.
      */
+    @Deprecated
     default OutputElementStyle toOutputElementStyle() {
         Builder<String, Object> builder = ImmutableMap.builder();
         builder.put(StyleProperties.STYLE_NAME, getName());

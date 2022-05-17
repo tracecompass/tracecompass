@@ -58,7 +58,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
     /* Gets the default palette for available colors for XY series */
     private static final IPaletteProvider COLOR_PALETTE = DefaultColorPaletteProvider.INSTANCE;
 
-    /* This map a series name and an IYAppearance */
+    /* This maps a series id and an OutputElementStyle */
     private final Map<Long, OutputElementStyle> fYAppearances = new HashMap<>();
 
     @Override
@@ -124,8 +124,8 @@ public class XYPresentationProvider implements IXYPresentationProvider {
      * @param type
      *            Series type. Indeed, we want to apply style only on type
      *            different than scatter
-     * @return A string defining the style. See {@link IYAppearance.Style}'s
-     *         strings
+     * @return A string defining the style. See
+     *         {@link StyleProperties.SeriesStyle}'s strings
      */
     private String generateStyle(String type) {
         if (!StyleProperties.SeriesType.SCATTER.equals(type)) {
