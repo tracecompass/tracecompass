@@ -668,12 +668,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.jboss.tools.tycho-plugins</groupId>
-          <artifactId>repository-utils</artifactId>
-          <version>1.7.0</version>
-        </plugin>
-
-        <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
           <version>${sonar-version}</version>

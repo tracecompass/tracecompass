@@ -28,29 +28,6 @@
   <name>Trace Compass Repository</name>
   <packaging>eclipse-repository</packaging>
 
-<build>
-  <plugins>
-    <plugin>
-      <groupId>org.jboss.tools.tycho-plugins</groupId>
-      <artifactId>repository-utils</artifactId>
-      <executions>
-        <execution>
-          <id>generate-facade</id>
-          <phase>package</phase>
-          <goals>
-            <goal>generate-repository-facade</goal>
-          </goals>
-        </execution>
-      </executions>
-      <configuration>
-        <removeDefaultCategory>true</removeDefaultCategory>
-        <skipWebContentGeneration>true</skipWebContentGeneration>
-        <skipBuildInfo>true</skipBuildInfo>
-      </configuration>
-    </plugin>
-  </plugins>
-</build>
-
 <profiles>
   <profile>
     <id>deploy-update-site</id>
