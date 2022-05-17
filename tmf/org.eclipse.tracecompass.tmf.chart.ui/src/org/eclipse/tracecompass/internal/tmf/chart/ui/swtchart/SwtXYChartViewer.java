@@ -594,6 +594,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
      * @param gc
      *            The graphic context
      * @return the average character width of the font
+     * @deprecated Since this method was brought back in through a revert.
      */
     @Deprecated
     private static int getAverageCharWidth(GC gc) {

@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.tmf.core.model.ICorePropertyCollection;
  *
  * @author Jean-Christian Kouame
  * @since 4.0
- *
+ * @deprecated As {@link ICorePropertyCollection} is to be used instead.
  */
 @Deprecated
 public interface IPropertyCollection extends ICorePropertyCollection {

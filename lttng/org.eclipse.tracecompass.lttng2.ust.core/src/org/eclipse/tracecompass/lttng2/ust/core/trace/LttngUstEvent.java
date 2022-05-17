@@ -33,6 +33,8 @@ public class LttngUstEvent extends CtfTmfEvent {
     /**
      * Default constructor. Only for use by extension points, should not be
      * called directly.
+     *
+     * @deprecated Since this class was introduced in org.eclipse.tracecompass.
      */
     @Deprecated
     public LttngUstEvent() {
