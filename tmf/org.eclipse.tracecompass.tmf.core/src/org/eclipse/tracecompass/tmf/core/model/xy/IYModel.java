@@ -12,14 +12,10 @@
 package org.eclipse.tracecompass.tmf.core.model.xy;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 
 /**
- * This represents a model for Y series of a XY chart. Even if {@link IYSeries}
- * and this class share the same data, {@link IYSeries} is only used by viewers
- * as a ViewModel and contains UI informations such as color, style, etc.
- * {@link IYModel} contains strict minimum informations. It's highly recommended
- * to used this class for data providers instead of {@link IYSeries}.
+ * This represents a model for Y series of a XY chart. {@link IYModel} contains
+ * strict minimum information.
  *
  * @author Yonni Chen
  * @since 4.0
