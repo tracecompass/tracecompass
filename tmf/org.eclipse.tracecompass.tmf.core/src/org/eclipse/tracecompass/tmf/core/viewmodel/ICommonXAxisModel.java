@@ -20,7 +20,9 @@ import org.eclipse.jdt.annotation.Nullable;
  *
  * @author Matthew Khouzam
  * @since 3.1
+ * @deprecated As currently unused, at least in o.e.tracecompass.
  */
+@Deprecated
 public interface ICommonXAxisModel {
 
     /**

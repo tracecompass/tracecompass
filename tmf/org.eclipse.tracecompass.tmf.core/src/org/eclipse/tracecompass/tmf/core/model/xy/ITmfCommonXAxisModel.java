@@ -13,8 +13,6 @@ package org.eclipse.tracecompass.tmf.core.model.xy;
 
 import java.util.Collection;
 
-import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
-
 /**
  * This is the XY model interface returned by data providers. This model is
  * immutable and is used by viewers. In this model, there is no information
@@ -32,9 +30,8 @@ import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
  * All series share [1, 2] as X values. <br/>
  * <br/>
  *
- * Unlike {@link ICommonXAxisModel}, this interface returns a collection of
- * {@link IYModel}, a minimal model for Y values that contains only data. No
- * informations about UI properties
+ * This interface returns a collection of {@link IYModel}, a minimal model for Y
+ * values that contains only data. (No information about UI properties.)
  *
  * @author Yonni Chen
  * @since 4.0
