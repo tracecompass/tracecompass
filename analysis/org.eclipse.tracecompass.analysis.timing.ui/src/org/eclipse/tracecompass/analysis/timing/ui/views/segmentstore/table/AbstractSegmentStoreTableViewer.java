@@ -91,8 +91,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 
@@ -393,8 +391,8 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         createProviderColumns();
 
         /*
-         * If the listener is null then the table is updated from another viewer.
-         * Otherwise this class is responsible to load the trace.
+         * If the listener is null then the table is updated from another
+         * viewer. Otherwise this class is responsible to load the trace.
          */
         SegmentStoreProviderProgressListener listener = fListener;
         if (listener == null) {
@@ -475,36 +473,6 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         if (provider instanceof IAnalysisModule) {
             ((IAnalysisModule) provider).schedule();
         }
-    }
-
-    /**
-     * Compute the predicate for every property regexes
-     *
-     * @return A map of time event filters predicate by property
-     * @since 3.1
-     * @deprecated Use {@link #generateRegexPredicate()}
-     */
-    @Deprecated
-    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull Object>>> computeRegexPredicate() {
-        Multimap<@NonNull Integer, @NonNull String> regexes = getRegexes();
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
-        for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
-            String regex = IFilterStrings.mergeFilters(entry.getValue());
-            FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull Object>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
-            if (predicate != null) {
-                predicates.put(entry.getKey(), predicate);
-            }
-        }
-        return predicates;
-    }
-
-    private static Predicate<@NonNull Map<@NonNull String, @NonNull Object>> multiToMapPredicate(Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> predicate) {
-        return map -> {
-            Builder<@NonNull String, @NonNull Object> builder = ImmutableMultimap.builder();
-            map.forEach((key, value) -> builder.put(key, value));
-            return predicate.test(Objects.requireNonNull(builder.build()));
-        };
     }
 
     /**
