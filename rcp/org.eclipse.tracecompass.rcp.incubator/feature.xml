@@ -20,24 +20,20 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipse.equinox.p2.ui.sdk"/>
+      <import plugin="org.eclipse.core.commands"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.ui.browser"/>
-      <import plugin="org.eclipse.equinox.p2.core" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.equinox.p2.ui" version="2.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.equinox.p2.metadata" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.equinox.p2.operations" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.equinox.p2.repository" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.equinox.p2.engine" version="2.0.0" match="compatible"/>
-      <import plugin="org.eclipse.core.runtime" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.core" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.discovery" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.engine" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.metadata" version="2.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.operations" version="2.0.0" match="compatible"/>
       <import plugin="org.eclipse.equinox.p2.repository" version="2.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.transport.ecf" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.commands"/>
+      <import plugin="org.eclipse.equinox.p2.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.ui.sdk"/>
       <import plugin="org.eclipse.swt"/>
-      <import plugin="org.eclipse.equinox.p2.discovery" version="1.0.0"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.browser"/>
    </requires>
 
    <plugin
