@@ -36,12 +36,11 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 public class TmfExperimentStub extends TmfExperiment {
 
     /**
-     * Default constructor. Should not be called directly by the code, but needed
-     * for the extension point.
+     * Default constructor. Should not be called directly by the code, but
+     * needed for the extension point.
      *
-     * @deprecated Do not call this directly (but do not remove it either!)
+     * Do not call this directly (but do not remove it either!)
      */
-    @Deprecated
     public TmfExperimentStub() {
         super();
     }
@@ -67,12 +66,13 @@ public class TmfExperimentStub extends TmfExperiment {
 
     /**
      * @return a copy of the pending request list
-     * @throws Exception if java reflection failed
+     * @throws Exception
+     *             if java reflection failed
      */
     public List<TmfCoalescedEventRequest> getAllPendingRequests() throws Exception {
         Method m = TmfEventProvider.class.getDeclaredMethod("getPendingRequests");
         m.setAccessible(true);
-        LinkedList<?> list= (LinkedList<?>) m.invoke(this);
+        LinkedList<?> list = (LinkedList<?>) m.invoke(this);
         LinkedList<TmfCoalescedEventRequest> retList = new LinkedList<>();
         for (Object element : list) {
             retList.add((TmfCoalescedEventRequest) element);
@@ -83,7 +83,9 @@ public class TmfExperimentStub extends TmfExperiment {
 
     /**
      * Clears the pending request list
-     * @throws Exception if java reflection failed
+     *
+     * @throws Exception
+     *             if java reflection failed
      */
     public void clearAllPendingRequests() throws Exception {
         Method m = TmfEventProvider.class.getDeclaredMethod("clearPendingRequests");
@@ -93,9 +95,11 @@ public class TmfExperimentStub extends TmfExperiment {
 
     /**
      * Sets the timer flag
+     *
      * @param enabled
-     *              flag to set
-     * @throws Exception if java reflection failed
+     *            flag to set
+     * @throws Exception
+     *             if java reflection failed
      */
     public void setTimerEnabledFlag(boolean enabled) throws Exception {
         Class<?>[] paramTypes = new Class[1];

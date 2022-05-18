@@ -144,9 +144,8 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
      * Default constructor. Should not be used directly, but is needed for
      * extension points.
      *
-     * @deprecated Do not call this directly (but do not remove it either!)
+     * Do not call this directly (but do not remove it either!)
      */
-    @Deprecated
     public TmfExperiment() {
         super();
     }
@@ -288,7 +287,8 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
 
         /*
          * For all traces on the same host, if two or more specify different
-         * clock offsets, adjust their clock offset by the average of all of them.
+         * clock offsets, adjust their clock offset by the average of all of
+         * them.
          *
          * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=484620
          */
@@ -319,7 +319,10 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
                 continue;
             }
 
-            /* Only synchronize traces if they haven't previously been synchronized */
+            /*
+             * Only synchronize traces if they haven't previously been
+             * synchronized
+             */
             if (tracesToSynchronize.stream()
                     .map(trace -> ((ITmfTrace) trace).getTimestampTransform())
                     .anyMatch(transform -> !transform.equals(TmfTimestampTransform.IDENTITY))) {
@@ -819,7 +822,10 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
             if (!status.isOK()) {
                 Activator.log(status);
             }
-            /* Refresh supplementary files in separate thread to prevent deadlock */
+            /*
+             * Refresh supplementary files in separate thread to prevent
+             * deadlock
+             */
             new Thread("Refresh supplementary files") { //$NON-NLS-1$
                 @Override
                 public void run() {
