@@ -47,6 +47,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.IAxisTick;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.ITitle;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
@@ -68,12 +74,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.IAxisTick;
-import org.eclipse.swtchart.ISeries;
-import org.eclipse.swtchart.ISeriesSet;
-import org.eclipse.swtchart.ITitle;
 
 import com.google.common.collect.Iterators;
 
@@ -588,20 +588,6 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
     }
 
     /**
-     * Returns the average character width, measured in pixels, of the font
-     * described by the receiver.
-     *
-     * @param gc
-     *            The graphic context
-     * @return the average character width of the font
-     * @deprecated Since this method was brought back in through a revert.
-     */
-    @Deprecated
-    private static int getAverageCharWidth(GC gc) {
-        return gc.getFontMetrics().getAverageCharWidth();
-    }
-
-    /**
      * Set the ITitle object text to a substring of canonicalTitle that when
      * rendered in the chart will fit maxPixelLength.
      */
@@ -623,11 +609,11 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
              * the average character width of the current font.
              */
             if (pixels.x > maxPixelLength) {
-                int charwidth = getAverageCharWidth(gc);
+                double charwidth = gc.getFontMetrics().getAverageCharacterWidth();
 
                 int minimum = 3;
 
-                int strLen = ((maxPixelLength / charwidth) - minimum);
+                int strLen = (int) (maxPixelLength / charwidth) - minimum;
 
                 if (strLen > minimum) {
                     newTitle = canonicalTitle.substring(0, strLen) + ELLIPSIS;
