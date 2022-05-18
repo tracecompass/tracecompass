@@ -195,9 +195,10 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     }
 
     /**
-     * @deprecated Use {@link #getEventStyle(ITimeEvent)} instead.
+     * This exists for legacy purposes; do not extend, re-implement or use this
+     * if the view is intended to work with TSP based clients. Use
+     * {@link #getEventStyle(ITimeEvent)} instead to style the time events.
      */
-    @Deprecated
     @Override
     public int getStateTableIndex(@Nullable ITimeEvent event) {
         return INVISIBLE;
@@ -342,8 +343,8 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                     prevHeightFactor = 1.0f;
                 }
                 /*
-                 * Update if the height with factor does not match the legend. In
-                 * that case update the base height without factor.
+                 * Update if the height with factor does not match the legend.
+                 * In that case update the base height without factor.
                  */
                 if (!Float.valueOf(heightFactor).equals(prevHeightFactor)) {
                     Object height = elementStyle.getStyleValues().get(StyleProperties.HEIGHT);
