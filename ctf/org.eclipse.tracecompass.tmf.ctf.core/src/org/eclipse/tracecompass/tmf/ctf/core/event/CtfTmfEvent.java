@@ -183,9 +183,8 @@ public class CtfTmfEvent extends TmfEvent
      * because it's used in extension points, and the framework will use this
      * constructor to get the class type.
      *
-     * @deprecated Should not be called by normal code
+     * Should not be called by normal code.
      */
-    @Deprecated
     public CtfTmfEvent() {
         super();
         fSourceCpu = -1;

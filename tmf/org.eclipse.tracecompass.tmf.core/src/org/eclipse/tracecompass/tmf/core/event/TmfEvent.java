@@ -54,11 +54,10 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
      * Default constructor. Is required for extension points, but should not be
      * used normally.
      *
-     * @deprecated Do not use, extension-point use only. Use
-     *             {@link #TmfEvent(ITmfTrace, long, ITmfTimestamp, ITmfEventType, ITmfEventField)}
-     *             instead.
+     * Do not use, extension-point use only. Use
+     * {@link #TmfEvent(ITmfTrace, long, ITmfTimestamp, ITmfEventType, ITmfEventField)}
+     * instead.
      */
-    @Deprecated
     public TmfEvent() {
         this(null, ITmfContext.UNKNOWN_RANK, null, null, null);
     }
@@ -97,7 +96,8 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
     /**
      * Copy constructor
      *
-     * @param event the original event
+     * @param event
+     *            the original event
      */
     public TmfEvent(final @NonNull ITmfEvent event) {
         fTrace = event.getTrace();
@@ -209,7 +209,7 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         ITmfTrace trace = fTrace;
         return getClass().getSimpleName() + " [fTimestamp=" + getTimestamp()
                 + ", fTrace=" + (trace == null ? "null" : trace) + ", fRank=" + getRank()
-                +  ", fType=" + getType() + ", fContent=" + getContent()
+                + ", fType=" + getType() + ", fContent=" + getContent()
                 + "]";
     }
 
