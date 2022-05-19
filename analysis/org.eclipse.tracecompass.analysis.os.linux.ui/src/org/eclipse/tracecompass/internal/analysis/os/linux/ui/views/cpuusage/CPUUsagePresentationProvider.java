@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.viewers.xychart.BaseXYPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -61,9 +61,9 @@ public class CPUUsagePresentationProvider extends BaseXYPresentationProvider {
     @Override
     public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
         if (fTotalSeries.contains(seriesId)) {
-            return getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
+            return getSeriesStyle(seriesId, StyleProperties.SeriesType.LINE, DEFAULT_SERIES_WIDTH);
         }
-        return getSeriesStyle(seriesId, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
+        return getSeriesStyle(seriesId, StyleProperties.SeriesType.AREA, DEFAULT_SERIES_WIDTH);
     }
 
 }

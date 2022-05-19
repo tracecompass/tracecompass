@@ -26,11 +26,11 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -148,7 +148,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     @Override
     public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
         BaseXYPresentationProvider presentationProvider = getPresentationProvider();
-        return fUseDefaultStyleValues.getOrDefault(presentationProvider, true) ? presentationProvider.getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : presentationProvider.getSeriesStyle(seriesId);
+        return fUseDefaultStyleValues.getOrDefault(presentationProvider, true) ? presentationProvider.getSeriesStyle(seriesId, StyleProperties.SeriesType.LINE, DEFAULT_SERIES_WIDTH) : presentationProvider.getSeriesStyle(seriesId);
     }
 
     @Override

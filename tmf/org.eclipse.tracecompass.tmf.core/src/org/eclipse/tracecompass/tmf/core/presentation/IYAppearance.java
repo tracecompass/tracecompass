@@ -13,6 +13,9 @@ package org.eclipse.tracecompass.tmf.core.presentation;
 
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SeriesStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SeriesType;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
@@ -34,7 +37,9 @@ import com.google.common.collect.ImmutableMap.Builder;
  *
  * @author Yonni Chen
  * @since 4.0
+ * @deprecated this is replaced by {@link StyleProperties}
  */
+@Deprecated
 public interface IYAppearance {
 
     /**
@@ -42,7 +47,9 @@ public interface IYAppearance {
      * bar, line, scatter, etc.
      *
      * @author Yonni Chen
+     * @deprecated use {@link SeriesType} instead
      */
+    @Deprecated
     public final class Type {
 
         /**
@@ -79,6 +86,7 @@ public interface IYAppearance {
      *
      * @author Yonni Chen
      * @deprecated As currently unused, at least in o.e.tracecompass.
+     * @deprecated this is replaced by {@link SeriesStyle}
      */
     @Deprecated
     public final class Style {
@@ -127,7 +135,9 @@ public interface IYAppearance {
      *
      * @author Matthew Khouzam
      * @since 4.1
+     * @deprecated use {@link SymbolType} instead
      */
+    @Deprecated
     public final class SymbolStyle {
 
         /**

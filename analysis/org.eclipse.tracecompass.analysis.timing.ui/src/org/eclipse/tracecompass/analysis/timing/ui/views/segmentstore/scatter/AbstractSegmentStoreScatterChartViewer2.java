@@ -21,9 +21,9 @@ import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.Segme
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.xyscatter.SegmentStoreScatterGraphTooltipProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -135,7 +135,7 @@ public class AbstractSegmentStoreScatterChartViewer2 extends TmfFilteredXYChartV
 
     @Override
     public OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
-        return getPresentationProvider().getSeriesStyle(seriesId, IYAppearance.Type.SCATTER, DEFAULT_SERIES_WIDTH);
+        return getPresentationProvider().getSeriesStyle(seriesId, StyleProperties.SeriesType.SCATTER, DEFAULT_SERIES_WIDTH);
     }
 
     /**

@@ -60,8 +60,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.Type;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -141,7 +140,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         yAxis.getTick().setForeground(foregroundColor);
         xAxis.getGrid().setStyle(LineStyle.DOT);
         yAxis.getGrid().setStyle(LineStyle.DOT);
-        fSeriesType = IYAppearance.Type.BAR;
+        fSeriesType = StyleProperties.SeriesType.BAR;
 
         fDragZoomProvider = new MouseDragZoomProvider(this);
         fDragProvider = new MouseSelectionProvider(this);
@@ -171,11 +170,11 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      */
     protected void setType(String type) {
         switch (type) {
-        case Type.BAR:
-            fSeriesType = Type.BAR;
+        case StyleProperties.SeriesType.BAR:
+            fSeriesType = StyleProperties.SeriesType.BAR;
             break;
-        case Type.AREA:
-            fSeriesType = Type.AREA;
+        case StyleProperties.SeriesType.AREA:
+            fSeriesType = StyleProperties.SeriesType.AREA;
             break;
         default:
             break;
@@ -183,10 +182,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     }
 
     private synchronized void updateDisplay(String name, Iterable<ISegment> data) {
-        ISeries<Integer> series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries(name);
+        ISeries<Integer> series = fSeriesType.equals(StyleProperties.SeriesType.BAR) ? createSeries() : createAreaSeries(name);
         int barWidth = 4;
         int preWidth = fOverrideNbPoints == 0 ? fChart.getPlotArea().getSize().x / barWidth : fOverrideNbPoints;
-        if (!fSeriesType.equals(Type.BAR)) {
+        if (!fSeriesType.equals(StyleProperties.SeriesType.BAR)) {
             preWidth += 2;
         }
         final int width = preWidth;
@@ -220,7 +219,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         double timeWidth = (double) maxLength / (double) width;
         for (int i = 0; i < width; i++) {
             xOrigSeries[i] = i * timeWidth;
-            if (!fSeriesType.equals(Type.BAR)) {
+            if (!fSeriesType.equals(StyleProperties.SeriesType.BAR)) {
                 xOrigSeries[i] += timeWidth / 2;
             }
         }
@@ -399,9 +398,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
             data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
             Display.getDefault().asyncExec(() -> updateDisplay(entry.getKey(), data));
             if (fSegmentStoreProviders.size() > 1) {
-                setType(Type.AREA);
+                setType(StyleProperties.SeriesType.AREA);
             } else {
-                setType(Type.BAR);
+                setType(StyleProperties.SeriesType.BAR);
             }
             for (ISegmentStoreDensityViewerDataListener l : fListeners) {
                 l.viewDataChanged(data);

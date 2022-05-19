@@ -35,13 +35,13 @@ public interface IXYPresentationProvider {
      *            The series type
      * @param width
      *            The series width
-     * @return The {@link IYAppearance} instance of the Y series.
+     * @return The {@link StyleProperties} instance of the Y series.
      * @since 6.0
      */
     OutputElementStyle getSeriesStyle(Long seriesId, String type, int width);
 
     /**
-     * Returns the {@link IYAppearance} to which the specified series ID is
+     * Returns the {@link StyleProperties} to which the specified series ID is
      * mapped. If no appearance is found, a new one will be created with given
      * parameters and added to this presentation provider.
      *
@@ -50,7 +50,7 @@ public interface IXYPresentationProvider {
      *
      * @param seriesId
      *            The name of the series
-     * @return The {@link IYAppearance} instance of the Y series.
+     * @return The {@link StyleProperties} instance of the Y series.
      * @since 6.0
      */
     default OutputElementStyle getSeriesStyle(Long seriesId) {

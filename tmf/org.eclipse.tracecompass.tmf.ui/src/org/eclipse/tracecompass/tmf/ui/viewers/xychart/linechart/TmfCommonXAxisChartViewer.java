@@ -69,7 +69,6 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
@@ -648,7 +647,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             Color color = COLOR_REGISTRY.get(rgb.toString());
             String symbolType = (String) presProvider.getStyle(appearance, StyleProperties.SYMBOL_TYPE);
 
-            if (type.equals(IYAppearance.Type.BAR)) {
+            if (type.equals(StyleProperties.SeriesType.BAR)) {
                 IBarSeries<Integer> barSeries = (IBarSeries<Integer>) seriesSet.createSeries(SeriesType.BAR, seriesName);
                 barSeries.setBarColor(color);
                 barSeries.setBarPadding(0);

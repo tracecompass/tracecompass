@@ -17,7 +17,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.BorderStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -59,13 +58,13 @@ public interface ITimeEventStyleStrings {
      * @since 5.2
      */
     Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String>builder()
-            .put(IYAppearance.SymbolStyle.DIAMOND, SymbolType.DIAMOND)
-            .put(IYAppearance.SymbolStyle.CIRCLE, SymbolType.CIRCLE)
-            .put(IYAppearance.SymbolStyle.SQUARE, SymbolType.SQUARE)
-            .put(IYAppearance.SymbolStyle.TRIANGLE, SymbolType.TRIANGLE)
-            .put(IYAppearance.SymbolStyle.INVERTED_TRIANGLE, SymbolType.INVERTED_TRIANGLE)
-            .put(IYAppearance.SymbolStyle.CROSS, SymbolType.CROSS)
-            .put(IYAppearance.SymbolStyle.PLUS, SymbolType.PLUS)
+            .put(StyleProperties.SymbolType.DIAMOND, SymbolType.DIAMOND)
+            .put(StyleProperties.SymbolType.CIRCLE, SymbolType.CIRCLE)
+            .put(StyleProperties.SymbolType.SQUARE, SymbolType.SQUARE)
+            .put(StyleProperties.SymbolType.TRIANGLE, SymbolType.TRIANGLE)
+            .put(StyleProperties.SymbolType.INVERTED_TRIANGLE, SymbolType.INVERTED_TRIANGLE)
+            .put(StyleProperties.SymbolType.CROSS, SymbolType.CROSS)
+            .put(StyleProperties.SymbolType.PLUS, SymbolType.PLUS)
             .build();
 
     /**
@@ -268,7 +267,7 @@ public interface ITimeEventStyleStrings {
     /**
      * Indicate that the item has a symbol style associated to it. Values
      * associated to it are defined in
-     * {@link org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.SymbolStyle}
+     * {@link org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType}
      *
      * @return the key associated to the symbol style.
      * @since 4.1

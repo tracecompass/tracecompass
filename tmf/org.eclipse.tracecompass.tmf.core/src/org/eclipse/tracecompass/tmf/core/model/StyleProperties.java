@@ -21,6 +21,7 @@ package org.eclipse.tracecompass.tmf.core.model;
 public final class StyleProperties {
 
     private StyleProperties() {
+        // do nothing
     }
 
     // Background
