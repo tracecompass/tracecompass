@@ -592,7 +592,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
     @Override
     protected @NonNull List<IMarkerEvent> getViewMarkerList(Iterable<@NonNull TimeGraphEntry> entries, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
-        List<IMarkerEvent> viewMarkerList = super.getViewMarkerList(startTime, endTime, resolution, monitor);
+        List<IMarkerEvent> viewMarkerList = new ArrayList<>();
         List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
         if (traceEntries == null) {
             return viewMarkerList;

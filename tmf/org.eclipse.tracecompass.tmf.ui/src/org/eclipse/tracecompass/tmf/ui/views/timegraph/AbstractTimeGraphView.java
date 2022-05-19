@@ -2087,38 +2087,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /**
      * Gets the list of view-specific markers for a trace in a given time range.
      * Default implementation returns an empty list.
-     *
-     * @param startTime
-     *            Start of the time range
-     * @param endTime
-     *            End of the time range
-     * @param resolution
-     *            The resolution
-     * @param monitor
-     *            The progress monitor object
-     * @return The list of marker events
-     * @since 2.0
-     * @deprecated use
-     *             {@link #getViewMarkerList(Iterable, long, long, long, IProgressMonitor)}
-     *             instead. To get all the entries of a view
-     *
-     *             <pre>
-     *             List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
-     *             for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
-     *                 Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(Utils.flatten(traceEntry), startTime, endTime);
-     *                 // Do stuff
-     *             }
-     *             </pre>
-     */
-    @Deprecated
-    protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime,
-            long resolution, @NonNull IProgressMonitor monitor) {
-        return new ArrayList<>();
-    }
-
-    /**
-     * Gets the list of view-specific markers for a trace in a given time range.
-     * Default implementation returns an empty list.
      * @param entries
      *            A list of entries to query
      * @param startTime
@@ -2134,7 +2102,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected @NonNull List<IMarkerEvent> getViewMarkerList(Iterable<@NonNull TimeGraphEntry> entries, long startTime, long endTime,
             long resolution, @NonNull IProgressMonitor monitor) {
-        return getViewMarkerList(startTime, endTime, resolution, monitor);
+        return new ArrayList<>();
     }
 
     /**
