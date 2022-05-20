@@ -13,7 +13,7 @@
   *******************************************************************************/
   -->
 
-  <artifactId>org.eclipse.tracecompass.rcp.tests</artifactId>
+  <artifactId>org.eclipse.tracecompass.rcp.rcptt.tests</artifactId>
   <name>Trace Compass RCP Product Tests</name>
 
   <parent>
@@ -28,7 +28,9 @@
     <dataPath>${project.build.directory}/dependency/tracecompass-test-traces-ctf-jar</dataPath>
     <!-- Overridden by profile on Windows -->
     <aut.extension>tar.gz</aut.extension>
+    <!--
     <skipTests>${skip-short-tc-ui-tests}</skipTests>
+    -->
   </properties>
 
   <dependencies>
@@ -98,7 +100,7 @@
             </vmArgs>
           </aut>
           <runner>
-            <version>2.3.0-M6c</version>
+            <version>2.5.3</version>
           </runner>
           <suites>
             <suite>open_trace_suite</suite>

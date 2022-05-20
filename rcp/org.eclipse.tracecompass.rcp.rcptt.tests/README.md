@@ -8,7 +8,9 @@ You can run this project either via maven or via the RCP Testing Tool.
 
 ### Local maven run
 
-`mvn clean install`
+`mvn clean install -Drun-rcptt=true`
+or, with skipping of other unit tests:
+`mvn clean install -Drun-rcptt=true -Dskip-short-tc-ui-tests=true -Dskip-long-tc-ui-tests=true -Dskip-tc-core-tests=true`
 
 Results will be located under `./target/results`.
 

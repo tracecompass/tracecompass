@@ -48,6 +48,17 @@
         <module>org.eclipse.tracecompass.rcp.product</module>
       </modules>
     </profile>
+    <profile>
+      <id>run-rcptt</id>
+      <activation>
+        <property>
+          <name>run-rcptt</name>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.tracecompass.rcp.rcptt.tests</module>
+      </modules>
+    </profile>
   </profiles>
 
 </project>
