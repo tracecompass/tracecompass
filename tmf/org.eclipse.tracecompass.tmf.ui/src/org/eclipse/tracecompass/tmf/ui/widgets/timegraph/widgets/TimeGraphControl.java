@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2020 Intel Corporation and others
+ * Copyright (c) 2007, 2022 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -1970,20 +1970,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     Rectangle getItemRect(Rectangle bounds, int idx) {
         int[] ySums = fItemData.fYSums;
+        ySums[0] = 0;
         if (ySums[idx] == ItemData.UNSET_SUM) {
-            int ySum = 0;
-            if (idx >= fTopIndex) {
-                for (int i = fTopIndex; i < idx; i++) {
-                    ySum += fItemData.fExpandedItems[i].fItemHeight;
-                }
-            } else {
-                for (int i = fTopIndex - 1; i >= idx; i--) {
-                    ySum -= fItemData.fExpandedItems[i].fItemHeight;
-                }
+            /* find closest previous item that is set */
+            int i = idx - 1;
+            while (ySums[i] == ItemData.UNSET_SUM) {
+                i--;
             }
-            ySums[idx] = ySum;
+            /* calculate and set all sums up to requested index */
+            while (i < idx) {
+                ySums[i + 1] = ySums[i] + fItemData.fExpandedItems[i].fItemHeight;
+                i++;
+            }
         }
-        int y = bounds.y + ySums[idx];
+        /* subtract top index position from calculated position */
+        int y = bounds.y + ySums[idx] - ySums[fTopIndex];
         int height = fItemData.fExpandedItems[idx].fItemHeight;
         return new Rectangle(bounds.x, y, bounds.width, height);
     }
@@ -3935,7 +3936,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         public void resetYSums() {
-            int[] ySums = new int[fItems.length];
+            int[] ySums = new int[fExpandedItems.length];
             Arrays.fill(ySums, UNSET_SUM);
             fYSums = ySums;
         }
@@ -3958,7 +3959,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             fItemMap = itemMap;
             fItems = fItemMap.values().toArray(new Item[0]);
-            resetYSums();
             updateExpandedItems();
             if (selection != null) {
                 for (Item item : fExpandedItems) {
@@ -4018,6 +4018,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
 
             fExpandedItems = expandedItemList.toArray(new Item[0]);
+            resetYSums();
             fTopIndex = Math.min(fTopIndex, Math.max(0, fExpandedItems.length - 1));
         }
 
