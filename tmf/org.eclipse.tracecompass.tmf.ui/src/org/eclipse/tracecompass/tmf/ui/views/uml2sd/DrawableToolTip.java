@@ -112,7 +112,6 @@ public class DrawableToolTip implements PaintListener {
     public DrawableToolTip(Composite parent) {
         fToolTipShell = new Shell(parent.getShell(), SWT.ON_TOP);
         fToolTipShell.setLayout(new RowLayout());
-        fToolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
         fToolTipShell.addPaintListener(this);
         fToolTipShell.setSize(SHELL_WIDTH, SHELL_HEIGHT);
         fToolTipShell.addDisposeListener((e) -> {

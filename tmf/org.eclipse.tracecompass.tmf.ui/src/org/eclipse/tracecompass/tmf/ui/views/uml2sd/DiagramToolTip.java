@@ -70,7 +70,6 @@ public class DiagramToolTip {
         fToolTipShell = new Shell(fParent.getShell(), SWT.MULTI);
         fToolTipShell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
         fTextBox = new Text(fToolTipShell, SWT.WRAP | SWT.MULTI);
-        fTextBox.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
     }
 
     // ------------------------------------------------------------------------
