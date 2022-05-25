@@ -339,9 +339,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         addKeyListener(this);
         addMenuDetectListener(this);
         addListener(SWT.MouseWheel, this);
-        addDisposeListener((e) -> {
-            fResourceManager.dispose();
-        });
+        addDisposeListener(e -> fResourceManager.dispose());
     }
 
     /**
@@ -3926,9 +3924,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         private Map<ITimeGraphEntry, Item> fItemMap = new LinkedHashMap<>();
         private Item[] fExpandedItems = new Item[0];
         private Item[] fItems = new Item[0];
-        private ITimeGraphEntry fRootEntries[] = new ITimeGraphEntry[0];
+        private ITimeGraphEntry[] fRootEntries = new ITimeGraphEntry[0];
         private List<ILinkEvent> fLinks = new ArrayList<>();
-        private int fYSums[] = new int[0];
+        private int[] fYSums = new int[0];
         public static final int UNSET_SUM = -1;
 
         public ItemData() {
