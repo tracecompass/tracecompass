@@ -15,8 +15,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
-import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
@@ -50,8 +48,6 @@ public final class TimeGraphStyleUtil {
      */
     public static void loadValue(ITimeGraphPresentationProvider presentationProvider, StateItem stateItem) {
         IPreferenceStore store = getStore();
-        String oldFillColorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.fillColor());
-        String oldHeightFactorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.heightFactor());
         String bgColorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.BACKGROUND_COLOR);
         String colorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.COLOR);
         String heightFactorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.HEIGHT);
@@ -61,17 +57,6 @@ public final class TimeGraphStyleUtil {
         String prefBgColor = store.getString(bgColorKey);
         if (!prefBgColor.isEmpty()) {
             styleMap.put(StyleProperties.BACKGROUND_COLOR, prefBgColor);
-        } else {
-            // Update the new value with the old
-            String oldPrefRgbColor = store.getString(oldFillColorKey);
-            if (!oldPrefRgbColor.isEmpty()) {
-                RGBAColor prefRgba = RGBAColor.fromString(oldPrefRgbColor);
-                if (prefRgba != null) {
-                    String hexColor = ColorUtils.toHexColor(prefRgba.getRed(), prefRgba.getGreen(), prefRgba.getBlue());
-                    styleMap.put(StyleProperties.BACKGROUND_COLOR, hexColor);
-                    store.setValue(bgColorKey, hexColor);
-                }
-            }
         }
         String prefColor = store.getString(colorKey);
         if (!prefColor.isEmpty()) {
@@ -79,17 +64,9 @@ public final class TimeGraphStyleUtil {
         }
 
         store.setDefault(heightFactorKey, -1.0f);
-        store.setDefault(oldHeightFactorKey, -1.0f);
         float prefHeightFactor = store.getFloat(heightFactorKey);
         if (prefHeightFactor != -1.0f) {
             styleMap.put(StyleProperties.HEIGHT, prefHeightFactor);
-        } else {
-            // Update the new value with the old
-            prefHeightFactor = store.getFloat(oldHeightFactorKey);
-            if (prefHeightFactor != -1.0f) {
-                styleMap.put(StyleProperties.HEIGHT, prefHeightFactor);
-                store.setValue(heightFactorKey, prefHeightFactor);
-            }
         }
 
         store.setDefault(widthKey, -1);
@@ -127,6 +104,7 @@ public final class TimeGraphStyleUtil {
 
     /**
      * Load default values into the state items from a preference store
+     *
      * @param presentationProvider
      *            the presentation provider
      */

@@ -97,7 +97,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.IT
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
-import org.eclipse.tracecompass.internal.tmf.ui.util.StylePropertiesUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredEntry;
@@ -2976,7 +2975,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 return new OutputElementStyle(null, new HashMap<>());
             }
         }
-        Map<@NonNull String, @NonNull Object> styleMap = StylePropertiesUtils.updateEventStyleProperties(fTimeGraphProvider.getEventStyle(event));
+        Map<@NonNull String, @NonNull Object> styleMap = new HashMap<>(fTimeGraphProvider.getEventStyle(event));
         return new OutputElementStyle(null, applyEventStyleProperties(styleMap, event));
     }
 
