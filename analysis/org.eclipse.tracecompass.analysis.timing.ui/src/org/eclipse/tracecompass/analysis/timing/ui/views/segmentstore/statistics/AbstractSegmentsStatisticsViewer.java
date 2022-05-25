@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics;
 
-import java.text.Format;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
-import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
@@ -70,13 +68,7 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeViewer {
 
-    private static final Format FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
-
     private static final int COL_LABEL = 0;
-    private static final int COL_MIN = 1;
-    private static final int COL_MAX = 2;
-    private static final int COL_AVG = 3;
-    private static final int COL_STDDEV = 4;
     private static final int COL_COUNT = 5;
     private static final int COL_TOTAL = 6;
 
@@ -138,21 +130,6 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                     } else {
                         label = BLANK;
                     }
-                } else if (columnIndex >= labels.size()) {
-                    // TODO Remove this else-if branch when toFormattedString() is removed
-                    if (columnIndex == COL_MIN) {
-                        return toFormattedString(model.getMin());
-                    } else if (columnIndex == COL_MAX) {
-                        return String.valueOf(toFormattedString(model.getMax()));
-                    } else if (columnIndex == COL_AVG) {
-                        return String.valueOf(toFormattedString(model.getMean()));
-                    } else if (columnIndex == COL_STDDEV) {
-                        return String.valueOf(toFormattedString(model.getStdDev()));
-                    } else if (columnIndex == COL_COUNT) {
-                        return String.valueOf(model.getNbElements());
-                    } else if (columnIndex == COL_TOTAL) {
-                        return String.valueOf(toFormattedString(model.getTotal()));
-                    }
                 }
             }
             return label;
@@ -169,7 +146,8 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                 createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_StandardDeviation, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getStdDev))),
                 createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Count, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getNbElements))),
                 createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Total, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getTotal))),
-                // A dummy column is added to prevent the Total column from taking all the remaining space
+                // A dummy column is added to prevent the Total column from
+                // taking all the remaining space
                 new TmfTreeColumnData("")); //$NON-NLS-1$
     }
 
@@ -193,8 +171,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
         return column;
     }
 
-    private static <E extends Comparable<E>, M extends SegmentStoreStatisticsModel> Function<TmfTreeViewerEntry, E>
-        keyExtractor(Function<M, E> modelExtractor) {
+    private static <E extends Comparable<E>, M extends SegmentStoreStatisticsModel> Function<TmfTreeViewerEntry, E> keyExtractor(Function<M, E> modelExtractor) {
         return entry -> {
             if (entry instanceof TmfGenericTreeEntry) {
                 return modelExtractor.apply(((TmfGenericTreeEntry<M>) entry).getModel());
@@ -253,22 +230,6 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
         }
     }
 
-    /**
-     * Formats a double value string
-     *
-     * @param value
-     *            a value to format
-     * @return formatted value
-     * @deprecated use formatting in the segment store statistics provider
-     */
-    @Deprecated
-    protected static String toFormattedString(double value) {
-        /*
-         * The cast to long is needed because the formatter cannot truncate the number.
-         */
-        return String.format("%s", FORMATTER.format(value)); //$NON-NLS-1$
-    }
-
     @Override
     protected @Nullable ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean isSelection) {
         ITmfTreeDataProvider<SegmentStoreStatisticsModel> provider = null;
@@ -302,8 +263,8 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
     }
 
     /**
-     * Algorithm to convert a model (List of {@link SegmentStoreStatisticsModel}) to
-     * the tree.
+     * Algorithm to convert a model (List of
+     * {@link SegmentStoreStatisticsModel}) to the tree.
      *
      * @param trace
      *            trace / experiment.
