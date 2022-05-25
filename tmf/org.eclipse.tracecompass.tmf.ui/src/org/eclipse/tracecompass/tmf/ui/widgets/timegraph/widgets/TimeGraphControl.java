@@ -542,10 +542,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
-        if (null != fSelectionChangedListeners) {
-            for (ISelectionChangedListener listener : fSelectionChangedListeners) {
-                listener.selectionChanged(new SelectionChangedEvent(this, getSelection()));
-            }
+        for (ISelectionChangedListener listener : fSelectionChangedListeners) {
+            listener.selectionChanged(new SelectionChangedEvent(this, getSelection()));
         }
     }
 
