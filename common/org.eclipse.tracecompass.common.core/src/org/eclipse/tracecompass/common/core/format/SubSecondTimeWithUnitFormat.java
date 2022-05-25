@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  * <li>314159264 -> "314.159 ms"</li>
  * <li>10000002000000 -> "1000.002 s"</li>
  * </ul>
+ *
  * @since 4.1
  */
 public final class SubSecondTimeWithUnitFormat extends Format {
@@ -104,7 +105,8 @@ public final class SubSecondTimeWithUnitFormat extends Format {
         if (multiplier != 1 && Double.isFinite(number.doubleValue())) {
             BigDecimal bd = new BigDecimal(number.toString());
             bd = bd.multiply(BigDecimal.valueOf(multiplier));
-            // This parses in ns, so just convert to the long value if within long range
+            // This parses in ns, so just convert to the long value if within
+            // long range
             if (bd.abs().compareTo(new BigDecimal(Long.MAX_VALUE)) < 0) {
                 return bd.longValue();
             }
@@ -116,8 +118,8 @@ public final class SubSecondTimeWithUnitFormat extends Format {
     @Override
     public StringBuffer format(@Nullable Object obj, @Nullable StringBuffer toAppendTo, @Nullable FieldPosition pos) {
         final @Nullable StringBuffer appender = toAppendTo;
-        if ((obj != null) && (obj instanceof Number)) {
-            double formattedTime =((Number) obj).doubleValue();
+        if (obj instanceof Number) {
+            double formattedTime = ((Number) obj).doubleValue();
             if (Double.isNaN(formattedTime)) {
                 return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append("---")); //$NON-NLS-1$
             }

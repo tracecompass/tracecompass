@@ -405,7 +405,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
 
         // FIXME Filtering should be done at the data provider level
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = generateRegexPredicate();
-        Predicate<ISegment> predicate = (segment) -> {
+        Predicate<ISegment> predicate = segment -> {
 
             // Get the filter external input data
             Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(provider, segment);
@@ -502,7 +502,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      *            The trace to consider
      * @return the segment store provider
      */
-    protected @Nullable abstract ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
+    protected abstract @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
 
     @Override
     protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
