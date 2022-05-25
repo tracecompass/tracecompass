@@ -875,11 +875,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int findExpandedLevel(ITimeGraphEntry entry) {
         Queue<SearchNode> queue = new LinkedList<>();
         SearchNode root = new SearchNode(entry, 0);
-        SearchNode node = root;
         queue.add(root);
 
         while (!queue.isEmpty()) {
-            node = queue.remove();
+            SearchNode node = queue.remove();
             if (node.entry.hasChildren() && !getExpandedState(node.entry)) {
                 return node.level;
             }
