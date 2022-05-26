@@ -494,6 +494,7 @@ public class TimeGraphViewTest {
         assertEquals("Window 0", time0, timeprovider.getTime0());
         assertEquals("Window 1", time1, timeprovider.getTime1());
     }
+
     /**
      * Test bookmark operations
      */
@@ -695,7 +696,6 @@ public class TimeGraphViewTest {
         assertNotNull(timegraph.getEntry(hpc, element));
 
         timegraph.collapseAll();
-        entries = timegraph.getEntries();
         assertEquals(3, getVisibleItems(timegraph).size());
 
         timegraph.getEntry(pg).select();
@@ -726,7 +726,6 @@ public class TimeGraphViewTest {
     public void testVerticalZoom() {
         resetTimeRange();
 
-        int threshold = 10;
         SWTBotTimeGraph timegraph = fTimeGraph;
         Rectangle bounds = fBounds;
 
@@ -739,7 +738,7 @@ public class TimeGraphViewTest {
 
         ImageHelper diff = ref.diff(bigSmall);
         // 3% of the image
-        threshold = (int) (diff.getHistogram().size() * 0.03);
+        int threshold = (int) (diff.getHistogram().size() * 0.03);
         List<RGB> colors = filter(diff.getHistogram(), threshold);
         assertEquals(colors.toString(), 1, colors.size());
 
@@ -887,9 +886,8 @@ public class TimeGraphViewTest {
         SWTBotTimeGraph timegraph = fTimeGraph;
         assertEquals(0, timegraph.selection().columnCount());
         ImageHelper currentImage = ImageHelper.waitForNewImage(fBounds, null);
-        SWTBotTimeGraphEntry entry = timegraph.getEntry(lines);
         // make sure it's visible
-        entry = timegraph.getEntry(lines).select();
+        SWTBotTimeGraphEntry entry = timegraph.getEntry(lines).select();
         ImageHelper.waitForNewImage(fBounds, currentImage);
         Rectangle rect = entry.absoluteLocation();
         ImageHelper image = ImageHelper.grabImage(rect);
