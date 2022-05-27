@@ -44,7 +44,7 @@
     <repository>
       <id>trace-compass-test-traces</id>
       <name>Trace Compass Test Traces</name>
-      <url>http://archive.eclipse.org/tracecompass/tracecompass-test-traces/maven</url>
+      <url>https://archive.eclipse.org/tracecompass/tracecompass-test-traces/maven</url>
     </repository>
   </repositories>
 
