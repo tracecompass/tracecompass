@@ -65,7 +65,6 @@ import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.LinkedHashMultimap;
@@ -295,8 +294,8 @@ public class TimeGraphLegend extends TitleAreaDialog {
      * @since 4.0
      */
     protected static boolean isLinkState(StateItem si) {
-        Object itemType = si.getStyleMap().getOrDefault(ITimeEventStyleStrings.itemTypeProperty(), ITimeEventStyleStrings.stateType());
-        return itemType instanceof String && ((String) itemType).equals(ITimeEventStyleStrings.linkType());
+        Object itemType = si.getStyleMap().getOrDefault(StyleProperties.itemTypeProperty(), StyleProperties.stateType());
+        return itemType instanceof String && ((String) itemType).equals(StyleProperties.linkType());
     }
 
     @Override

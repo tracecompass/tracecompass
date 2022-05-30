@@ -19,7 +19,6 @@ import java.util.Map;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 import com.google.common.collect.ImmutableMap;
@@ -121,8 +120,8 @@ public class StateItem {
      * @since 4.3
      */
     public float getStateHeightFactor() {
-        Object itemType = fStyleMap.get(ITimeEventStyleStrings.itemTypeProperty());
-        float defaultStateWidth = ITimeEventStyleStrings.linkType().equals(itemType) ? TimeGraphControl.DEFAULT_LINK_WIDTH : TimeGraphControl.DEFAULT_STATE_WIDTH;
+        Object itemType = fStyleMap.get(StyleProperties.itemTypeProperty());
+        float defaultStateWidth = StyleProperties.linkType().equals(itemType) ? TimeGraphControl.DEFAULT_LINK_WIDTH : TimeGraphControl.DEFAULT_STATE_WIDTH;
         return (float) fStyleMap.getOrDefault(StyleProperties.HEIGHT, defaultStateWidth);
     }
 

@@ -17,7 +17,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 import com.google.common.base.Joiner;
 
@@ -77,7 +76,7 @@ public final class TimeGraphStyleUtil {
     }
 
     private static @Nullable Object getItemProperty(StateItem stateItem) {
-        return stateItem.getStyleMap().get(ITimeEventStyleStrings.itemTypeProperty());
+        return stateItem.getStyleMap().get(StyleProperties.itemTypeProperty());
     }
 
     /**

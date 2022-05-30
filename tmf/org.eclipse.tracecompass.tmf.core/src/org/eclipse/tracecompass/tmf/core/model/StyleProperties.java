@@ -488,4 +488,47 @@ public final class StyleProperties {
          */
         String BOTTOM = "bottom"; //$NON-NLS-1$
     }
+
+    /**
+     * Item property. Possible values are
+     * {@link #stateType()} or
+     * {@link #linkType()}
+     *
+     * @return The key to get the item property of a state item
+     * @since 8.0
+     */
+    public static String itemTypeProperty() {
+        return ".type"; //$NON-NLS-1$
+    }
+
+    /**
+     * Indicate that the item type is a STATE
+     *
+     * @return The state item type value
+     * @since 8.0
+     */
+    public static String stateType() {
+        return ".type.state"; //$NON-NLS-1$
+    }
+
+    /**
+     * Indicate that the item type is a LINK
+     *
+     * @return The link item type value
+     * @since 8.0
+     */
+    public static String linkType() {
+        return ".type.link"; //$NON-NLS-1$
+    }
+
+    /**
+     * The event is annotated. When this is set, the label will not be drawn and
+     * postDrawEvents will not be called
+     *
+     * @return the key to get the annotated value
+     * @since 8.0
+     */
+    public static String annotated() {
+        return ".annotated"; //$NON-NLS-1$
+    }
 }

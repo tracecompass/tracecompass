@@ -137,7 +137,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTreeExpansionE
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -2645,7 +2644,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.drawLine(rect.x, rect.y, newEndpoint.x, newEndpoint.y);
         gc.setLineWidth(old);
         gc.setAlpha(prevAlpha);
-        if (!Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated()))) {
+        if (!Boolean.TRUE.equals(styleManager.getStyle(elementStyle, StyleProperties.annotated()))) {
             fPostDrawArrows.add(new PostDrawEvent(event, rect));
         }
         return true;
@@ -2931,7 +2930,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (!visible) {
             addPoint(fPoints, rect.x, rect.y - 2);
         }
-        if (visible && !Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated())) && last != null) {
+        if (visible && !Boolean.TRUE.equals(styleManager.getStyle(elementStyle, StyleProperties.annotated())) && last != null) {
             last.add(new PostDrawEvent(event, drawRect));
         }
         return visible && !event.isPropertyActive(IFilterProperty.DIMMED);
@@ -2983,13 +2982,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (event.isPropertyActive(IFilterProperty.DIMMED)) {
             float opacity = (float) styleMap.getOrDefault(StyleProperties.OPACITY, 1.0f);
             styleMap.put(StyleProperties.OPACITY, opacity / DIMMED_ALPHA_COEFFICIENT);
-            styleMap.put(ITimeEventStyleStrings.annotated(), Boolean.TRUE);
+            styleMap.put(StyleProperties.annotated(), Boolean.TRUE);
         }
         if (event.isPropertyActive(IFilterProperty.BOUND)) {
             styleMap.put(StyleProperties.BORDER_COLOR, HIGHLIGHTED_BOUND_COLOR);
             styleMap.put(StyleProperties.BORDER_WIDTH, HIGHLIGHTED_BOUND_WIDTH);
             styleMap.put(StyleProperties.BORDER_STYLE, BorderStyle.SOLID);
-            styleMap.put(ITimeEventStyleStrings.annotated(), Boolean.FALSE);
+            styleMap.put(StyleProperties.annotated(), Boolean.FALSE);
         }
         return styleMap;
     }

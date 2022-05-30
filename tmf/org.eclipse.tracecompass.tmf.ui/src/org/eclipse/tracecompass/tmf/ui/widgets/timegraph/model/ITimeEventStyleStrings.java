@@ -32,8 +32,10 @@ import com.google.common.collect.ImmutableMap;
  * @author Matthew Khouzam
  * @noimplement This interface is not intended to be implemented by clients.
  * @since 3.0
+ * @deprecated use {@link StyleProperties} instead
  */
 @NonNullByDefault
+@Deprecated
 public interface ITimeEventStyleStrings {
 
     /**
@@ -60,9 +62,11 @@ public interface ITimeEventStyleStrings {
      *
      * @return The key to get the item property of a state item
      * @since 4.0
+     * @Deprecated use {@link StyleProperties#itemTypeProperty()} instead
      */
+    @Deprecated
     static String itemTypeProperty() {
-        return ".type"; //$NON-NLS-1$
+        return StyleProperties.itemTypeProperty();
     }
 
     /**
@@ -70,7 +74,9 @@ public interface ITimeEventStyleStrings {
      *
      * @return The state item type value
      * @since 4.0
+     * @Deprecated use {@link StyleProperties#stateType()} instead
      */
+    @Deprecated
     static String stateType() {
         return ".type.state"; //$NON-NLS-1$
     }
@@ -80,7 +86,9 @@ public interface ITimeEventStyleStrings {
      *
      * @return The link item type value
      * @since 4.0
+     * @Deprecated use {@link StyleProperties#linkType()} instead
      */
+    @Deprecated
     static String linkType() {
         return ".type.link"; //$NON-NLS-1$
     }
@@ -91,7 +99,9 @@ public interface ITimeEventStyleStrings {
      *
      * @return the key to get the annotated value
      * @since 4.0
+     * @Deprecated use {@link StyleProperties#annotated()} instead
      */
+    @Deprecated
     static String annotated() {
         return ".annotated"; //$NON-NLS-1$
     }
