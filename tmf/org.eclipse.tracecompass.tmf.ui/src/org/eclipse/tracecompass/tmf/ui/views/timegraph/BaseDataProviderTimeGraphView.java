@@ -601,7 +601,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(entries, startTime, endTime);
         for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providersToModelIds.keySet()) {
             if (provider instanceof IOutputAnnotationProvider) {
-                List<String> categories = new ArrayList<>(fMarkerCategories.get(provider));
+                List<String> providerCategories = fMarkerCategories.get(provider);
+                List<String> categories = (providerCategories == null) ? new ArrayList<>() : new ArrayList<>(providerCategories);
                 categories.removeIf(category -> !getTimeGraphViewer().isMarkerCategoryVisible(category));
                 if (categories.isEmpty()) {
                     continue;
