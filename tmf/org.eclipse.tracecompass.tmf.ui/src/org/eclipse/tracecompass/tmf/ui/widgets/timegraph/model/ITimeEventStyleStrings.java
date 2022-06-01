@@ -42,10 +42,11 @@ public interface ITimeEventStyleStrings {
      * Mapping of symbol types.
      *
      * @since 5.2
-     * @deprecated DO NOT USE, it is effectively a 1-1 mapping. Use {@link SymbolType} directly.
+     * @deprecated DO NOT USE, it is effectively a 1-1 mapping. Use
+     *             {@link SymbolType} directly.
      */
     @Deprecated
-    Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String>builder()
+    Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String> builder()
             .put(StyleProperties.SymbolType.DIAMOND, SymbolType.DIAMOND)
             .put(StyleProperties.SymbolType.CIRCLE, SymbolType.CIRCLE)
             .put(StyleProperties.SymbolType.SQUARE, SymbolType.SQUARE)

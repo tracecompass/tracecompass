@@ -264,6 +264,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         });
         return gridLayouts;
     }
+
     private void createLinkGroup(Collection<StateItem> linkStates, Composite composite) {
         if (linkStates.isEmpty()) {
             return;
@@ -311,8 +312,8 @@ public class TimeGraphLegend extends TitleAreaDialog {
     }
 
     /**
-     * Widget for a legend entry has a color chooser, a label, a width and a reset
-     * button
+     * Widget for a legend entry has a color chooser, a label, a width and a
+     * reset button
      *
      * @author Matthew Khouzam
      * @since 3.3

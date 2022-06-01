@@ -155,7 +155,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
         ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) event.getEntry());
         TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> response = dataProvider.fetchTooltip(
-        FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entryModel.getId()))), null);
+                FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entryModel.getId()))), null);
         Map<@NonNull String, @NonNull String> tooltipModel = response.getModel();
         if (tooltipModel != null) {
             retMap.putAll(tooltipModel);

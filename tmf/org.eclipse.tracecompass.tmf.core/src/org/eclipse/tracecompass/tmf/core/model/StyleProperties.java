@@ -388,13 +388,14 @@ public final class StyleProperties {
      * XY Series type. Possible values: {@link SeriesType}.
      * <p>
      * Default: @link {@link SeriesType#LINE}
+     *
      * @since 6.0
      */
     public static final String SERIES_TYPE = "series-type"; //$NON-NLS-1$
 
     /**
-     * This contains strings defining a series type. It could be for example bar,
-     * line, scatter, etc.
+     * This contains strings defining a series type. It could be for example
+     * bar, line, scatter, etc.
      *
      * @author Yonni Chen
      * @since 6.0
@@ -422,13 +423,14 @@ public final class StyleProperties {
      * XY Series style. Possible values: {@link SeriesStyle}.
      * <p>
      * Default: @link {@link SeriesStyle#SOLID}
+     *
      * @since 6.0
      */
     public static final String SERIES_STYLE = "series-style"; //$NON-NLS-1$
 
     /**
-     * This contains strings defining a series line style. It could be for example
-     * solid, dash, dot, etc.
+     * This contains strings defining a series line style. It could be for
+     * example solid, dash, dot, etc.
      *
      * @author Yonni Chen
      * @since 6.0
@@ -464,6 +466,7 @@ public final class StyleProperties {
      * Vertical alignment as a string. Possible values: {@link VerticalAlign}.
      * <p>
      * Default: {@link VerticalAlign#MIDDLE}
+     *
      * @since 6.3
      */
     public static final String VERTICAL_ALIGN = "vertical-align"; //$NON-NLS-1$
@@ -490,8 +493,7 @@ public final class StyleProperties {
     }
 
     /**
-     * Item property. Possible values are
-     * {@link #stateType()} or
+     * Item property. Possible values are {@link #stateType()} or
      * {@link #linkType()}
      *
      * @return The key to get the item property of a state item
