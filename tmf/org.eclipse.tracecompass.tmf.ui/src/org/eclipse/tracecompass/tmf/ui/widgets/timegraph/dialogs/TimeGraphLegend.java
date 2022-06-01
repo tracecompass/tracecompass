@@ -133,9 +133,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         // Set the minimum size to avoid 0-sized legends from user resize
         parent.getShell().setMinimumSize(150, 150);
 
-        composite.addDisposeListener((e) -> {
-            fResourceManager.dispose();
-        });
+        composite.addDisposeListener(e -> fResourceManager.dispose());
         return composite;
     }
 
