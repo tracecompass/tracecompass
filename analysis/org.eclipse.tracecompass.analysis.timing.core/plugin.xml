@@ -26,5 +26,9 @@
             class="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProviderFactory"
             id="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider">
       </dataProviderFactory>
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreTableDataProviderFactory"
+            id="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreTableDataProvider">
+      </dataProviderFactory>
    </extension>
 </plugin>

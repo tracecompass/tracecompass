@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -46,10 +47,11 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
      *
      * @param order
      *            The desired order for the returned iterator
-     * @return An iterator over all the segments in the store in the desired order
+     * @return An iterator over all the segments in the store in the desired
+     *         order
      * @since 1.1
      */
-    default Iterable<E> iterator(Comparator<ISegment> order){
+    default Iterable<E> iterator(Comparator<ISegment> order) {
         return getIntersectingElements(0, Long.MAX_VALUE, order);
     }
 
@@ -61,7 +63,7 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
      *            tree's X axis represents time.
      * @return The intervals that cross this position
      */
-    default Iterable<E> getIntersectingElements(long position){
+    default Iterable<E> getIntersectingElements(long position) {
         return getIntersectingElements(position, position);
     }
 
@@ -128,6 +130,43 @@ public interface ISegmentStore<E extends ISegment> extends Collection<E> {
         }
         list.sort(order);
         return list;
+    }
+
+    /**
+     * Retrieve all elements that inclusively cross another segment, sorted in
+     * the specified order. We define this target segment by a predicate that
+     * tests a given segment
+     *
+     * @param start the target start position
+     *
+     * @param end the target end position
+     *
+     * @param order The desired order for the returned iterator
+     *
+     * param filter The predicate that defines the first target segment
+     *
+     * @return The segments that follows a specific segment inclusively
+     *
+     * @since 3.0
+     */
+    default List<E> getIntersectingElements(long start, long end, Comparator<ISegment> order, Predicate<ISegment> filter) {
+        Iterable<E> segments = getIntersectingElements(start, end, order);
+        List ret;
+        long i = 0;
+        for (E segment : segments) {
+            if (filter.test(segment)) {
+                break;
+            }
+            i++;
+        }
+        if (segments instanceof ArrayList<?>) {
+            ret = ((ArrayList) segments).subList((int) i, ((ArrayList) segments).size());
+            ret.stream().filter(filter);
+        } else {
+            List tmp = Lists.newArrayList(segments);
+            ret = tmp.subList((int) i, tmp.size());
+        }
+        return ret;
     }
 
     /**

@@ -130,6 +130,14 @@ public class Messages extends NLS {
      * Name of the maximum end time column
      */
     public static @Nullable String SegmentStoreStatistics_MaxEndLabel;
+    /**
+     * Title of the data provider
+     */
+    public static @Nullable String SegmentStoreTableDataProvider_title;
+    /**
+     * Description of the data provider
+     */
+    public static @Nullable String SegmentStoreTableDataProvider_description;
 
     static {
         // initialize resource bundle
