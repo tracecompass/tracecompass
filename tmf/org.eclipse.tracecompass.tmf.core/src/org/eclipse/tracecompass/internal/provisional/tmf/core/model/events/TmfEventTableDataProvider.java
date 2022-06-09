@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.MultiAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
@@ -167,7 +168,13 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     public TmfModelResponse<TmfTreeModel<TmfEventTableColumnDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         List<TmfEventTableColumnDataModel> model = new ArrayList<>();
         boolean hasTs = false;
+        Map<String, ITmfEventAspect<?>> aspects = new LinkedHashMap<>();
         for (ITmfEventAspect<?> aspect : getTraceAspects(getTrace())) {
+            String name = aspect.getName();
+            aspects.computeIfPresent(name, (key, existing) -> MultiAspect.createFrom(existing, aspect));
+            aspects.putIfAbsent(name, aspect); // If not a multi aspect above.
+        }
+        for (ITmfEventAspect<?> aspect : aspects.values()) {
             synchronized (fAspectToIdMap) {
                 long id = fAspectToIdMap.computeIfAbsent(aspect, a -> fAtomicLong.getAndIncrement());
                 model.add(new TmfEventTableColumnDataModel(id, -1, Collections.singletonList(aspect.getName()), aspect.getHelpText(), aspect.isHiddenByDefault()));

@@ -11,7 +11,9 @@
 
 package org.eclipse.tracecompass.tmf.core.event.aspect;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.logging.Level;
@@ -77,6 +79,55 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
         }
 
         return new MultiAspect<>(Iterables.get(names, 0), aspects);
+    }
+
+    /**
+     * Factory method for building a multi aspect out of existing ones. Cannot
+     * return null so it can be used by computeIfPresent or similar lambdas.
+     *
+     * @param existing
+     *            The existing (multi, or not) aspect
+     * @param toAdd
+     *            The (non-multi) aspect to add to the existing one
+     *
+     * @return a MultiAspect or another ITmfEventAspect; 'existing' if unable to
+     *         add
+     * @since 8.0
+     */
+    public static ITmfEventAspect<?> createFrom(ITmfEventAspect<?> existing, ITmfEventAspect<?> toAdd) {
+        if (toAdd instanceof MultiAspect) {
+            // TODO: investigate support for potentially adding a multi.
+            throw new IllegalArgumentException(String.format("\"%s\" as the to-add parameter cannot be a MultiAspect.", toAdd.getName())); //$NON-NLS-1$
+        }
+        List<ITmfEventAspect<?>> aspects = new ArrayList<>();
+        ITmfEventAspect<?> subclassOwner;
+        if (existing instanceof MultiAspect) { // >2 twins case, including toAdd
+            MultiAspect<?> multi = (MultiAspect<?>) existing;
+            for (ITmfEventAspect<?> each : multi.fAspects) {
+                aspects.add(each);
+            }
+            subclassOwner = aspects.get(0); // same class for all
+        } else {
+            aspects.add(existing);
+            subclassOwner = existing;
+        }
+        aspects.add(toAdd);
+        Class<?> aspectClass = assignableFor(subclassOwner, toAdd);
+        ITmfEventAspect<?> createdFrom = MultiAspect.create(aspects, aspectClass);
+        if (createdFrom == null) {
+            createdFrom = existing;
+        }
+        return createdFrom;
+    }
+
+    private static Class<?> assignableFor(ITmfEventAspect<?> subclassOwner, ITmfEventAspect<?> toAdd) {
+        Class<?> candidate = subclassOwner.getClass();
+        Class<?> superclass = candidate.getSuperclass();
+        while (superclass != null && !candidate.isAssignableFrom(toAdd.getClass())) {
+            candidate = superclass;
+            superclass = candidate.getSuperclass();
+        }
+        return candidate;
     }
 
     private MultiAspect(String name, Iterable<ITmfEventAspect<?>> aspects) {
