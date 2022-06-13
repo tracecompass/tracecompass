@@ -11,7 +11,8 @@
 
 package org.eclipse.tracecompass.tmf.core.tests.event.lookup.aspect;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -150,7 +151,7 @@ public class MultiAspectTest {
     }
 
     /**
-     * Happy path testing for heterogenous multi-aspect creation
+     * Happy path testing for heterogeneous multi-aspect creation
      */
     @Test
     public void testCreateHappy() {
@@ -165,7 +166,7 @@ public class MultiAspectTest {
     }
 
     /**
-     * What happens when heterogenous multi-aspect creation is given impossible
+     * What happens when heterogeneous multi-aspect creation is given impossible
      * arguments
      */
     @Test(expected = IllegalArgumentException.class)

@@ -60,7 +60,8 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
 
         Set<String> names = new HashSet<>();
         for (ITmfEventAspect<?> aspect : aspects) {
-            // Ensure all aspects belong to the same class as the "aspectClass" parameter
+            // Ensure all aspects belong to the same class as the "aspectClass"
+            // parameter
             if (aspectClass.isAssignableFrom(aspect.getClass())) {
                 names.add(aspect.getName());
             } else {
@@ -93,6 +94,7 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
         return Iterables.get(fAspects, 0).getHelpText();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public @Nullable T resolve(ITmfEvent event) {
         for (ITmfEventAspect<?> aspect : fAspects) {
@@ -103,5 +105,4 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
         }
         return null;
     }
-
 }
