@@ -110,9 +110,10 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     private TreeMap<Long, Long> fRankToIndexMap = new TreeMap<>();
 
     /**
-     * Keep the filtered count for future request with the same filter. TODO: Remove
-     * this cache since it is not thread safe and replace it with a better cache
-     * with the two list of cached index/rank
+     * Keep the filtered count for future request with the same filter.
+     *
+     * TODO: Remove this cache since it is not thread safe and replace it with a
+     * better cache with the two list of cached index/rank.
      */
     private long fFilteredCount = -1L;
 
@@ -125,22 +126,24 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
 
     /**
      * To optimize filtered request a map of index to rank is used to find the
-     * starting point of a request in the trace. This value is used to avoid storing
-     * too many entries in the map. The corresponding rank associated to an index is
-     * only store each time the index is a factor of this value. TODO: Can be
-     * improve in the future to have a constant number of point per trace to avoid
-     * getting a huge map
+     * starting point of a request in the trace. This value is used to avoid
+     * storing too many entries in the map. The corresponding rank associated to
+     * an index is only store each time the index is a factor of this value.
+     *
+     * TODO: Can be improve in the future to have a constant number of point per
+     * trace to avoid getting a huge map.
      */
     private static final int INDEX_STORING_INTERVAL = 1000;
 
     /**
      * Direction of search, navigation etc.
+     *
      * @since 7.1
      */
     public enum Direction {
         /** Search next */
         NEXT,
-        /** Search previous*/
+        /** Search previous */
         PREVIOUS
     }
 
@@ -148,7 +151,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * Constructor
      *
      * @param trace
-     *            A trace on which we are interested to fetch an event table model
+     *            A trace on which we are interested to fetch an event table
+     *            model
      */
     public TmfEventTableDataProvider(ITmfTrace trace) {
         super(trace);
@@ -208,18 +212,21 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         }
 
         /*
-         * Search for the next or previous event starting from the given event index
+         * Search for the next or previous event starting from the given event
+         * index
          */
         Object directionValue = fetchParameters.get(TABLE_SEARCH_DIRECTION_KEY);
 
-        /////////////////////////////////////
-        // TODO remove isFiltered when Theia front-end is updated to use TABLE_SEARCH_DIRECTION_KEY instead
+        /*
+         * TODO: Remove isFiltered when Theia front-end is updated to use
+         * TABLE_SEARCH_DIRECTION_KEY instead.
+         */
         Boolean isFiltered = DataProviderParameterUtils.extractIsFiltered(fetchParameters);
         boolean isIndexRequest = isFiltered != null && isFiltered;
         if (isIndexRequest && directionValue == null) {
             directionValue = Direction.NEXT.name();
         }
-        /////////////////////////////////////
+        // End of the TODO, above.
 
         if (searchFilter != null && directionValue != null) {
             Direction direction = directionValue.equals(Direction.PREVIOUS.name()) ? Direction.PREVIOUS : Direction.NEXT;
@@ -239,14 +246,16 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             long rank = queryFilter.getIndex();
             if (event != null) {
                 rank = event.getRank();
-                // create new queryFilter with updated start rank to get number of events starting from first matching event
+                // create new queryFilter with updated start rank to get number
+                // of events starting from first matching event
                 queryFilter = new VirtualTableQueryFilter(queryFilter.getColumnsId(), rank, queryFilter.getCount());
                 lines.add(buildEventTableLine(aspects, event.getOriginalEvent(), rank, rank, true));
             }
             if ((queryFilter.getCount() == 1) || (event == null)) {
                 /**
-                 * If no event was found or the number of requested events is one
-                 * reply here since all required data for the reply is available.
+                 * If no event was found or the number of requested events is
+                 * one reply here since all required data for the reply is
+                 * available.
                  */
                 TmfVirtualTableModel<EventTableLine> model = new TmfVirtualTableModel<>(columnsIds, lines, rank, getTrace().getNbEvents());
                 return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -258,8 +267,9 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
          */
 
         /*
-         * TODO implement upper limit of queryFilter.getCount() to avoid running out of memory.
-         * TBD if the check and should be handled here or in the calling methods.
+         * TODO: Implement upper limit of queryFilter.getCount() to avoid
+         * running out of memory. TBD if the check and should be handled here or
+         * in the calling methods.
          */
         TableEventRequest request;
         if (filter != null) {
@@ -409,7 +419,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      *            The collapse filter to apply
      * @param monitor
      *            a progress monitor
-     * @return a {@link TableEventRequest} to fill a list of {@link EventTableLine}
+     * @return a {@link TableEventRequest} to fill a list of
+     *         {@link EventTableLine}
      */
     private TableEventRequest filteredTableRequest(int queryCount,
             long queryIndex,
@@ -450,7 +461,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     currentIndex++;
                     incrementCount();
                 } else if (collapseFilter != null && !events.isEmpty()) {
-                    // If a collapse filter is present, we need to update the last event we have in
+                    // If a collapse filter is present, we need to update the
+                    // last event we have in
                     // our list to increment the repeat count value.
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
@@ -459,12 +471,14 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                 }
 
                 /*
-                 *  FIXME: Right now the whole trace is read to determine the number of matched events.
-                 *  In case of search filter being present, it only starts counting from the first
-                 *  matched event and the total number of filtered event is incorrect.
+                 * FIXME: Right now the whole trace is read to determine the
+                 * number of matched events. In case of search filter being
+                 * present, it only starts counting from the first matched event
+                 * and the total number of filtered event is incorrect.
                  *
-                 *  However, the number of matched events should only be done once per filter and
-                 *  after the filter changed. Implement way to determine the number of matched events.
+                 * However, the number of matched events should only be done
+                 * once per filter and after the filter changed. Implement way
+                 * to determine the number of matched events.
                  */
 
                 rank++;
@@ -497,7 +511,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      *            The collapse filter to apply
      * @param monitor
      *            a progress monitor
-     * @return a {@link TableEventRequest} to fill a list of {@link EventTableLine}
+     * @return a {@link TableEventRequest} to fill a list of
+     *         {@link EventTableLine}
      */
     private TableEventRequest tableRequest(int queryCount,
             long queryIndex,
@@ -524,7 +539,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                         events.add(buildEventTableLine(aspects, event, rank, rank, matches));
                     }
                 } else if (!events.isEmpty()) {
-                    // If a collapse filter is present, we need to update the last event we have in
+                    // If a collapse filter is present, we need to update the
+                    // last event we have in
                     // our list to increment the repeat count value.
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
@@ -567,15 +583,15 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     /**
-     * Apply a filter to this provider that will be used for future request. If the
-     * current filter is null or not equal to the provided filter, the IndexToRank
-     * and RankToIndex maps are cleared
+     * Apply a filter to this provider that will be used for future request. If
+     * the current filter is null or not equal to the provided filter, the
+     * IndexToRank and RankToIndex maps are cleared
      *
      * @param filter
      *            Filter to apply
      */
     private void applyFilter(ITmfFilter filter) {
-        // TODO verify if this works correctly
+        // TODO: Verify if this works correctly.
         if (!filter.equals(fFilter)) {
             fFilter = filter;
             fIndexToRankMap.clear();
@@ -585,14 +601,14 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     /**
-     * We want to resolve only the columns that will be shown. This limits resolve
-     * operation and model size. If list of desired columns is empty, we retrieve
-     * all columns by default
+     * We want to resolve only the columns that will be shown. This limits
+     * resolve operation and model size. If list of desired columns is empty, we
+     * retrieve all columns by default
      *
      * @param desiredColumns
      *            The list of desired columns name that we want to
-     * @return The list of {@link ITmfEventAspect} that match the desired columns
-     *         name
+     * @return The list of {@link ITmfEventAspect} that match the desired
+     *         columns name
      */
     private static Map<Long, ITmfEventAspect<?>> getAspectsFromColumnsId(List<Long> desiredColumns) {
         Map<Long, ITmfEventAspect<?>> aspects = new LinkedHashMap<>();
@@ -661,7 +677,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return null;
     }
 
-    private static @Nullable ITmfFilter extractSimpleSearchFilter (Map<?, String> searchMap) {
+    private static @Nullable ITmfFilter extractSimpleSearchFilter(Map<?, String> searchMap) {
         if (searchMap.isEmpty()) {
             return null;
         }
@@ -718,8 +734,9 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     /**
-     * Get the events table for an experiment. If all traces in the experiment are
-     * of the same type, use the same behavior as if it was one trace of that type.
+     * Get the events table for an experiment. If all traces in the experiment
+     * are of the same type, use the same behavior as if it was one trace of
+     * that type.
      *
      * @param experiment
      *            the experiment
@@ -738,15 +755,16 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
 
         if (hasCommonTraceType(experiment)) {
             /*
-             * All the traces in this experiment are of the same type, let's just use the
-             * normal table for that type.
+             * All the traces in this experiment are of the same type, let's
+             * just use the normal table for that type.
              */
             builder.addAll(traces.get(0).getEventAspects());
 
         } else {
             /*
-             * There are different trace types in the experiment, so we are definitely using
-             * a TmfEventsTable. Aggregate the columns from all trace types.
+             * There are different trace types in the experiment, so we are
+             * definitely using a TmfEventsTable. Aggregate the columns from all
+             * trace types.
              */
             for (ITmfTrace trace : traces) {
                 builder.addAll(trace.getEventAspects());
@@ -756,8 +774,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     /**
-     * Check if an experiment contains traces of all the same type. If so, returns
-     * this type as a String. If not, returns null.
+     * Check if an experiment contains traces of all the same type. If so,
+     * returns this type as a String. If not, returns null.
      *
      * @param experiment
      *            The experiment
@@ -776,7 +794,6 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return commonTraceType != null;
     }
 
-
     /**
      * Retrieve from a trace the next event, from a starting rank, matching the
      * given predicate.
@@ -792,9 +809,10 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * @param predicate
      *            The predicate to test events against
      * @param monitor
-     *            Optional progress monitor that can be used to cancel the operation
-     * @return The first {@link WrappedEvent} matching the predicate, or null if the end of the
-     *         trace was reached and no event was found
+     *            Optional progress monitor that can be used to cancel the
+     *            operation
+     * @return The first {@link WrappedEvent} matching the predicate, or null if
+     *         the end of the trace was reached and no event was found
      */
     private static @Nullable WrappedEvent getNextWrappedEventMatching(ITmfTrace trace, long startRank,
             Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
@@ -827,9 +845,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * @param predicate
      *            The predicate to test events against
      * @param monitor
-     *            Optional progress monitor that can be used to cancel the operation
-     * @return The first {@link WrappedEvent} found matching the predicate, or null if the
-     *         beginning of the trace was reached and no event was found
+     *            Optional progress monitor that can be used to cancel the
+     *            operation
+     * @return The first {@link WrappedEvent} found matching the predicate, or
+     *         null if the beginning of the trace was reached and no event was
+     *         found
      */
     private static @Nullable WrappedEvent getPreviousWrappedEventMatching(ITmfTrace trace, long startRank,
             Predicate<ITmfEvent> predicate, @Nullable IProgressMonitor monitor) {
@@ -837,9 +857,9 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             return null;
         }
         /*
-         * We are going to do a series of queries matching the trace's cache size in
-         * length (which should minimize on-disk seeks), then iterate on the found
-         * events in reverse order until we find a match.
+         * We are going to do a series of queries matching the trace's cache
+         * size in length (which should minimize on-disk seeks), then iterate on
+         * the found events in reverse order until we find a match.
          */
         int step = trace.getCacheSize();
 
@@ -876,7 +896,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         }
 
         /*
-         * We searched up to the beginning of the trace and didn't find anything.
+         * We searched up to the beginning of the trace and didn't find
+         * anything.
          */
         return null;
 
@@ -969,7 +990,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     /**
-     * A TMF Events wrapper class wrapping a ITmfEvent and the corresponding, valid rank.
+     * A TMF Events wrapper class wrapping a ITmfEvent and the corresponding,
+     * valid rank.
      */
     private static class WrappedEvent implements ITmfEvent {
         /**
@@ -989,7 +1011,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
          * @param rank
          *            The rank of this event in the trace
          */
-        public WrappedEvent (ITmfEvent tmfEvent, long rank) {
+        public WrappedEvent(ITmfEvent tmfEvent, long rank) {
             this.fEvent = tmfEvent;
             this.fRank = rank;
         }
