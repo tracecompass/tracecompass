@@ -455,7 +455,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
                     long prevRepeatCount = prevLine.getRepeatCount();
-                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
+                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), ++prevRepeatCount));
                 }
 
                 /*
@@ -529,7 +529,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
                     long prevRepeatCount = prevLine.getRepeatCount();
-                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
+                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), ++prevRepeatCount));
                 }
 
                 if ((getNbRead() == queryCount) || events.size() == queryCount) {
@@ -975,11 +975,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         /**
          * Event reference.
          */
-        ITmfEvent fEvent;
+        private final ITmfEvent fEvent;
         /**
          * Events rank.
          */
-        long fRank;
+        private final long fRank;
 
         /**
          * Constructor for new cached events.
@@ -1033,5 +1033,4 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             return fEvent.getContent();
         }
     }
-
 }
