@@ -668,6 +668,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         /**
          * Flag to indicate default FG color
+         *
          * @since 4.2
          */
         String IS_DEFAULT_FG_COLOR = "$default_fc"; //$NON-NLS-1$
@@ -890,7 +891,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
             }
         }
-
 
         TmfMarginColumn collapseCol = new TmfMarginColumn();
         fColumns.add(MARGIN_COLUMN_INDEX, collapseCol);
@@ -1393,8 +1393,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
 
             /*
-             * Only show collapse filter if at least one trace can be
-             * collapsed.
+             * Only show collapse filter if at least one trace can be collapsed.
              */
             boolean isCollapsible = false;
             if (fTrace != null) {
@@ -1788,7 +1787,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     newEditor.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(final FocusEvent e) {
-                            // With GTK, focus gets lost during initialization, ignore
+                            // With GTK, focus gets lost during initialization,
+                            // ignore
                             if (!(boolean) newEditor.getData()) {
                                 return;
                             }
@@ -2272,8 +2272,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     return;
                 }
                 /*
-                 * +1 for header row, +2 for top and bottom filter status
-                 * rows
+                 * +1 for header row, +2 for top and bottom filter status rows
                  */
                 fTable.setItemCount((int) fFilterMatchCount + 3);
                 fTable.refresh();
@@ -2746,8 +2745,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 ITmfEvent passedEvent = event;
                 if (!(column instanceof TmfMarginColumn) && (event instanceof CachedEvent)) {
                     /*
-                     * Make sure that the event object from the trace is passed to all columns but
-                     * the TmfMarginColumn
+                     * Make sure that the event object from the trace is passed
+                     * to all columns but the TmfMarginColumn
                      */
                     passedEvent = ((CachedEvent) event).event;
                 }
@@ -2855,8 +2854,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
         if (width.length > 0 && width[0] == 0) {
             /*
-             * When width of margin column is 0 instead of SWT.DEFAULT, it is an old
-             * setting. Reset all widths to SWT.DEFAULT to initially enable AutoFit.
+             * When width of margin column is 0 instead of SWT.DEFAULT, it is an
+             * old setting. Reset all widths to SWT.DEFAULT to initially enable
+             * AutoFit.
              */
             Arrays.fill(width, SWT.DEFAULT);
         }
@@ -3364,16 +3364,19 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
 
                     /**
-                     * Verify if the event is within the trace range and adjust if
-                     * necessary.
+                     * Verify if the event is within the trace range and adjust
+                     * if necessary.
+                     *
                      * @param monitor
-                     *                a progress monitor
+                     *            a progress monitor
                      * @return A pair of rank representing the selected area
                      **/
                     @Nullable
                     private Pair<Long, Long> getSelectedRanks(IProgressMonitor monitor) {
 
-                        /* Clamp the timestamp value to fit inside of the trace */
+                        /*
+                         * Clamp the timestamp value to fit inside of the trace
+                         */
                         ITmfTimestamp timestampBegin = ts;
                         if (timestampBegin.compareTo(fTrace.getStartTime()) < 0) {
                             timestampBegin = fTrace.getStartTime();
@@ -3400,7 +3403,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             return null;
                         }
 
-                        /* Adjust the rank of the selection to the right range */
+                        /*
+                         * Adjust the rank of the selection to the right range
+                         */
                         if (timestampBegin.compareTo(timestampEnd) > 0) {
                             te = timestampEnd;
                             contextEnd = fTrace.seekEvent(te);
@@ -3411,8 +3416,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 return null;
                             }
                             /*
-                             * To include all events at the begin time, seek at the
-                             * next nanosecond and then use the previous rank
+                             * To include all events at the begin time, seek at
+                             * the next nanosecond and then use the previous
+                             * rank
                              */
                             tb = timestampBegin.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
                             if (tb.compareTo(fTrace.getEndTime()) <= 0) {
@@ -3424,8 +3430,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             }
                             rankBegin = (rankBegin == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankBegin) - 1;
                             /*
-                             * If no events in selection range, select only the next
-                             * event
+                             * If no events in selection range, select only the
+                             * next event
                              */
                             rankBegin = rankBegin >= rankEnd ? rankBegin : rankEnd;
                         } else {
@@ -3437,8 +3443,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 return null;
                             }
                             /*
-                             * To include all events at the end time, seek at the
-                             * next nanosecond and then use the previous rank
+                             * To include all events at the end time, seek at
+                             * the next nanosecond and then use the previous
+                             * rank
                              */
                             te = timestampEnd.normalize(1, ITmfTimestamp.NANOSECOND_SCALE);
                             if (te.compareTo(fTrace.getEndTime()) <= 0) {
@@ -3450,8 +3457,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             }
                             rankEnd = (rankEnd == ITmfContext.UNKNOWN_RANK ? fTrace.getNbEvents() : rankEnd) - 1;
                             /*
-                             * If no events in selection range, select only the next
-                             * event
+                             * If no events in selection range, select only the
+                             * next event
                              */
                             rankEnd = rankEnd >= rankBegin ? rankEnd : rankBegin;
                         }
@@ -3488,8 +3495,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 };
                 timeSelectJob.setSystem(true);
                 /*
-                 *  Make subsequent jobs not run concurrently so that they are
-                 *  executed in order.
+                 * Make subsequent jobs not run concurrently so that they are
+                 * executed in order.
                  */
                 timeSelectJob.setRule(fTimeSelectMutexRule);
                 timeSelectJob.schedule();
