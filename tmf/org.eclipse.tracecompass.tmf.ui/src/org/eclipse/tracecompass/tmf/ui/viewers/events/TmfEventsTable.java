@@ -202,7 +202,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     protected static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
+    private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux"); //$NON-NLS-1$ //$NON-NLS-2$
     private static final boolean IS_WIN32 = SWT.getPlatform().equals("win32"); //$NON-NLS-1$
 
     private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventtable"; //$NON-NLS-1$
@@ -533,7 +533,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     }
 
     private final class TooltipListener implements Listener {
-        Shell tooltipShell = null;
+        private Shell tooltipShell = null;
 
         @Override
         public void handleEvent(final Event event) {
@@ -680,7 +680,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @version 1.0
      * @author Patrick Tasse
      */
-    public static enum HeaderState {
+    public enum HeaderState {
         /**
          * No search filter is applied
          *
@@ -769,8 +769,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private Menu fHeaderMenu;
 
     private Menu fTablePopup;
-
-    private Menu fRawTablePopup;
 
     private Point fLastMenuCursorLocation;
     private MenuManager fRawViewerPopupMenuManager;
@@ -985,9 +983,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         createPopupMenu();
 
-        fComposite.addDisposeListener((e) -> {
-            internalDispose();
-        });
+        fComposite.addDisposeListener(e -> internalDispose());
     }
 
     private IAction createAutoFitAction(TableColumn column) {
@@ -1178,7 +1174,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             @Override
             public void run() {
 
-                final TableItem items[] = fTable.getSelection();
+                final TableItem[] items = fTable.getSelection();
                 if (items.length != 1) {
                     return;
                 }
@@ -1288,7 +1284,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         };
 
         class ToggleBookmarkAction extends Action {
-            Long fRank;
+            private final Long fRank;
 
             public ToggleBookmarkAction(final String text, final Long rank) {
                 super(text);
@@ -1458,8 +1454,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTablePopup = fTablePopupMenuManager.createContextMenu(fTable);
         fTable.setMenu(fTablePopup);
 
-        fRawTablePopup = fRawViewerPopupMenuManager.createContextMenu(fRawViewer);
-        fRawViewer.setMenu(fRawTablePopup);
+        Menu rawTablePopup = fRawViewerPopupMenuManager.createContextMenu(fRawViewer);
+        fRawViewer.setMenu(rawTablePopup);
     }
 
     /**
@@ -1735,9 +1731,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         // Handle the header row selection
         fTable.addMouseListener(new MouseAdapter() {
-            int columnIndex;
-            TableColumn column;
-            TableItem item;
+            private TableColumn column;
 
             @Override
             public void mouseDown(final MouseEvent event) {
@@ -1746,7 +1740,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
                 // Identify the selected row
                 final Point point = new Point(event.x, event.y);
-                item = fTable.getItem(point);
+                TableItem item = fTable.getItem(point);
 
                 // Header row selected
                 if ((item != null) && (fTable.indexOf(item) == 0)) {
@@ -1760,7 +1754,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
 
                     // Identify the selected column
-                    columnIndex = -1;
+                    int columnIndex = -1;
                     for (int i = 0; i < fTable.getColumns().length; i++) {
                         final Rectangle rect = item.getBounds(i);
                         if (rect.contains(point)) {
@@ -2473,7 +2467,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
                 request = new TmfEventRequest(ITmfEvent.class, TmfTimeRange.ETERNITY,
                         (int) rank, nbRequested, ExecutionType.BACKGROUND) {
-                    long currentRank = rank;
+                    private long currentRank = rank;
 
                     @Override
                     public void handleData(final ITmfEvent event) {
@@ -2632,7 +2626,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fTable.setRedraw(false);
         try {
             int horizontalPos = fTable.getHorizontalBar().getSelection();
-            TableColumn tableColumns[] = fTable.getColumns();
+            TableColumn[] tableColumns = fTable.getColumns();
             for (int i = 0; i < tableColumns.length; i++) {
                 final TableColumn column = tableColumns[i];
                 if (Objects.equals(column.getData(Key.WIDTH), SWT.DEFAULT)) {
@@ -3112,7 +3106,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             @Override
                             public void run(IProgressMonitor monitor) throws CoreException {
                                 final IMarker bookmark = bookmarksFile.createMarker(IMarker.BOOKMARK);
-                                bookmark.setAttribute(IMarker.MESSAGE, message.toString());
+                                bookmark.setAttribute(IMarker.MESSAGE, Objects.requireNonNull(message));
                                 bookmark.setAttribute(IMarker.LOCATION, location);
                                 bookmark.setAttribute(ITmfMarker.MARKER_RANK, rank.toString());
                                 bookmark.setAttribute(ITmfMarker.MARKER_TIME, Long.toString(timestamp.toNanos()));
