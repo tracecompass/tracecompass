@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.Ti
  * specific for the partial state system.
  *
  * @author Abdellah Rahmani
- * @since 5.1
+ * @since 5.2
  */
 public interface IPartialStateHistoryBackend extends IStateHistoryBackend {
 
