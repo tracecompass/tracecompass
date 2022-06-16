@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.event.aspect;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.logging.Level;
@@ -45,13 +46,14 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
     private final Iterable<ITmfEventAspect<?>> fAspects;
 
     /**
-     * Factory method for building a multi aspect.
+     * Factory method for building a {@link MultiAspect}.
      *
      * @param aspects
-     *            Aspects sharing the same type as the "aspectClass" parameter
+     *            Aspects sharing the same type as the {@code aspectClass}
+     *            parameter
      * @param aspectClass
-     *            Class of the aspects to aggregate
-     * @return a MultiAspect or another ITmfEventAspect
+     *            {@link Class} of the aspects to aggregate
+     * @return a {@link MultiAspect} or another {@link ITmfEventAspect}
      */
     public static @Nullable ITmfEventAspect<?> create(Iterable<ITmfEventAspect<?>> aspects, Class<?> aspectClass) {
         int size = Iterables.size(aspects);
@@ -82,16 +84,18 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
     }
 
     /**
-     * Factory method for building a multi aspect out of existing ones. Cannot
-     * return null so it can be used by computeIfPresent or similar lambdas.
+     * Factory method for building a {@link MultiAspect} out of {@code existing}
+     * ones. Cannot return {@code null} so it can be used by
+     * {@link Map#computeIfPresent} or similar lambdas.
      *
      * @param existing
-     *            The existing (multi, or not) aspect
+     *            The existing ({@link MultiAspect}, or not) aspect
      * @param toAdd
-     *            The (non-multi) aspect to add to the existing one
+     *            The (non-{@link MultiAspect}) aspect to add to the
+     *            {@code existing} one
      *
-     * @return a MultiAspect or another ITmfEventAspect; 'existing' if unable to
-     *         add
+     * @return a {@link MultiAspect} or another {@link ITmfEventAspect};
+     *         {@code existing} if unable to add
      * @since 8.0
      */
     public static ITmfEventAspect<?> createFrom(ITmfEventAspect<?> existing, ITmfEventAspect<?> toAdd) {

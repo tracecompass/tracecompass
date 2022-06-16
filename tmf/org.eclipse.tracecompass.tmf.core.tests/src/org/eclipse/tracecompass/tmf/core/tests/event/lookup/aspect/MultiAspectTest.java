@@ -28,7 +28,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Simple test for MultiAspect
+ * Simple test for {@link MultiAspect}
  *
  * @author Matthew Khouzam
  */
@@ -61,11 +61,10 @@ public class MultiAspectTest {
     };
 
     /**
-     * Test the resolve of aspects.
+     * Test the {@code resolve} of aspects.
      */
     @Test
     public void testResolve() {
-
         ITmfEventAspect<?> fMultiAspect0 = MultiAspect.create(ImmutableList.of(fAspectNull), TmfCpuAspect.class);
         ITmfEventAspect<?> fMultiAspect1 = MultiAspect.create(ImmutableList.of(fAspect0), TmfCpuAspect.class);
         ITmfEventAspect<?> fMultiAspect2 = MultiAspect.create(ImmutableList.of(fAspect1), TmfCpuAspect.class);
@@ -103,7 +102,7 @@ public class MultiAspectTest {
     }
 
     /**
-     * Simple Foo aspect
+     * Simple {@code Foo} aspect
      */
     interface FooAspect extends ITmfEventAspect<Long> {
     }
@@ -112,7 +111,7 @@ public class MultiAspectTest {
     private long fBarImplRet = 0;
 
     /**
-     * Simple Bar aspect
+     * Simple {@code Bar} aspect
      */
     interface BarAspect extends FooAspect {
     }
@@ -152,7 +151,7 @@ public class MultiAspectTest {
     }
 
     /**
-     * Happy path testing for heterogeneous multi-aspect creation
+     * Happy path testing for heterogeneous {@link MultiAspect} creation
      */
     @Test
     public void testCreateHappy() {
@@ -167,8 +166,8 @@ public class MultiAspectTest {
     }
 
     /**
-     * What happens when heterogeneous multi-aspect creation is given impossible
-     * arguments
+     * What happens when heterogeneous {@link MultiAspect} creation is given
+     * impossible arguments
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateIllegal() {
@@ -177,8 +176,8 @@ public class MultiAspectTest {
     }
 
     /**
-     * What happens when heterogeneous multi-aspect creation is given impossible
-     * arguments, from existing
+     * What happens when heterogeneous {@link MultiAspect} creation is given
+     * impossible arguments, from {@code existing}
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateIllegalFrom() {
@@ -191,7 +190,8 @@ public class MultiAspectTest {
     }
 
     /**
-     * Happy path testing for heterogeneous multi-aspect creation, from existing
+     * Happy path testing for heterogeneous {@link MultiAspect} creation, from
+     * {@code existing}
      */
     @Test
     public void testCreateFrom() {
@@ -204,8 +204,8 @@ public class MultiAspectTest {
     }
 
     /**
-     * Happy path testing for heterogeneous multi-aspect creation, from
-     * non-multi
+     * Happy path testing for heterogeneous {@link MultiAspect} creation, from
+     * non-{@link MultiAspect}
      */
     @Test
     public void testCreateFromSingle() {
