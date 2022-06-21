@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.common.core.log.TraceCompassMonitor;
  * Use the {@link #update(String, long)} method to publish a new value
  *
  * @author Matthew Khouzam
- * @since 5.0
+ * @since 5.1
  */
 public final class TraceCompassMonitorManager {
 

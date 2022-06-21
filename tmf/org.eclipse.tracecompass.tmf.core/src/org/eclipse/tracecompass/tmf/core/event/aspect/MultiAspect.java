@@ -96,7 +96,7 @@ public class MultiAspect<T> implements ITmfEventAspect<T> {
      *
      * @return a {@link MultiAspect} or another {@link ITmfEventAspect};
      *         {@code existing} if unable to add
-     * @since 8.0
+     * @since 8.1
      */
     public static ITmfEventAspect<?> createFrom(ITmfEventAspect<?> existing, ITmfEventAspect<?> toAdd) {
         if (toAdd instanceof MultiAspect) {
