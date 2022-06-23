@@ -244,7 +244,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      *            The active trace
      *
      * @return The segment store provider
-     * @since 5.2
+     * @since 5.3
      */
     protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
         // TODO: make getSegmentStoreProvider abstract when removing the following:
