@@ -538,12 +538,12 @@ public abstract class HTNode {
      *            NumCondition on the times on which we want information
      * @return an Iterable over intervals that match conditions.
      */
-    public Iterable<HTInterval> iterable2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
+    public Iterable<@NonNull HTInterval> iterable2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
         fRwl.readLock().lock();
         try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINEST, "HTNode:query2D", //$NON-NLS-1$
                 "quarks", quarks, //$NON-NLS-1$
                 "times", times)) { //$NON-NLS-1$
-            List<HTInterval> intervals = new ArrayList<>();
+            List<@NonNull HTInterval> intervals = new ArrayList<>();
             for (HTInterval interval : fIntervals.subList(getStartIndexFor(times.min()), fIntervals.size())) {
                 if (quarks.test(interval.getAttribute())
                         && times.intersects(interval.getStartTime(), interval.getEndTime())) {
