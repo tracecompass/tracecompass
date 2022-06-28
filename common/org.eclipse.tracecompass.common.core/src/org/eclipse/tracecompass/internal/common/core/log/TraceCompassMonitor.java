@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.common.core.log;
 import java.lang.management.ManagementFactory;
 import java.util.LongSummaryStatistics;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -49,6 +50,14 @@ public final class TraceCompassMonitor extends NotificationBroadcasterSupport im
      */
     public TraceCompassMonitor(String label) {
         fLabel = label;
+        /**
+         * Override potentially finer logging for these, as this breaks the
+         * resulting JSON trace file. This happens upon @{link
+         * ManagementFactory} use below. Use the default @{link Level.FINE},
+         * which doesn't output any such breaking strings. Finer logging for
+         * this package isn't necessary anyway here.
+         */
+        Logger.getLogger("javax.management").setLevel(Level.FINE); //$NON-NLS-1$
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         String beanName = "org.eclipse.tracecompass.common.core.log:type=TraceCompassMonitoring,name=" + label.replace(':', '-'); //$NON-NLS-1$
         try {

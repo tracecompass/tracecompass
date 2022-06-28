@@ -13,6 +13,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.lang.management.ManagementFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.management.JMX;
 import javax.management.MBeanServer;
@@ -36,6 +38,9 @@ public class MonitorTest {
     private static final String MEAN = "mean";
     private static final String MIN = "min";
     private static final String MAX = "max";
+
+    private static final String JMX_PACKAGE = "javax.management";
+    private static final String JMX_MESSAGE = JMX_PACKAGE + " log level";
 
     /**
      * Test climbing array
@@ -92,6 +97,23 @@ public class MonitorTest {
         assertEquals(SUM, 15, fixture.getTotalTime());
         assertEquals(MIN, 3, fixture.getMinTime());
         assertEquals(MAX, 3, fixture.getMaxTime());
+    }
+
+    /**
+     * Test JMX package log level. Uses dummy values just for
+     * TraceCompassMonitor to initialize this log level as expected.
+     */
+    @Test
+    public void testJmx() {
+        long input = 0;
+        String name = "testJmx";
+        TraceCompassMonitorManager.getInstance().update(name, input);
+
+        Level expected = Level.FINE;
+        @Nullable Level actual = Logger.getLogger(JMX_PACKAGE).getLevel();
+
+        assertNotNull(JMX_MESSAGE + " unexpectedly null", actual);
+        assertEquals(JMX_MESSAGE, expected, actual);
     }
 
     private static ITraceCompassMonitor populateVector(long[] inputVector, String name) throws MalformedObjectNameException {
