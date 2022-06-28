@@ -136,7 +136,9 @@ public abstract class HTNode {
     /* Sum of bytes of all intervals in the node */
     private int fSizeOfIntervalSection;
 
-    /* True if this node was read from disk (meaning its end time is now fixed) */
+    /*
+     * True if this node was read from disk (meaning its end time is now fixed)
+     */
     private volatile boolean fIsOnDisk;
 
     /* Vector containing all the intervals contained in this node */
@@ -145,7 +147,9 @@ public abstract class HTNode {
     /* Lock used to protect the accesses to intervals, nodeEnd and such */
     private final ReentrantReadWriteLock fRwl = new ReentrantReadWriteLock(false);
 
-    /** Order of intervals in a HTNode: sorted by end times, then by start times. */
+    /**
+     * Order of intervals in a HTNode: sorted by end times, then by start times.
+     */
     private static final Comparator<ITmfStateInterval> NODE_ORDER = Comparator
             .comparingLong(ITmfStateInterval::getEndTime)
             .thenComparingLong(ITmfStateInterval::getStartTime)
@@ -199,7 +203,7 @@ public abstract class HTNode {
         buffer.clear();
         int res = fc.read(buffer);
         if (res != config.getBlockSize()) {
-            throw new IOException("Expected " + config.getBlockSize() + " block size, but got " + res);  //$NON-NLS-1$//$NON-NLS-2$
+            throw new IOException("Expected " + config.getBlockSize() + " block size, but got " + res); //$NON-NLS-1$//$NON-NLS-2$
         }
         buffer.flip();
 
@@ -443,8 +447,8 @@ public abstract class HTNode {
         fRwl.writeLock().lock();
         try {
             /*
-             * Make sure there are no intervals in this node with their EndTime > the one
-             * requested.
+             * Make sure there are no intervals in this node with their EndTime
+             * greater than (>) the one requested.
              */
             if (fNodeEnd > endtime) {
                 throw new IllegalArgumentException("Closing end time should be greater than or equal to the end time of the intervals of this node"); //$NON-NLS-1$
@@ -685,8 +689,8 @@ public abstract class HTNode {
         /* Only used for debugging, shouldn't be externalized */
         writer.println("Intervals for node #" + fSequenceNumber + ":");
 
-        /* Array of children */
-        if (getNodeType() != NodeType.LEAF) { /* Only Core Nodes can have children */
+        /* Leaf Nodes don't have children */
+        if (getNodeType() != NodeType.LEAF) {
             ParentNode thisNode = (ParentNode) this;
             writer.print("  " + thisNode.getNbChildren() + " children");
             if (thisNode.getNbChildren() >= 1) {
