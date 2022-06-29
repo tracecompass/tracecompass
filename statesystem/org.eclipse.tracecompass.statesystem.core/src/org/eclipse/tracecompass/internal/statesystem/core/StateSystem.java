@@ -553,7 +553,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
 
         try (ScopeLog log = new ScopeLog(LOGGER, Level.FINER, "StateSystem:FullQuery", //$NON-NLS-1$
-                "ssid", getSSID(), "ts", t);) { //$NON-NLS-1$ //$NON-NLS-2$
+                "ssid", getSSID(), "ts", t)) { //$NON-NLS-1$ //$NON-NLS-2$
 
             final int nbAttr = getNbAttributes();
             List<@Nullable ITmfStateInterval> stateInfo = new ArrayList<>(nbAttr);
@@ -641,7 +641,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
-        boolean reverse = (start > end) ? true : false;
+        boolean reverse = start > end;
         TimeRangeCondition timeCondition = TimeRangeCondition.forContinuousRange(Math.min(start, end), Math.max(start, end));
         return query2D(quarks, timeCondition, reverse);
     }
