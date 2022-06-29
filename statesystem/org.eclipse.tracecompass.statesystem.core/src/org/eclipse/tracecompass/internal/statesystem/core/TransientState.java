@@ -218,9 +218,9 @@ public class TransientState {
      * WITH THIS!
      *
      * @param newStateIntervals
-     *            The List of intervals that will represent the new
-     *            "ongoing state". Their end times don't matter, we will only
-     *            check their value and start times.
+     *            The List of intervals that will represent the new "ongoing
+     *            state". Their end times don't matter, we will only check their
+     *            value and start times.
      */
     public void replaceOngoingState(List<ITmfStateInterval> newStateIntervals) {
         final int size = newStateIntervals.size();
@@ -312,7 +312,7 @@ public class TransientState {
                 throw new StateValueTypeException(fBackend.getSSID() + " Quark:" + quark + ", Type:" + value.getClass() + ", Expected:" + expectedSvType); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
-            if (Objects.equals(fOngoingStateInfo.get(quark),value) && !fBackend.canInsertBackwards()) {
+            if (Objects.equals(fOngoingStateInfo.get(quark), value) && !fBackend.canInsertBackwards()) {
                 /*
                  * This is the case where the new value and the one already
                  * present in the Builder are the same. We do not need to create
@@ -510,7 +510,5 @@ public class TransientState {
             writer.println(fOngoingStateStartTimes.get(i).toString());
         }
         writer.println('\n');
-        return;
     }
-
 }
