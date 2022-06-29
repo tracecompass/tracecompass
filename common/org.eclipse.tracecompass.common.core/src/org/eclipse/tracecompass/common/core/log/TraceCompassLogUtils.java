@@ -282,7 +282,7 @@ public final class TraceCompassLogUtils {
         }
 
         /**
-         * Set a category and ID for the flow scope. When building the scope
+         * Set a category and ID for the flow scope.
          *
          * This method is mutually exclusive with
          * {@link #setParentScope(FlowScopeLog)}. Calling both will throw an
