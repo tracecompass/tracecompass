@@ -147,8 +147,10 @@ public class HistoryTreeClassic implements IHistoryTree {
          * Open the file ourselves, get the tree header information we need,
          * then pass on the descriptor to the TreeIO object.
          */
-        int rootNodeSeqNb, res;
-        int bs, maxc;
+        int rootNodeSeqNb;
+        int res;
+        int bs;
+        int maxc;
         long startTime;
 
         /* Java I/O mumbo jumbo... */
@@ -160,7 +162,7 @@ public class HistoryTreeClassic implements IHistoryTree {
         }
 
         try (FileInputStream fis = new FileInputStream(existingStateFile);
-                FileChannel fc = fis.getChannel();) {
+                FileChannel fc = fis.getChannel()) {
 
             ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
             buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -270,7 +272,7 @@ public class HistoryTreeClassic implements IHistoryTree {
 
             closeBranch(0, requestedEndTime);
 
-            try (FileChannel fc = fTreeIO.getFcOut();) {
+            try (FileChannel fc = fTreeIO.getFcOut()) {
                 ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);
                 buffer.clear();
