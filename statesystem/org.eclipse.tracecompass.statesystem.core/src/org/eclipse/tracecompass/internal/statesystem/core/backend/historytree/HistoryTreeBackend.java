@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.Activator;
@@ -354,7 +356,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times, boolean reverse) {
-        try (TraceCompassLogUtils.FlowScopeLog log = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
+        try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINER,
                 "HistoryTreeBackend:query2D:init", //$NON-NLS-1$
                 "ssid", getSSID(), //$NON-NLS-1$
                 "quarks", quarks, //$NON-NLS-1$

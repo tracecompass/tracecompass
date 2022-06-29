@@ -28,7 +28,8 @@ import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
-import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -40,12 +41,12 @@ class HistoryTreeBackendIterator implements Iterator<@NonNull ITmfStateInterval>
     private final IntegerRangeCondition fQuarks;
     private final TimeRangeCondition fTimes;
     private final boolean fReverse;
-    private final TraceCompassLogUtils.@NonNull FlowScopeLog fParentLog;
+    private final @NonNull FlowScopeLog fParentLog;
     private final Deque<Integer> fSeqNumberQueue;
 
     private Iterator<@NonNull HTInterval> intervalQueue = Collections.emptyIterator();
 
-    HistoryTreeBackendIterator(@NonNull IHistoryTree sht, IntegerRangeCondition quarks, TimeRangeCondition times, boolean reverse, TraceCompassLogUtils.@NonNull FlowScopeLog parentLog) {
+    HistoryTreeBackendIterator(@NonNull IHistoryTree sht, IntegerRangeCondition quarks, TimeRangeCondition times, boolean reverse, @NonNull FlowScopeLog parentLog) {
         fSht = sht;
         fQuarks = quarks;
         fTimes = times;
@@ -77,7 +78,7 @@ class HistoryTreeBackendIterator implements Iterator<@NonNull ITmfStateInterval>
                     intervalQueue = currentNode.iterable2D(fQuarks, subTimes).iterator();
                 }
             } catch (ClosedChannelException e) {
-                try (TraceCompassLogUtils.FlowScopeLog closedChannelLog = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
+                try (FlowScopeLog closedChannelLog = new FlowScopeLogBuilder(LOGGER, Level.FINER,
                         "HistoryTreeBackendIterator:query2D:channelClosed").setParentScope(fParentLog).build()) { //$NON-NLS-1$
                     return false;
                 }
@@ -85,7 +86,7 @@ class HistoryTreeBackendIterator implements Iterator<@NonNull ITmfStateInterval>
         }
         boolean hasNext = intervalQueue.hasNext();
         if (!hasNext) {
-            try (TraceCompassLogUtils.FlowScopeLog noNext = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
+            try (FlowScopeLog noNext = new FlowScopeLogBuilder(LOGGER, Level.FINER,
                     "HistoryTreeBackendIterator:query2D:iteratorEnd").setParentScope(fParentLog).build()) { //$NON-NLS-1$
             }
         }
