@@ -92,8 +92,7 @@ public class HT_IO {
 
     private static final int CACHE_SIZE = 200;
 
-    private static final CacheLoader<CacheKey, HTNode> NODE_LOADER = new CacheLoader<CacheKey, HTNode>() {
-
+    private static final class HTNodeCacheLoader extends CacheLoader<CacheKey, HTNode> {
         @Override
         public HTNode load(CacheKey key) throws IOException {
             HT_IO io = key.fStateHistory;
@@ -106,7 +105,9 @@ public class HT_IO {
                 return HTNode.readNode(io.fConfig, io.fFileChannelIn, key.fStateHistory.fNodeFactory);
             }
         }
-    };
+    }
+
+    private static final HTNodeCacheLoader NODE_LOADER = new HTNodeCacheLoader();
 
     private static final LoadingCache<CacheKey, HTNode> NODE_CACHE = CacheBuilder.newBuilder()
             .maximumSize(CACHE_SIZE).build(NODE_LOADER);
