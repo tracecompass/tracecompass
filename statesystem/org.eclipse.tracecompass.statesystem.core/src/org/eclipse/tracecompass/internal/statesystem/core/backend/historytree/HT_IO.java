@@ -63,7 +63,7 @@ public class HT_IO {
         public final HT_IO fStateHistory;
         public final int fSeqNumber;
 
-        public CacheKey(HT_IO stateHistory,  int seqNumber) {
+        public CacheKey(HT_IO stateHistory, int seqNumber) {
             fStateHistory = stateHistory;
             fSeqNumber = seqNumber;
         }
@@ -93,6 +93,7 @@ public class HT_IO {
     private static final int CACHE_SIZE = 200;
 
     private static final CacheLoader<CacheKey, HTNode> NODE_LOADER = new CacheLoader<CacheKey, HTNode>() {
+
         @Override
         public HTNode load(CacheKey key) throws IOException {
             HT_IO io = key.fStateHistory;
@@ -109,7 +110,6 @@ public class HT_IO {
 
     private static final LoadingCache<CacheKey, HTNode> NODE_CACHE = CacheBuilder.newBuilder()
             .maximumSize(CACHE_SIZE).build(NODE_LOADER);
-
 
     // ------------------------------------------------------------------------
     // Instance fields
@@ -129,8 +129,6 @@ public class HT_IO {
     // ------------------------------------------------------------------------
     // Methods
     // ------------------------------------------------------------------------
-
-
 
     /**
      * Standard constructor
@@ -204,7 +202,8 @@ public class HT_IO {
                 throw (ClosedChannelException) cause;
             }
             /*
-             * Other types of IOExceptions shouldn't happen at this point though.
+             * Other types of IOExceptions shouldn't happen at this point
+             * though.
              */
             Activator.getDefault().logError(e.getMessage(), e);
             throw new IllegalStateException(e);
@@ -216,16 +215,17 @@ public class HT_IO {
      *
      * @param queue
      *            NON-EMPTY queue of node sequence numbers to read from
-     * @return any node from the queue, returning cached nodes first, else resorting
-     *         to reading on disk.
+     * @return any node from the queue, returning cached nodes first, else
+     *         resorting to reading on disk.
      * @throws ClosedChannelException
      *             Usually happens because the file was closed while we were
-     *             reading. Instead of using a big reader-writer lock, we'll just
-     *             catch this exception.
+     *             reading. Instead of using a big reader-writer lock, we'll
+     *             just catch this exception.
      */
     public @NonNull HTNode readNode(Deque<Integer> queue) throws ClosedChannelException {
         /*
-         * Use an iterator in order to remove efficiently from the queue position
+         * Use an iterator in order to remove efficiently from the queue
+         * position
          */
         Iterator<Integer> iterator = queue.iterator();
         while (iterator.hasNext()) {
@@ -322,8 +322,8 @@ public class HT_IO {
     }
 
     /**
-     * Seek the given FileChannel to the position corresponding to the node that has
-     * seqNumber
+     * Seek the given FileChannel to the position corresponding to the node that
+     * has seqNumber
      *
      * @param fc
      *            the channel to seek
