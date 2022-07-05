@@ -718,8 +718,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @since 5.2
      */
     protected @NonNull Map<@NonNull String, @NonNull Object> getFetchAnnotationCategoriesParameters() {
-        HashMap<@NonNull String, @NonNull Object> categoriesParameters = new HashMap<>();
-        return categoriesParameters;
+        return new HashMap<>();
     }
 
     /**
