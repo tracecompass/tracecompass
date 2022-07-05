@@ -229,7 +229,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final String HIDE_LABELS_KEY = "hide.labels"; //$NON-NLS-1$
 
     private final class AnnotationMarkerEventSource implements IMarkerEventSource {
-        IOutputAnnotationProvider fProvider;
+        private IOutputAnnotationProvider fProvider;
 
         private AnnotationMarkerEventSource(IOutputAnnotationProvider ap) {
             fProvider = ap;
@@ -511,7 +511,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (columnIndex == 0) {
                 return entry.getName();
             }
-            return new String();
+            return ""; //$NON-NLS-1$
         }
 
         @Override
@@ -1489,7 +1489,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
-        fTimeGraphViewer.addMarkerListener(() -> restartZoomThread());
+        fTimeGraphViewer.addMarkerListener(this::restartZoomThread);
 
         timeGraphControl.addPaintListener(new PaintListener() {
 
@@ -2287,7 +2287,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
-    private void sortChildren(ITimeGraphEntry entry, Comparator<ITimeGraphEntry> comparator) {
+    private static void sortChildren(ITimeGraphEntry entry, Comparator<ITimeGraphEntry> comparator) {
         if (entry instanceof TimeGraphEntry) {
             ((TimeGraphEntry) entry).sortChildren(comparator);
         }
@@ -3142,7 +3142,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     @TmfSignalHandler
     public void regexFilterApplied(TmfFilterAppliedSignal signal) {
         // Restart the zoom thread to apply the new filter
-        Display.getDefault().asyncExec(() -> restartZoomThread());
+        Display.getDefault().asyncExec(this::restartZoomThread);
     }
 
     /**
