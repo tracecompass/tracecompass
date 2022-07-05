@@ -184,6 +184,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         if (presentationProvider instanceof BaseDataProviderTimeGraphPresentationProvider) {
             ((BaseDataProviderTimeGraphPresentationProvider) presentationProvider).addProvider(dataProvider, getTooltipResolver(dataProvider));
         }
+        double factor = 1.0;
         boolean complete = false;
         while (!complete && !monitor.isCanceled()) {
             Map<@NonNull String, @NonNull Object> parameters = getFetchTreeParameters();
@@ -195,7 +196,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 return;
             }
             complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
-            double factor = 1.0;
             TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
