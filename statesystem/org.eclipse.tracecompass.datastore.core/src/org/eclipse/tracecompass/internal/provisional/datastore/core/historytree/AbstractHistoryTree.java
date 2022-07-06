@@ -204,8 +204,10 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
          * Open the file ourselves, get the tree header information we need,
          * then pass on the descriptor to the TreeIO object.
          */
-        int rootNodeSeqNb, res;
-        int bs, maxc;
+        int rootNodeSeqNb;
+        int res;
+        int bs;
+        int maxc;
         long startTime;
 
         /* Java I/O mumbo jumbo... */
@@ -217,7 +219,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
         }
 
         try (FileInputStream fis = new FileInputStream(existingStateFile);
-                FileChannel fc = fis.getChannel();) {
+                FileChannel fc = fis.getChannel()) {
 
             ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
             buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -317,7 +319,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
         // the one we'll query first... Won't it build itself later?
 
         /* Follow the last branch up to the leaf */
-        while (nextChildNode.getNodeType() == HTNode.NodeType.CORE) {
+        while (nextChildNode.getNodeType() == IHTNode.NodeType.CORE) {
             nextChildNode = fTreeIO.readNode(nextChildNode.getLatestChild());
             list.add(nextChildNode);
         }
@@ -848,7 +850,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
                 fTreeIO.writeNode(fLatestBranch.get(i));
             }
 
-            try (FileOutputStream fc = fTreeIO.getFileWriter(-1);) {
+            try (FileOutputStream fc = fTreeIO.getFileWriter(-1)) {
                 ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);
                 buffer.clear();
@@ -908,7 +910,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
                     continue;
                 }
 
-                if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                if (currentNode.getNodeType() == IHTNode.NodeType.CORE) {
                     /* Here we add the relevant children nodes for BFS */
                     queue.addAll(currentNode.selectNextChildren(nodeCondition, currentNode.getCoreDataPredicate(extraPredicate)));
                 }
@@ -916,6 +918,7 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
                 intervalsOfNodes.addAll(nodeIntervals);
             }
         } catch (ClosedChannelException e) {
+            // ignored
         }
         return intervalsOfNodes;
     }
@@ -940,12 +943,13 @@ public abstract class AbstractHistoryTree<E extends IHTInterval, N extends HTNod
                     return interval;
                 }
 
-                if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                if (currentNode.getNodeType() == IHTNode.NodeType.CORE) {
                     /* Here we add the relevant children nodes for BFS */
                     queue.addAll(currentNode.selectNextChildren(timeCondition));
                 }
             }
         } catch (ClosedChannelException e) {
+            // ignored
         }
         return null;
     }
