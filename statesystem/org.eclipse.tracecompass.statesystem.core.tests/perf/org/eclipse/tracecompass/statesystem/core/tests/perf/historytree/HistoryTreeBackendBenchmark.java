@@ -122,7 +122,7 @@ public class HistoryTreeBackendBenchmark {
 
         private final List<Object> fValues;
 
-        private HTBValues(List<Object> values) {
+        HTBValues(List<Object> values) {
             fValues = values;
         }
 
@@ -132,7 +132,7 @@ public class HistoryTreeBackendBenchmark {
     }
 
     @FunctionalInterface
-    private static interface IIntervalDistribution {
+    private interface IIntervalDistribution {
         long getNextEndTime(Random randomGenerator, long limit);
     }
 
@@ -258,7 +258,7 @@ public class HistoryTreeBackendBenchmark {
     @Test
     public void testBenchmark() {
         /* Check arguments */
-        long totalTime = this.fNbAvgIntervals * INTERVAL_AVG_TIME;
+        long totalTime = (long) this.fNbAvgIntervals * INTERVAL_AVG_TIME;
 
         Performance perf = Performance.getDefault();
         PerformanceMeter pmBuild = perf.createPerformanceMeter(TEST_PREFIX + TEST_BUILDING_ID + fName);
@@ -320,7 +320,7 @@ public class HistoryTreeBackendBenchmark {
                  * Benchmark the single queries: for each random timestamp,
                  * query a random attribute
                  */
-                List<Integer> subAttributes = ss.getSubAttributes(rootQuark, false);
+                @NonNull List<@NonNull Integer> subAttributes = ss.getSubAttributes(rootQuark, false);
                 pmSingleQuery.start();
                 for (int j = 0; j < QUERY_COUNT; j++) {
                     long ts = getNextRandomValue(randomGenerator, totalTime);
