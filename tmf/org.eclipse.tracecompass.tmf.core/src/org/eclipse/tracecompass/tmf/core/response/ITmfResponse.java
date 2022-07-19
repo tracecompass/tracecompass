@@ -22,7 +22,7 @@ package org.eclipse.tracecompass.tmf.core.response;
 public interface ITmfResponse {
 
     /**
-     * The status of the response can be either a runing, completed, failed or
+     * The status of the response can be either a running, completed, failed or
      * cancelled
      *
      * @author Yonni Chen
@@ -30,12 +30,13 @@ public interface ITmfResponse {
     enum Status {
         /**
          * Model is partial, data provider is still computing. If this status is
-         * returned, it's viewer responsability to request again the data provider after
-         * waiting some time. Request data provider until COMPLETED status is received
+         * returned, it's viewer responsibility to request again the data
+         * provider after waiting some time. Request data provider until
+         * COMPLETED status is received.
          */
         RUNNING,
         /**
-         * Model is complete, no need to request data provider again
+         * Model is complete, no need to request data provider again.
          */
         COMPLETED,
         /**
@@ -43,7 +44,8 @@ public interface ITmfResponse {
          */
         FAILED,
         /**
-         * Task has been cancelled. Please see logs or detailed message of status.
+         * Task has been cancelled. Please see logs or detailed message of
+         * status.
          */
         CANCELLED
     }
@@ -51,7 +53,7 @@ public interface ITmfResponse {
     /**
      * Gets the status of the response
      *
-     * @return A {@link Status}
+     * @return A {@link Status}.
      */
     Status getStatus();
 
