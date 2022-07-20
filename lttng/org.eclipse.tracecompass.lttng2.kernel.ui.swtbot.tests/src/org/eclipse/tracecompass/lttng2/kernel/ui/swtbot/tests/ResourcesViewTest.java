@@ -124,9 +124,9 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
 
     @Override
     protected List<String> getToolbarTooltips() {
-        return Arrays.asList("Hide Empty Rows", "Show View Filters", "Show Legend", SEPARATOR,
-                "Reset the Time Scale to Default", "Select Previous State Change", "Select Next State Change", SEPARATOR,
-                "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
+        return Arrays.asList(HIDE_EMPTY_ROWS, "Show View Filters", "Show Legend", SEPARATOR,
+                "Reset the Time Scale to Default", SELECT_PREVIOUS_STATE_CHANGE, SELECT_NEXT_STATE_CHANGE, SEPARATOR,
+                ADD_BOOKMARK, PREVIOUS_MARKER, NEXT_MARKER, SEPARATOR,
                 "Select Previous Resource", "Select Next Resource", "Zoom In", "Zoom Out", SEPARATOR,
                 "Pin View");
     }
