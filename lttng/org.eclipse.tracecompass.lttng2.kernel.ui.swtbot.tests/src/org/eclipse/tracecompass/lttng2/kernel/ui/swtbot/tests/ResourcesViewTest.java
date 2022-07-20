@@ -67,14 +67,13 @@ import org.junit.Test;
  * @author Patrick Tasse
  */
 public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
-    private static final String CHECK_SELECTED = "Check selected";
 
+    private static final String CHECK_SELECTED = "Check selected";
     private static final String CHECK_ALL = "Check all";
     private static final String CHECK_SUBTREE = "Check subtree";
     private static final String UNCHECK_SELECTED = "Uncheck selected";
     private static final String UNCHECK_ALL = "Uncheck all";
     private static final String UNCHECK_SUBTREE = "Uncheck subtree";
-
 
     private static final String NEXT_MARKER = "Next Marker";
     private static final String PREVIOUS_MARKER = "Previous Marker";
@@ -86,6 +85,16 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final String HIDE_EMPTY_ROWS = "Hide Empty Rows";
     private static final String LOST_EVENTS = "Lost Events";
     private static final String OK = "OK";
+
+    private static final String PIN_VIEW = "Pin View";
+    private static final String RESET_THE_TIME_SCALE_TO_DEFAULT = "Reset the Time Scale to Default";
+    private static final String SELECT_NEXT_RESOURCE = "Select Next Resource";
+    private static final String SELECT_PREVIOUS_RESOURCE = "Select Previous Resource";
+    private static final String SHOW_LEGEND = "Show Legend";
+    private static final String SHOW_VIEW_FILTERS = "Show View Filters";
+    private static final String ZOOM_IN = "Zoom In";
+    private static final String ZOOM_OUT = "Zoom Out";
+
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
     private static final @NonNull ITmfTimestamp LOST_EVENT_TIME1 = TmfTimestamp.fromNanos(1368000272697356476L);
     private static final @NonNull ITmfTimestamp LOST_EVENT_END1 = TmfTimestamp.fromNanos(1368000272703627994L);
@@ -100,11 +109,11 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final @NonNull ITmfTimestamp CPU0_TIME5 = TmfTimestamp.fromNanos(1368000272652497502L);
     private static final @NonNull ITmfTimestamp START_FOR_EMPTY_ROWS_TEST = TmfTimestamp.fromNanos(1368000272651423332L);
     private static final @NonNull ITmfTimestamp END_FOR_EMPTY_ROWS_TEST = TmfTimestamp.fromNanos(1368000272651836454L);
+
     private static final String CPU0_THREADS = "CPU 0 Threads";
     private static final int TOP_MARGIN = 1;
     private static final Point TOGGLE_SIZE = new Point(7, 8);
     private static final Point HIDE_SIZE = new Point(16, 16);
-
 
     @Override
     protected SWTBotView getViewBot() {
@@ -124,11 +133,11 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
 
     @Override
     protected List<String> getToolbarTooltips() {
-        return Arrays.asList(HIDE_EMPTY_ROWS, "Show View Filters", "Show Legend", SEPARATOR,
-                "Reset the Time Scale to Default", SELECT_PREVIOUS_STATE_CHANGE, SELECT_NEXT_STATE_CHANGE, SEPARATOR,
+        return Arrays.asList(HIDE_EMPTY_ROWS, SHOW_VIEW_FILTERS, SHOW_LEGEND, SEPARATOR,
+                RESET_THE_TIME_SCALE_TO_DEFAULT, SELECT_PREVIOUS_STATE_CHANGE, SELECT_NEXT_STATE_CHANGE, SEPARATOR,
                 ADD_BOOKMARK, PREVIOUS_MARKER, NEXT_MARKER, SEPARATOR,
-                "Select Previous Resource", "Select Next Resource", "Zoom In", "Zoom Out", SEPARATOR,
-                "Pin View");
+                SELECT_PREVIOUS_RESOURCE, SELECT_NEXT_RESOURCE, ZOOM_IN, ZOOM_OUT, SEPARATOR,
+                PIN_VIEW);
     }
 
     /**
@@ -492,12 +501,13 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(1000000L, ITmfTimestamp.NANOSECOND_SCALE));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
-        SWTBotToolbarButton filterButton = getViewBot().toolbarButton("Show View Filters");
+        SWTBotToolbarButton filterButton = getViewBot().toolbarButton(ResourcesViewTest.SHOW_VIEW_FILTERS);
         filterButton.click();
         SWTBot bot = fBot.shell("Filter").activate().bot();
         /*
-         * The filtered tree initialization triggers a delayed refresh job that can
-         * interfere with the tree selection. Wait for new refresh jobs to avoid this.
+         * The filtered tree initialization triggers a delayed refresh job that
+         * can interfere with the tree selection. Wait for new refresh jobs to
+         * avoid this.
          */
         SWTBotTree treeBot = bot.tree();
         // set filter text
