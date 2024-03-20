@@ -1,3 +1,6 @@
+# This is moved to https://github.com/eclipse-tracecompass/org.eclipse.tracecompass
+
+
 Eclipse Trace Compass
 =====================
 
